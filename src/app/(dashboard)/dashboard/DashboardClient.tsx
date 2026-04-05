@@ -524,32 +524,6 @@ export default function DashboardClient({ session }: { session: Session }) {
                                 }}
                             />
                         </div>
-                        <button
-                            onClick={fetchStats}
-                            className="btn-primary"
-                            style={{
-                                padding: "6px 16px",
-                                fontSize: "var(--text-xs)",
-                                borderRadius: "var(--radius-md)",
-                                display: "flex",
-                                alignItems: "center",
-                                gap: "var(--space-1)",
-                            }}
-                        >
-                            <svg
-                                width="11"
-                                height="11"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2.5"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                            >
-                                <polyline points="20 6 9 17 4 12" />
-                            </svg>
-                            Aplicar
-                        </button>
                     </div>
                 )}
             </div>
