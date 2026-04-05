@@ -968,7 +968,6 @@ export default function TransactionsPage() {
                                                     "var(--radius-md)",
                                                 fontSize: "var(--text-sm)",
                                                 fontWeight: 600,
-                                                border: "none",
                                                 cursor: "pointer",
                                                 transition:
                                                     "all var(--transition-base)",
