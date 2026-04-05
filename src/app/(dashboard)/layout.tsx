@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { signOut } from "@/lib/auth";
+import NavLinks, { NavMobileLinks } from "./NavLinks";
 
 const navItems = [
     {
@@ -191,30 +192,7 @@ export default async function DashboardLayout({
                     >
                         Menu
                     </p>
-                    {navItems.map((item) => (
-                        <Link
-                            key={item.href}
-                            href={item.href}
-                            className="nav-link"
-                        >
-                            <span
-                                style={{
-                                    color: "inherit",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    flexShrink: 0,
-                                }}
-                            >
-                                {item.icon}
-                            </span>
-                            <span
-                                className="nav-label"
-                                style={{ whiteSpace: "nowrap" }}
-                            >
-                                {item.label}
-                            </span>
-                        </Link>
-                    ))}
+                    <NavLinks />
                 </nav>
 
                 <div
@@ -374,26 +352,7 @@ export default async function DashboardLayout({
                         gap: "4px",
                     }}
                 >
-                    {navItems.map((item) => (
-                        <Link
-                            key={item.href}
-                            href={item.href}
-                            style={{
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                width: "36px",
-                                height: "36px",
-                                borderRadius: "var(--radius-md)",
-                                color: "var(--text-muted)",
-                                textDecoration: "none",
-                                transition:
-                                    "background var(--transition-base), color var(--transition-base)",
-                            }}
-                        >
-                            {item.icon}
-                        </Link>
-                    ))}
+                    <NavMobileLinks />
                 </nav>
             </div>
 

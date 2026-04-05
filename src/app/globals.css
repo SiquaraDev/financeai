@@ -733,10 +733,12 @@ select option {
     font-weight: 500;
     color: var(--text-muted);
     text-decoration: none;
+    line-height: 1;
     transition:
         background var(--transition-base),
         color var(--transition-base);
 }
+
 .nav-link:hover {
     background: var(--bg-elevated);
     color: var(--text-secondary);
