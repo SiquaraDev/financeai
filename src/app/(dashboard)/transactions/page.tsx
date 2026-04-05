@@ -67,6 +67,7 @@ export default function TransactionsPage() {
         setEditingId(null);
         setShowModal(true);
     };
+
     const openEdit = (t: Transaction) => {
         setForm({
             title: t.title,
@@ -183,37 +184,120 @@ export default function TransactionsPage() {
             : TRANSACTION_CATEGORIES.EXPENSE;
 
     return (
-        <div className="p-6">
-            <div className="flex items-center justify-between mb-6">
+        <div
+            style={{
+                padding: "clamp(.75rem, 4vw, 2rem)",
+                width: "100%",
+                maxWidth: "1400px",
+                margin: "0 auto",
+                boxSizing: "border-box",
+            }}
+        >
+            {/* Header */}
+            <div
+                style={{
+                    display: "flex",
+                    alignItems: "flex-start",
+                    justifyContent: "space-between",
+                    gap: "1rem",
+                    marginBottom: "1.5rem",
+                    flexWrap: "wrap",
+                }}
+            >
                 <div>
-                    <h1 className="text-xl font-medium text-gray-900">
+                    <h1
+                        className="font-display"
+                        style={{
+                            fontSize: "clamp(18px, 5vw, 28px)",
+                            fontWeight: 800,
+                            color: "var(--text-primary)",
+                            letterSpacing: "-0.03em",
+                            lineHeight: 1.2,
+                        }}
+                    >
                         Transações
                     </h1>
-                    <p className="text-sm text-gray-500">
-                        {total} registros no total
+                    <p
+                        style={{
+                            fontSize: "var(--text-sm)",
+                            color: "var(--text-muted)",
+                            marginTop: ".25rem",
+                        }}
+                    >
+                        {total} registro{total !== 1 ? "s" : ""} no total
                     </p>
                 </div>
-                <div className="flex gap-2">
+                <div style={{ display: "flex", gap: ".625rem", flexShrink: 0 }}>
                     <button
                         onClick={() => {
                             setShowImport(true);
                             setImportError("");
                         }}
-                        className="border border-gray-200 rounded-lg px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 transition-colors"
+                        className="btn-ghost"
+                        style={{
+                            padding: ".5rem 1rem",
+                            fontSize: "var(--text-sm)",
+                            borderRadius: "var(--radius-md)",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: ".375rem",
+                        }}
                     >
-                        + Importar
+                        <svg
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                        >
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="17 8 12 3 7 8" />
+                            <line x1="12" y1="3" x2="12" y2="15" />
+                        </svg>
+                        Importar
                     </button>
                     <button
                         onClick={openCreate}
-                        className="bg-blue-600 text-white rounded-lg px-4 py-2 text-sm font-medium hover:bg-blue-700 transition-colors"
+                        className="btn-primary"
+                        style={{
+                            padding: ".5rem 1rem",
+                            fontSize: "var(--text-sm)",
+                            borderRadius: "var(--radius-md)",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: ".375rem",
+                        }}
                     >
-                        + Nova
+                        <svg
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                        >
+                            <line x1="12" y1="5" x2="12" y2="19" />
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                        </svg>
+                        Nova
                     </button>
                 </div>
             </div>
 
             {/* Filtros */}
-            <div className="flex gap-2 mb-5">
+            <div
+                style={{
+                    display: "flex",
+                    gap: ".5rem",
+                    marginBottom: "1.25rem",
+                    flexWrap: "wrap",
+                }}
+            >
                 {(["ALL", "INCOME", "EXPENSE"] as const).map((f) => (
                     <button
                         key={f}
@@ -221,11 +305,28 @@ export default function TransactionsPage() {
                             setFilter(f);
                             setPage(1);
                         }}
-                        className={`px-4 py-1.5 rounded-full text-sm transition-colors ${
-                            filter === f
-                                ? "bg-blue-50 text-blue-600 font-medium"
-                                : "border border-gray-200 text-gray-500 hover:bg-gray-50"
-                        }`}
+                        style={{
+                            padding: ".375rem .875rem",
+                            borderRadius: "var(--radius-full)",
+                            fontSize: "var(--text-sm)",
+                            fontWeight: filter === f ? 600 : 500,
+                            cursor: "pointer",
+                            transition: "all var(--transition-base)",
+                            border:
+                                filter === f
+                                    ? "none"
+                                    : "1px solid var(--border)",
+                            background:
+                                filter === f
+                                    ? "var(--gradient-brand)"
+                                    : "transparent",
+                            color:
+                                filter === f
+                                    ? "var(--text-on-brand)"
+                                    : "var(--text-muted)",
+                            boxShadow:
+                                filter === f ? "var(--shadow-brand)" : "none",
+                        }}
                     >
                         {f === "ALL"
                             ? "Todas"
@@ -236,67 +337,476 @@ export default function TransactionsPage() {
                 ))}
             </div>
 
-            {/* Lista */}
-            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+            {/* Lista — mobile: cards / desktop: tabela */}
+            <div className="card-glass" style={{ overflow: "hidden" }}>
                 {loading ? (
-                    <div className="p-8 text-center text-sm text-gray-400">
+                    <div
+                        style={{
+                            padding: "3rem",
+                            textAlign: "center",
+                            color: "var(--text-muted)",
+                            fontSize: "var(--text-sm)",
+                        }}
+                    >
                         Carregando...
                     </div>
                 ) : transactions.length === 0 ? (
-                    <div className="p-8 text-center text-sm text-gray-400">
-                        Nenhuma transação encontrada.
+                    <div style={{ padding: "3rem", textAlign: "center" }}>
+                        <svg
+                            width="32"
+                            height="32"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="var(--text-dim)"
+                            strokeWidth="1.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            style={{ margin: "0 auto .75rem" }}
+                        >
+                            <rect x="2" y="3" width="20" height="14" rx="2" />
+                            <line x1="8" y1="21" x2="16" y2="21" />
+                            <line x1="12" y1="17" x2="12" y2="21" />
+                        </svg>
+                        <p
+                            style={{
+                                fontSize: "var(--text-sm)",
+                                color: "var(--text-muted)",
+                            }}
+                        >
+                            Nenhuma transação encontrada.
+                        </p>
                     </div>
                 ) : (
-                    <table className="w-full">
-                        <thead>
-                            <tr className="border-b border-gray-100 bg-gray-50">
-                                <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">
-                                    Descrição
-                                </th>
-                                <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">
-                                    Categoria
-                                </th>
-                                <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">
-                                    Data
-                                </th>
-                                <th className="text-right px-4 py-3 text-xs text-gray-500 font-medium">
-                                    Valor
-                                </th>
-                                <th className="px-4 py-3" />
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {transactions.map((t) => (
-                                <tr
-                                    key={t.id}
-                                    className="border-b border-gray-50 hover:bg-gray-50 transition-colors"
-                                >
-                                    <td className="px-4 py-3 text-sm text-gray-900">
-                                        {t.title}
-                                    </td>
-                                    <td className="px-4 py-3">
-                                        <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
-                                            {t.category}
-                                        </span>
-                                    </td>
-                                    <td className="px-4 py-3 text-sm text-gray-400">
-                                        {format(new Date(t.date), "dd/MM/yyyy")}
-                                    </td>
-                                    <td
-                                        className={`px-4 py-3 text-sm font-medium text-right ${
-                                            t.type === "INCOME"
-                                                ? "text-green-600"
-                                                : "text-red-500"
-                                        }`}
+                    <>
+                        {/* Desktop: tabela */}
+                        <div className="tx-table-wrapper">
+                            <table
+                                style={{
+                                    width: "100%",
+                                    borderCollapse: "collapse",
+                                }}
+                            >
+                                <thead>
+                                    <tr
+                                        style={{
+                                            borderBottom:
+                                                "1px solid var(--border-subtle)",
+                                        }}
                                     >
-                                        {t.type === "INCOME" ? "+" : "-"}
-                                        {formatCurrency(Number(t.amount))}
-                                    </td>
-                                    <td className="px-4 py-3">
-                                        <div className="flex gap-3 justify-end">
+                                        {[
+                                            "Descrição",
+                                            "Categoria",
+                                            "Data",
+                                            "Valor",
+                                            "",
+                                        ].map((h) => (
+                                            <th
+                                                key={h}
+                                                style={{
+                                                    padding: ".75rem 1rem",
+                                                    textAlign:
+                                                        h === "Valor" ||
+                                                        h === ""
+                                                            ? "right"
+                                                            : "left",
+                                                    fontSize: "var(--text-xs)",
+                                                    fontWeight: 600,
+                                                    color: "var(--text-muted)",
+                                                    textTransform: "uppercase",
+                                                    letterSpacing: ".06em",
+                                                    background:
+                                                        "var(--bg-elevated)",
+                                                    whiteSpace: "nowrap",
+                                                }}
+                                            >
+                                                {h}
+                                            </th>
+                                        ))}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {transactions.map((t) => (
+                                        <tr
+                                            key={t.id}
+                                            style={{
+                                                borderBottom:
+                                                    "1px solid var(--border-subtle)",
+                                                transition:
+                                                    "background var(--transition-base)",
+                                            }}
+                                            onMouseEnter={(e) =>
+                                                (e.currentTarget.style.background =
+                                                    "var(--bg-elevated)")
+                                            }
+                                            onMouseLeave={(e) =>
+                                                (e.currentTarget.style.background =
+                                                    "transparent")
+                                            }
+                                        >
+                                            <td
+                                                style={{
+                                                    padding: ".75rem 1rem",
+                                                }}
+                                            >
+                                                <div
+                                                    style={{
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                        gap: ".625rem",
+                                                    }}
+                                                >
+                                                    <div
+                                                        style={{
+                                                            width: "28px",
+                                                            height: "28px",
+                                                            flexShrink: 0,
+                                                            borderRadius:
+                                                                "var(--radius-md)",
+                                                            background:
+                                                                t.type ===
+                                                                "INCOME"
+                                                                    ? "var(--color-success-bg)"
+                                                                    : "var(--color-danger-bg)",
+                                                            border: `1px solid ${t.type === "INCOME" ? "var(--color-success-border)" : "var(--color-danger-border)"}`,
+                                                            display: "flex",
+                                                            alignItems:
+                                                                "center",
+                                                            justifyContent:
+                                                                "center",
+                                                        }}
+                                                    >
+                                                        <svg
+                                                            width="11"
+                                                            height="11"
+                                                            viewBox="0 0 24 24"
+                                                            fill="none"
+                                                            stroke={
+                                                                t.type ===
+                                                                "INCOME"
+                                                                    ? "var(--color-success-light)"
+                                                                    : "var(--color-danger-light)"
+                                                            }
+                                                            strokeWidth="2.5"
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
+                                                        >
+                                                            {t.type ===
+                                                            "INCOME" ? (
+                                                                <>
+                                                                    <line
+                                                                        x1="12"
+                                                                        y1="19"
+                                                                        x2="12"
+                                                                        y2="5"
+                                                                    />
+                                                                    <polyline points="5 12 12 5 19 12" />
+                                                                </>
+                                                            ) : (
+                                                                <>
+                                                                    <line
+                                                                        x1="12"
+                                                                        y1="5"
+                                                                        x2="12"
+                                                                        y2="19"
+                                                                    />
+                                                                    <polyline points="19 12 12 19 5 12" />
+                                                                </>
+                                                            )}
+                                                        </svg>
+                                                    </div>
+                                                    <span
+                                                        style={{
+                                                            fontSize:
+                                                                "var(--text-sm)",
+                                                            color: "var(--text-primary)",
+                                                            fontWeight: 500,
+                                                        }}
+                                                    >
+                                                        {t.title}
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td
+                                                style={{
+                                                    padding: ".75rem 1rem",
+                                                }}
+                                            >
+                                                <span
+                                                    style={{
+                                                        fontSize:
+                                                            "var(--text-xs)",
+                                                        fontWeight: 500,
+                                                        padding: "2px 8px",
+                                                        borderRadius:
+                                                            "var(--radius-full)",
+                                                        background:
+                                                            "var(--bg-elevated)",
+                                                        border: "1px solid var(--border-subtle)",
+                                                        color: "var(--text-secondary)",
+                                                        whiteSpace: "nowrap",
+                                                    }}
+                                                >
+                                                    {t.category}
+                                                </span>
+                                            </td>
+                                            <td
+                                                style={{
+                                                    padding: ".75rem 1rem",
+                                                    fontSize: "var(--text-sm)",
+                                                    color: "var(--text-muted)",
+                                                    whiteSpace: "nowrap",
+                                                }}
+                                            >
+                                                {format(
+                                                    new Date(t.date),
+                                                    "dd/MM/yyyy",
+                                                )}
+                                            </td>
+                                            <td
+                                                style={{
+                                                    padding: ".75rem 1rem",
+                                                    textAlign: "right",
+                                                }}
+                                            >
+                                                <span
+                                                    className="font-mono"
+                                                    style={{
+                                                        fontSize:
+                                                            "var(--text-sm)",
+                                                        fontWeight: 600,
+                                                        color:
+                                                            t.type === "INCOME"
+                                                                ? "var(--color-success-light)"
+                                                                : "var(--color-danger-light)",
+                                                        whiteSpace: "nowrap",
+                                                    }}
+                                                >
+                                                    {t.type === "INCOME"
+                                                        ? "+"
+                                                        : "-"}
+                                                    {formatCurrency(
+                                                        Number(t.amount),
+                                                    )}
+                                                </span>
+                                            </td>
+                                            <td
+                                                style={{
+                                                    padding: ".75rem 1rem",
+                                                    textAlign: "right",
+                                                }}
+                                            >
+                                                <div
+                                                    style={{
+                                                        display: "flex",
+                                                        gap: ".5rem",
+                                                        justifyContent:
+                                                            "flex-end",
+                                                    }}
+                                                >
+                                                    <button
+                                                        onClick={() =>
+                                                            openEdit(t)
+                                                        }
+                                                        style={{
+                                                            fontSize:
+                                                                "var(--text-xs)",
+                                                            fontWeight: 500,
+                                                            color: "var(--accent-brand-light)",
+                                                            background: "none",
+                                                            border: "none",
+                                                            cursor: "pointer",
+                                                            padding: "4px 8px",
+                                                            borderRadius:
+                                                                "var(--radius-sm)",
+                                                            transition:
+                                                                "background var(--transition-base)",
+                                                        }}
+                                                        onMouseEnter={(e) =>
+                                                            (e.currentTarget.style.background =
+                                                                "var(--accent-brand-glow)")
+                                                        }
+                                                        onMouseLeave={(e) =>
+                                                            (e.currentTarget.style.background =
+                                                                "none")
+                                                        }
+                                                    >
+                                                        Editar
+                                                    </button>
+                                                    <button
+                                                        onClick={() =>
+                                                            handleDelete(t.id)
+                                                        }
+                                                        style={{
+                                                            fontSize:
+                                                                "var(--text-xs)",
+                                                            fontWeight: 500,
+                                                            color: "var(--color-danger-light)",
+                                                            background: "none",
+                                                            border: "none",
+                                                            cursor: "pointer",
+                                                            padding: "4px 8px",
+                                                            borderRadius:
+                                                                "var(--radius-sm)",
+                                                            transition:
+                                                                "background var(--transition-base)",
+                                                        }}
+                                                        onMouseEnter={(e) =>
+                                                            (e.currentTarget.style.background =
+                                                                "var(--color-danger-bg)")
+                                                        }
+                                                        onMouseLeave={(e) =>
+                                                            (e.currentTarget.style.background =
+                                                                "none")
+                                                        }
+                                                    >
+                                                        Excluir
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* Mobile: cards */}
+                        <div className="tx-cards-wrapper">
+                            {transactions.map((t) => (
+                                <div
+                                    key={t.id}
+                                    style={{
+                                        padding: ".875rem 1rem",
+                                        borderBottom:
+                                            "1px solid var(--border-subtle)",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: ".75rem",
+                                    }}
+                                >
+                                    <div
+                                        style={{
+                                            width: "36px",
+                                            height: "36px",
+                                            flexShrink: 0,
+                                            borderRadius: "var(--radius-md)",
+                                            background:
+                                                t.type === "INCOME"
+                                                    ? "var(--color-success-bg)"
+                                                    : "var(--color-danger-bg)",
+                                            border: `1px solid ${t.type === "INCOME" ? "var(--color-success-border)" : "var(--color-danger-border)"}`,
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                        }}
+                                    >
+                                        <svg
+                                            width="14"
+                                            height="14"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke={
+                                                t.type === "INCOME"
+                                                    ? "var(--color-success-light)"
+                                                    : "var(--color-danger-light)"
+                                            }
+                                            strokeWidth="2.5"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                        >
+                                            {t.type === "INCOME" ? (
+                                                <>
+                                                    <line
+                                                        x1="12"
+                                                        y1="19"
+                                                        x2="12"
+                                                        y2="5"
+                                                    />
+                                                    <polyline points="5 12 12 5 19 12" />
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <line
+                                                        x1="12"
+                                                        y1="5"
+                                                        x2="12"
+                                                        y2="19"
+                                                    />
+                                                    <polyline points="19 12 12 19 5 12" />
+                                                </>
+                                            )}
+                                        </svg>
+                                    </div>
+                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                        <p
+                                            style={{
+                                                fontSize: "var(--text-sm)",
+                                                fontWeight: 500,
+                                                color: "var(--text-primary)",
+                                                overflow: "hidden",
+                                                textOverflow: "ellipsis",
+                                                whiteSpace: "nowrap",
+                                            }}
+                                        >
+                                            {t.title}
+                                        </p>
+                                        <p
+                                            style={{
+                                                fontSize: "var(--text-xs)",
+                                                color: "var(--text-muted)",
+                                                marginTop: "2px",
+                                            }}
+                                        >
+                                            {t.category} ·{" "}
+                                            {format(
+                                                new Date(t.date),
+                                                "dd/MM/yyyy",
+                                            )}
+                                        </p>
+                                    </div>
+                                    <div
+                                        style={{
+                                            display: "flex",
+                                            flexDirection: "column",
+                                            alignItems: "flex-end",
+                                            gap: ".375rem",
+                                            flexShrink: 0,
+                                        }}
+                                    >
+                                        <span
+                                            className="font-mono"
+                                            style={{
+                                                fontSize: "var(--text-sm)",
+                                                fontWeight: 600,
+                                                color:
+                                                    t.type === "INCOME"
+                                                        ? "var(--color-success-light)"
+                                                        : "var(--color-danger-light)",
+                                                whiteSpace: "nowrap",
+                                            }}
+                                        >
+                                            {t.type === "INCOME" ? "+" : "-"}
+                                            {formatCurrency(Number(t.amount))}
+                                        </span>
+                                        <div
+                                            style={{
+                                                display: "flex",
+                                                gap: ".375rem",
+                                            }}
+                                        >
                                             <button
                                                 onClick={() => openEdit(t)}
-                                                className="text-xs text-blue-500 hover:text-blue-700"
+                                                style={{
+                                                    fontSize: "10px",
+                                                    fontWeight: 500,
+                                                    color: "var(--accent-brand-light)",
+                                                    background:
+                                                        "var(--accent-brand-glow)",
+                                                    border: "1px solid var(--border-glow)",
+                                                    cursor: "pointer",
+                                                    padding: "3px 8px",
+                                                    borderRadius:
+                                                        "var(--radius-sm)",
+                                                }}
                                             >
                                                 Editar
                                             </button>
@@ -304,51 +814,142 @@ export default function TransactionsPage() {
                                                 onClick={() =>
                                                     handleDelete(t.id)
                                                 }
-                                                className="text-xs text-red-400 hover:text-red-600"
+                                                style={{
+                                                    fontSize: "10px",
+                                                    fontWeight: 500,
+                                                    color: "var(--color-danger-light)",
+                                                    background:
+                                                        "var(--color-danger-bg)",
+                                                    border: "1px solid var(--color-danger-border)",
+                                                    cursor: "pointer",
+                                                    padding: "3px 8px",
+                                                    borderRadius:
+                                                        "var(--radius-sm)",
+                                                }}
                                             >
                                                 Excluir
                                             </button>
                                         </div>
-                                    </td>
-                                </tr>
+                                    </div>
+                                </div>
                             ))}
-                        </tbody>
-                    </table>
+                        </div>
+                    </>
                 )}
             </div>
 
             {/* Paginação */}
             {total > 15 && (
-                <div className="flex justify-center gap-2 mt-4">
+                <div
+                    style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        gap: ".75rem",
+                        marginTop: "1.25rem",
+                        flexWrap: "wrap",
+                    }}
+                >
                     <button
                         onClick={() => setPage((p) => Math.max(1, p - 1))}
                         disabled={page === 1}
-                        className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg disabled:opacity-40 hover:bg-gray-50"
+                        className="btn-ghost"
+                        style={{
+                            padding: ".375rem .875rem",
+                            fontSize: "var(--text-sm)",
+                            borderRadius: "var(--radius-md)",
+                            opacity: page === 1 ? 0.4 : 1,
+                        }}
                     >
-                        Anterior
+                        ← Anterior
                     </button>
-                    <span className="px-3 py-1.5 text-sm text-gray-500">
-                        Página {page} de {Math.ceil(total / 15)}
+                    <span
+                        style={{
+                            fontSize: "var(--text-sm)",
+                            color: "var(--text-muted)",
+                        }}
+                    >
+                        {page} / {Math.ceil(total / 15)}
                     </span>
                     <button
                         onClick={() => setPage((p) => p + 1)}
                         disabled={page >= Math.ceil(total / 15)}
-                        className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg disabled:opacity-40 hover:bg-gray-50"
+                        className="btn-ghost"
+                        style={{
+                            padding: ".375rem .875rem",
+                            fontSize: "var(--text-sm)",
+                            borderRadius: "var(--radius-md)",
+                            opacity: page >= Math.ceil(total / 15) ? 0.4 : 1,
+                        }}
                     >
-                        Próxima
+                        Próxima →
                     </button>
                 </div>
             )}
 
             {/* Modal criar/editar */}
             {showModal && (
-                <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-2xl w-full max-w-md p-6">
-                        <h2 className="text-base font-medium text-gray-900 mb-5">
+                <div
+                    style={{
+                        position: "fixed",
+                        inset: 0,
+                        background: "var(--bg-overlay)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        zIndex: 50,
+                        padding: "1rem",
+                    }}
+                >
+                    <div
+                        className="card-glass animate-fade-in-scale"
+                        style={{
+                            width: "100%",
+                            maxWidth: "440px",
+                            padding: "clamp(1.25rem, 4vw, 1.75rem)",
+                            overflow: "hidden",
+                            boxShadow:
+                                "var(--shadow-xl), 0 0 0 1px var(--border-glow)",
+                        }}
+                    >
+                        <div
+                            style={{
+                                height: "3px",
+                                background: "var(--gradient-brand)",
+                                margin: "-clamp(1.25rem, 4vw, 1.75rem) -clamp(1.25rem, 4vw, 1.75rem) 1.25rem",
+                            }}
+                        />
+
+                        <h2
+                            className="font-display"
+                            style={{
+                                fontSize: "var(--text-lg)",
+                                fontWeight: 700,
+                                color: "var(--text-primary)",
+                                marginBottom: "1.25rem",
+                                letterSpacing: "-0.02em",
+                            }}
+                        >
                             {editingId ? "Editar transação" : "Nova transação"}
                         </h2>
-                        <div className="space-y-4">
-                            <div className="flex rounded-lg border border-gray-200 overflow-hidden">
+
+                        <div
+                            style={{
+                                display: "flex",
+                                flexDirection: "column",
+                                gap: "1rem",
+                            }}
+                        >
+                            {/* Tipo */}
+                            <div
+                                style={{
+                                    display: "flex",
+                                    background: "var(--bg-surface)",
+                                    border: "1px solid var(--border-subtle)",
+                                    borderRadius: "var(--radius-lg)",
+                                    padding: "4px",
+                                }}
+                            >
                                 {(["EXPENSE", "INCOME"] as const).map((t) => (
                                     <button
                                         key={t}
@@ -359,20 +960,55 @@ export default function TransactionsPage() {
                                                 category: "",
                                             }))
                                         }
-                                        className={`flex-1 py-2 text-sm transition-colors ${
-                                            form.type === t
-                                                ? t === "EXPENSE"
-                                                    ? "bg-red-500 text-white"
-                                                    : "bg-green-500 text-white"
-                                                : "text-gray-500 hover:bg-gray-50"
-                                        }`}
+                                        style={
+                                            {
+                                                flex: 1,
+                                                padding: ".5rem",
+                                                borderRadius:
+                                                    "var(--radius-md)",
+                                                fontSize: "var(--text-sm)",
+                                                fontWeight: 600,
+                                                border: "none",
+                                                cursor: "pointer",
+                                                transition:
+                                                    "all var(--transition-base)",
+                                                background:
+                                                    form.type === t
+                                                        ? t === "EXPENSE"
+                                                            ? "var(--color-danger-bg)"
+                                                            : "var(--color-success-bg)"
+                                                        : "transparent",
+                                                color:
+                                                    form.type === t
+                                                        ? t === "EXPENSE"
+                                                            ? "var(--color-danger-light)"
+                                                            : "var(--color-success-light)"
+                                                        : "var(--text-muted)",
+                                                border:
+                                                    form.type === t
+                                                        ? `1px solid ${t === "EXPENSE" ? "var(--color-danger-border)" : "var(--color-success-border)"}`
+                                                        : "1px solid transparent",
+                                            } as React.CSSProperties
+                                        }
                                     >
                                         {t === "EXPENSE" ? "Gasto" : "Receita"}
                                     </button>
                                 ))}
                             </div>
+
+                            {/* Descrição */}
                             <div>
-                                <label className="text-xs text-gray-500 mb-1 block">
+                                <label
+                                    style={{
+                                        display: "block",
+                                        fontSize: "var(--text-xs)",
+                                        fontWeight: 500,
+                                        color: "var(--text-secondary)",
+                                        marginBottom: ".375rem",
+                                        textTransform: "uppercase",
+                                        letterSpacing: ".05em",
+                                    }}
+                                >
                                     Descrição
                                 </label>
                                 <input
@@ -383,12 +1019,34 @@ export default function TransactionsPage() {
                                             title: e.target.value,
                                         }))
                                     }
-                                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="Ex: Supermercado"
+                                    style={{
+                                        width: "100%",
+                                        padding: ".625rem .875rem",
+                                    }}
                                 />
                             </div>
-                            <div className="grid grid-cols-2 gap-3">
+
+                            {/* Valor + Data */}
+                            <div
+                                style={{
+                                    display: "grid",
+                                    gridTemplateColumns: "1fr 1fr",
+                                    gap: ".75rem",
+                                }}
+                            >
                                 <div>
-                                    <label className="text-xs text-gray-500 mb-1 block">
+                                    <label
+                                        style={{
+                                            display: "block",
+                                            fontSize: "var(--text-xs)",
+                                            fontWeight: 500,
+                                            color: "var(--text-secondary)",
+                                            marginBottom: ".375rem",
+                                            textTransform: "uppercase",
+                                            letterSpacing: ".05em",
+                                        }}
+                                    >
                                         Valor (R$)
                                     </label>
                                     <input
@@ -401,11 +1059,25 @@ export default function TransactionsPage() {
                                                 amount: e.target.value,
                                             }))
                                         }
-                                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        placeholder="0,00"
+                                        style={{
+                                            width: "100%",
+                                            padding: ".625rem .875rem",
+                                        }}
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-xs text-gray-500 mb-1 block">
+                                    <label
+                                        style={{
+                                            display: "block",
+                                            fontSize: "var(--text-xs)",
+                                            fontWeight: 500,
+                                            color: "var(--text-secondary)",
+                                            marginBottom: ".375rem",
+                                            textTransform: "uppercase",
+                                            letterSpacing: ".05em",
+                                        }}
+                                    >
                                         Data
                                     </label>
                                     <input
@@ -417,12 +1089,27 @@ export default function TransactionsPage() {
                                                 date: e.target.value,
                                             }))
                                         }
-                                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        style={{
+                                            width: "100%",
+                                            padding: ".625rem .875rem",
+                                        }}
                                     />
                                 </div>
                             </div>
+
+                            {/* Categoria */}
                             <div>
-                                <label className="text-xs text-gray-500 mb-1 block">
+                                <label
+                                    style={{
+                                        display: "block",
+                                        fontSize: "var(--text-xs)",
+                                        fontWeight: 500,
+                                        color: "var(--text-secondary)",
+                                        marginBottom: ".375rem",
+                                        textTransform: "uppercase",
+                                        letterSpacing: ".05em",
+                                    }}
+                                >
                                     Categoria
                                 </label>
                                 <select
@@ -433,7 +1120,10 @@ export default function TransactionsPage() {
                                             category: e.target.value,
                                         }))
                                     }
-                                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    style={{
+                                        width: "100%",
+                                        padding: ".625rem .875rem",
+                                    }}
                                 >
                                     <option value="">Selecione...</option>
                                     {categories.map((c) => (
@@ -443,8 +1133,20 @@ export default function TransactionsPage() {
                                     ))}
                                 </select>
                             </div>
+
+                            {/* Observação */}
                             <div>
-                                <label className="text-xs text-gray-500 mb-1 block">
+                                <label
+                                    style={{
+                                        display: "block",
+                                        fontSize: "var(--text-xs)",
+                                        fontWeight: 500,
+                                        color: "var(--text-secondary)",
+                                        marginBottom: ".375rem",
+                                        textTransform: "uppercase",
+                                        letterSpacing: ".05em",
+                                    }}
+                                >
                                     Observação (opcional)
                                 </label>
                                 <textarea
@@ -456,14 +1158,32 @@ export default function TransactionsPage() {
                                         }))
                                     }
                                     rows={2}
-                                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                                    placeholder="Alguma anotação..."
+                                    style={{
+                                        width: "100%",
+                                        padding: ".625rem .875rem",
+                                        resize: "none",
+                                    }}
                                 />
                             </div>
                         </div>
-                        <div className="flex gap-3 mt-6">
+
+                        <div
+                            style={{
+                                display: "flex",
+                                gap: ".75rem",
+                                marginTop: "1.25rem",
+                            }}
+                        >
                             <button
                                 onClick={() => setShowModal(false)}
-                                className="flex-1 border border-gray-200 rounded-lg py-2 text-sm text-gray-600 hover:bg-gray-50"
+                                className="btn-ghost"
+                                style={{
+                                    flex: 1,
+                                    padding: ".625rem",
+                                    fontSize: "var(--text-sm)",
+                                    borderRadius: "var(--radius-md)",
+                                }}
                             >
                                 Cancelar
                             </button>
@@ -475,7 +1195,20 @@ export default function TransactionsPage() {
                                     !form.amount ||
                                     !form.category
                                 }
-                                className="flex-1 bg-blue-600 text-white rounded-lg py-2 text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
+                                className="btn-primary"
+                                style={{
+                                    flex: 1,
+                                    padding: ".625rem",
+                                    fontSize: "var(--text-sm)",
+                                    borderRadius: "var(--radius-md)",
+                                    opacity:
+                                        saving ||
+                                        !form.title ||
+                                        !form.amount ||
+                                        !form.category
+                                            ? 0.5
+                                            : 1,
+                                }}
                             >
                                 {saving ? "Salvando..." : "Salvar"}
                             </button>
@@ -486,80 +1219,215 @@ export default function TransactionsPage() {
 
             {/* Modal importar */}
             {showImport && (
-                <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-2xl w-full max-w-sm p-6">
-                        <h2 className="text-base font-medium text-gray-900 mb-2">
+                <div
+                    style={{
+                        position: "fixed",
+                        inset: 0,
+                        background: "var(--bg-overlay)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        zIndex: 50,
+                        padding: "1rem",
+                    }}
+                >
+                    <div
+                        className="card-glass animate-fade-in-scale"
+                        style={{
+                            width: "100%",
+                            maxWidth: "360px",
+                            padding: "clamp(1.25rem, 4vw, 1.75rem)",
+                            boxShadow:
+                                "var(--shadow-xl), 0 0 0 1px var(--border-glow)",
+                        }}
+                    >
+                        <h2
+                            className="font-display"
+                            style={{
+                                fontSize: "var(--text-lg)",
+                                fontWeight: 700,
+                                color: "var(--text-primary)",
+                                marginBottom: ".375rem",
+                                letterSpacing: "-0.02em",
+                            }}
+                        >
                             Importar transações
                         </h2>
-                        <p className="text-xs text-gray-400 mb-5">
+                        <p
+                            style={{
+                                fontSize: "var(--text-xs)",
+                                color: "var(--text-muted)",
+                                marginBottom: "1.25rem",
+                            }}
+                        >
                             Escolha o formato do arquivo
                         </p>
-                        <div className="space-y-3">
+
+                        <div
+                            style={{
+                                display: "flex",
+                                flexDirection: "column",
+                                gap: ".625rem",
+                            }}
+                        >
                             {[
                                 {
                                     label: "JSON",
                                     accept: ".json",
                                     type: "json" as const,
-                                    color: "amber",
+                                    color: "var(--color-warning-light)",
+                                    bg: "var(--color-warning-bg)",
+                                    border: "var(--color-warning-border)",
                                 },
                                 {
                                     label: "Excel (.xlsx)",
                                     accept: ".xlsx,.xls",
                                     type: "excel" as const,
-                                    color: "green",
+                                    color: "var(--color-success-light)",
+                                    bg: "var(--color-success-bg)",
+                                    border: "var(--color-success-border)",
                                 },
                                 {
                                     label: "PDF",
                                     accept: ".pdf",
                                     type: "pdf" as const,
-                                    color: "red",
+                                    color: "var(--color-danger-light)",
+                                    bg: "var(--color-danger-bg)",
+                                    border: "var(--color-danger-border)",
                                 },
                             ].map((opt) => (
                                 <label
                                     key={opt.type}
-                                    className="flex items-center gap-3 border border-gray-200 rounded-xl p-3 cursor-pointer hover:bg-gray-50 transition-colors"
+                                    style={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: ".75rem",
+                                        padding: ".75rem 1rem",
+                                        borderRadius: "var(--radius-lg)",
+                                        border: "1px solid var(--border-subtle)",
+                                        cursor: "pointer",
+                                        transition:
+                                            "border-color var(--transition-base), background var(--transition-base)",
+                                        background: "transparent",
+                                    }}
+                                    onMouseEnter={(e) =>
+                                        (e.currentTarget.style.borderColor =
+                                            "var(--border)")
+                                    }
+                                    onMouseLeave={(e) =>
+                                        (e.currentTarget.style.borderColor =
+                                            "var(--border-subtle)")
+                                    }
                                 >
                                     <span
-                                        className={`text-xs font-medium px-2 py-0.5 rounded-full bg-${opt.color}-100 text-${opt.color}-700`}
+                                        style={{
+                                            fontSize: "var(--text-xs)",
+                                            fontWeight: 600,
+                                            padding: "2px 8px",
+                                            borderRadius: "var(--radius-full)",
+                                            color: opt.color,
+                                            background: opt.bg,
+                                            border: `1px solid ${opt.border}`,
+                                            whiteSpace: "nowrap",
+                                        }}
                                     >
                                         {opt.label}
                                     </span>
-                                    <span className="text-sm text-gray-600 flex-1">
+                                    <span
+                                        style={{
+                                            fontSize: "var(--text-sm)",
+                                            color: "var(--text-secondary)",
+                                            flex: 1,
+                                        }}
+                                    >
                                         Selecionar arquivo
                                     </span>
                                     <input
                                         type="file"
                                         accept={opt.accept}
-                                        className="hidden"
+                                        style={{ display: "none" }}
                                         onChange={(e) =>
                                             handleFileImport(e, opt.type)
                                         }
                                     />
                                 </label>
                             ))}
-                            <label className="flex items-center gap-3 border border-gray-200 rounded-xl p-3 cursor-pointer hover:bg-gray-50 transition-colors">
-                                <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
+
+                            <button
+                                onClick={() => {
+                                    setShowImport(false);
+                                    openCreate();
+                                }}
+                                style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: ".75rem",
+                                    padding: ".75rem 1rem",
+                                    borderRadius: "var(--radius-lg)",
+                                    border: "1px solid var(--border-subtle)",
+                                    cursor: "pointer",
+                                    background: "transparent",
+                                    transition:
+                                        "border-color var(--transition-base)",
+                                    width: "100%",
+                                    textAlign: "left",
+                                }}
+                                onMouseEnter={(e) =>
+                                    (e.currentTarget.style.borderColor =
+                                        "var(--border)")
+                                }
+                                onMouseLeave={(e) =>
+                                    (e.currentTarget.style.borderColor =
+                                        "var(--border-subtle)")
+                                }
+                            >
+                                <span
+                                    style={{
+                                        fontSize: "var(--text-xs)",
+                                        fontWeight: 600,
+                                        padding: "2px 8px",
+                                        borderRadius: "var(--radius-full)",
+                                        color: "var(--accent-brand-light)",
+                                        background: "var(--accent-brand-glow)",
+                                        border: "1px solid var(--border-glow)",
+                                        whiteSpace: "nowrap",
+                                    }}
+                                >
                                     Formulário
                                 </span>
-                                <button
-                                    className="text-sm text-gray-600 flex-1 text-left"
-                                    onClick={() => {
-                                        setShowImport(false);
-                                        openCreate();
+                                <span
+                                    style={{
+                                        fontSize: "var(--text-sm)",
+                                        color: "var(--text-secondary)",
                                     }}
                                 >
                                     Adicionar manualmente
-                                </button>
-                            </label>
+                                </span>
+                            </button>
                         </div>
+
                         {importError && (
-                            <p className="text-xs text-red-500 mt-3">
+                            <p
+                                style={{
+                                    fontSize: "var(--text-xs)",
+                                    color: "var(--color-danger-light)",
+                                    marginTop: ".75rem",
+                                }}
+                            >
                                 {importError}
                             </p>
                         )}
+
                         <button
                             onClick={() => setShowImport(false)}
-                            className="w-full mt-4 border border-gray-200 rounded-lg py-2 text-sm text-gray-500 hover:bg-gray-50"
+                            className="btn-ghost"
+                            style={{
+                                width: "100%",
+                                marginTop: "1rem",
+                                padding: ".625rem",
+                                fontSize: "var(--text-sm)",
+                                borderRadius: "var(--radius-md)",
+                            }}
                         >
                             Cancelar
                         </button>

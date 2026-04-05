@@ -824,3 +824,20 @@ select option {
         flex-shrink: 0;
     }
 }
+
+/* ── Transactions ── */
+.tx-table-wrapper {
+    display: block;
+}
+.tx-cards-wrapper {
+    display: none;
+}
+
+@media (max-width: 640px) {
+    .tx-table-wrapper {
+        display: none;
+    }
+    .tx-cards-wrapper {
+        display: block;
+    }
+}
