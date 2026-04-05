@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { format } from "date-fns";
 import { TRANSACTION_CATEGORIES } from "@/types";
 import * as XLSX from "xlsx";
@@ -25,6 +25,9 @@ interface FormData {
     description: string;
 }
 
+type SortColumn = "title" | "category" | "date" | "amount" | null;
+type SortDirection = "asc" | "desc";
+
 const emptyForm: FormData = {
     title: "",
     amount: "",
@@ -33,6 +36,59 @@ const emptyForm: FormData = {
     date: new Date().toISOString().split("T")[0],
     description: "",
 };
+
+/* ── Ícone de ordenação ── */
+function SortIcon({
+    column,
+    sortColumn,
+    sortDirection,
+}: {
+    column: SortColumn;
+    sortColumn: SortColumn;
+    sortDirection: SortDirection;
+}) {
+    const isActive = sortColumn === column;
+    return (
+        <span
+            style={{
+                display: "inline-flex",
+                flexDirection: "column",
+                gap: "1px",
+                marginLeft: "5px",
+                verticalAlign: "middle",
+                opacity: isActive ? 1 : 0.3,
+                transition: "opacity var(--transition-base)",
+            }}
+        >
+            {/* seta cima */}
+            <svg
+                width="7"
+                height="5"
+                viewBox="0 0 7 5"
+                fill={
+                    isActive && sortDirection === "asc"
+                        ? "var(--accent-brand-light)"
+                        : "var(--text-muted)"
+                }
+            >
+                <path d="M3.5 0L7 5H0L3.5 0Z" />
+            </svg>
+            {/* seta baixo */}
+            <svg
+                width="7"
+                height="5"
+                viewBox="0 0 7 5"
+                fill={
+                    isActive && sortDirection === "desc"
+                        ? "var(--accent-brand-light)"
+                        : "var(--text-muted)"
+                }
+            >
+                <path d="M3.5 5L0 0H7L3.5 5Z" />
+            </svg>
+        </span>
+    );
+}
 
 export default function TransactionsPage() {
     const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -46,6 +102,56 @@ export default function TransactionsPage() {
     const [form, setForm] = useState<FormData>(emptyForm);
     const [saving, setSaving] = useState(false);
     const [importError, setImportError] = useState("");
+
+    /* ── Ordenação ── */
+    const [sortColumn, setSortColumn] = useState<SortColumn>(null);
+    const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
+
+    const handleSort = (column: SortColumn) => {
+        if (sortColumn === column) {
+            // mesma coluna → inverte direção
+            setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
+        } else {
+            // coluna nova → reseta para asc
+            setSortColumn(column);
+            setSortDirection("asc");
+        }
+    };
+
+    /* ── Transações ordenadas (client-side) ── */
+    const sortedTransactions = useMemo(() => {
+        if (!sortColumn) return transactions;
+
+        return [...transactions].sort((a, b) => {
+            let valA: string | number;
+            let valB: string | number;
+
+            switch (sortColumn) {
+                case "title":
+                    valA = a.title.toLowerCase();
+                    valB = b.title.toLowerCase();
+                    break;
+                case "category":
+                    valA = a.category.toLowerCase();
+                    valB = b.category.toLowerCase();
+                    break;
+                case "date":
+                    valA = new Date(a.date).getTime();
+                    valB = new Date(b.date).getTime();
+                    break;
+                case "amount":
+                    valA = Number(a.amount);
+                    valB = Number(b.amount);
+                    break;
+                default:
+                    return 0;
+            }
+
+            if (valA < valB) return sortDirection === "asc" ? -1 : 1;
+            if (valA > valB) return sortDirection === "asc" ? 1 : -1;
+            return 0;
+        });
+    }, [transactions, sortColumn, sortDirection]);
 
     const fetchTransactions = useCallback(async () => {
         setLoading(true);
@@ -183,6 +289,54 @@ export default function TransactionsPage() {
             ? TRANSACTION_CATEGORIES.INCOME
             : TRANSACTION_CATEGORIES.EXPENSE;
 
+    /* ── Cabeçalho de coluna clicável ── */
+    const ThCol = ({
+        col,
+        label,
+        align = "left",
+    }: {
+        col: SortColumn;
+        label: string;
+        align?: "left" | "right";
+    }) => (
+        <th
+            onClick={() => handleSort(col)}
+            style={{
+                padding: ".75rem 1rem",
+                textAlign: align,
+                fontSize: "var(--text-xs)",
+                fontWeight: 600,
+                color:
+                    sortColumn === col
+                        ? "var(--accent-brand-light)"
+                        : "var(--text-muted)",
+                textTransform: "uppercase",
+                letterSpacing: ".06em",
+                background: "var(--bg-elevated)",
+                whiteSpace: "nowrap",
+                cursor: "pointer",
+                userSelect: "none",
+                transition: "color var(--transition-base)",
+            }}
+            onMouseEnter={(e) =>
+                (e.currentTarget.style.color = "var(--text-secondary)")
+            }
+            onMouseLeave={(e) =>
+                (e.currentTarget.style.color =
+                    sortColumn === col
+                        ? "var(--accent-brand-light)"
+                        : "var(--text-muted)")
+            }
+        >
+            {label}
+            <SortIcon
+                column={col}
+                sortColumn={sortColumn}
+                sortDirection={sortDirection}
+            />
+        </th>
+    );
+
     return (
         <div
             style={{
@@ -289,7 +443,7 @@ export default function TransactionsPage() {
                 </div>
             </div>
 
-            {/* Filtros */}
+            {/* Filtros de tipo */}
             <div
                 style={{
                     display: "flex",
@@ -337,7 +491,7 @@ export default function TransactionsPage() {
                 ))}
             </div>
 
-            {/* Lista — mobile: cards / desktop: tabela */}
+            {/* Lista */}
             <div className="card-glass" style={{ overflow: "hidden" }}>
                 {loading ? (
                     <div
@@ -393,39 +547,30 @@ export default function TransactionsPage() {
                                                 "1px solid var(--border-subtle)",
                                         }}
                                     >
-                                        {[
-                                            "Descrição",
-                                            "Categoria",
-                                            "Data",
-                                            "Valor",
-                                            "",
-                                        ].map((h) => (
-                                            <th
-                                                key={h}
-                                                style={{
-                                                    padding: ".75rem 1rem",
-                                                    textAlign:
-                                                        h === "Valor" ||
-                                                        h === ""
-                                                            ? "right"
-                                                            : "left",
-                                                    fontSize: "var(--text-xs)",
-                                                    fontWeight: 600,
-                                                    color: "var(--text-muted)",
-                                                    textTransform: "uppercase",
-                                                    letterSpacing: ".06em",
-                                                    background:
-                                                        "var(--bg-elevated)",
-                                                    whiteSpace: "nowrap",
-                                                }}
-                                            >
-                                                {h}
-                                            </th>
-                                        ))}
+                                        <ThCol col="title" label="Descrição" />
+                                        <ThCol
+                                            col="category"
+                                            label="Categoria"
+                                        />
+                                        <ThCol col="date" label="Data" />
+                                        <ThCol
+                                            col="amount"
+                                            label="Valor"
+                                            align="right"
+                                        />
+                                        {/* coluna de ações — sem ordenação */}
+                                        <th
+                                            style={{
+                                                padding: ".75rem 1rem",
+                                                background:
+                                                    "var(--bg-elevated)",
+                                                width: "120px",
+                                            }}
+                                        />
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {transactions.map((t) => (
+                                    {sortedTransactions.map((t) => (
                                         <tr
                                             key={t.id}
                                             style={{
@@ -671,7 +816,7 @@ export default function TransactionsPage() {
 
                         {/* Mobile: cards */}
                         <div className="tx-cards-wrapper">
-                            {transactions.map((t) => (
+                            {sortedTransactions.map((t) => (
                                 <div
                                     key={t.id}
                                     style={{
@@ -919,7 +1064,6 @@ export default function TransactionsPage() {
                                 margin: "-clamp(1.25rem, 4vw, 1.75rem) -clamp(1.25rem, 4vw, 1.75rem) 1.25rem",
                             }}
                         />
-
                         <h2
                             className="font-display"
                             style={{
