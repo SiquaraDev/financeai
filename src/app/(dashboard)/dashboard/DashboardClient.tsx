@@ -1,4 +1,3 @@
-// src/app/(dashboard)/dashboard/DashboardClient.tsx
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
@@ -37,6 +36,7 @@ interface Session {
 
 /* ── Opções de filtro ── */
 type FilterKey =
+    | "all"
     | "this_month"
     | "last_month"
     | "3_months"
@@ -51,6 +51,7 @@ interface FilterOption {
 }
 
 const FILTER_OPTIONS: FilterOption[] = [
+    { key: "all", label: "Sem filtro" },
     { key: "this_month", label: "Este mês" },
     { key: "last_month", label: "Mês anterior" },
     { key: "3_months", label: "3 meses" },
@@ -60,12 +61,11 @@ const FILTER_OPTIONS: FilterOption[] = [
     { key: "custom", label: "Personalizado" },
 ];
 
-// ✅ Retorna sempre start às 00:00:00 e end às 23:59:59 no horário local
 function getDateRange(
     filter: FilterKey,
     customStart?: string,
     customEnd?: string,
-) {
+): { start: Date | null; end: Date | null } {
     const now = new Date();
 
     const startOf = (d: Date) => {
@@ -81,6 +81,9 @@ function getDateRange(
     };
 
     switch (filter) {
+        case "all":
+            return { start: null, end: null };
+
         case "this_month":
             return { start: startOf(now), end: endOf(now) };
 
@@ -113,7 +116,6 @@ function getDateRange(
         }
 
         case "custom": {
-            // ✅ Parse manual para evitar problemas de timezone com new Date("yyyy-MM-dd")
             const parseLocalDate = (str: string, endOfDay = false) => {
                 const [year, month, day] = str.split("-").map(Number);
                 const d = new Date(year, month - 1, day);
@@ -128,6 +130,9 @@ function getDateRange(
             const e = customEnd ? parseLocalDate(customEnd, true) : endOf(now);
             return { start: s, end: e };
         }
+
+        default:
+            return { start: null, end: null };
     }
 }
 
@@ -161,9 +166,10 @@ export default function DashboardClient({ session }: { session: Session }) {
         );
 
         try {
-            // ✅ Passa start e end como ISO string para a API filtrar no banco
+            const startParam = start ? `&start=${start.toISOString()}` : "";
+            const endParam = end ? `&end=${end.toISOString()}` : "";
             const res = await fetch(
-                `/api/transactions?limit=200&start=${start.toISOString()}&end=${end.toISOString()}`,
+                `/api/transactions?limit=200${startParam}${endParam}`,
             );
             const data = await res.json();
             const txs: Transaction[] = data.transactions ?? [];
@@ -215,9 +221,13 @@ export default function DashboardClient({ session }: { session: Session }) {
     /* Label do período ativo */
     const { start, end } = getDateRange(activeFilter, customStart, customEnd);
     const periodLabel =
-        activeFilter === "this_month"
-            ? format(new Date(), "MMMM 'de' yyyy", { locale: ptBR })
-            : `${format(start, "dd/MM/yyyy")} – ${format(end, "dd/MM/yyyy")}`;
+        activeFilter === "all"
+            ? "Todos os períodos"
+            : activeFilter === "this_month"
+              ? format(new Date(), "MMMM 'de' yyyy", { locale: ptBR })
+              : start && end
+                ? `${format(start, "dd/MM/yyyy")} – ${format(end, "dd/MM/yyyy")}`
+                : "Todos os períodos";
 
     return (
         <div
@@ -342,10 +352,10 @@ export default function DashboardClient({ session }: { session: Session }) {
                         fontSize: "var(--text-xs)",
                         color: "var(--text-muted)",
                         marginBottom: ".25rem",
-                        textTransform: "capitalize",
                     }}
                 >
-                    {periodLabel}
+                    {periodLabel.charAt(0).toUpperCase() +
+                        periodLabel.slice(1).toLowerCase()}
                 </p>
                 <h1
                     className="font-display"
@@ -398,7 +408,6 @@ export default function DashboardClient({ session }: { session: Session }) {
                         marginBottom: "var(--space-3)",
                     }}
                 >
-                    {/* Ícone calendário */}
                     <span
                         style={{
                             width: "22px",
@@ -447,7 +456,6 @@ export default function DashboardClient({ session }: { session: Session }) {
                         Período
                     </p>
 
-                    {/* Label do período ativo — right side */}
                     <span
                         style={{
                             marginLeft: "auto",
@@ -461,7 +469,8 @@ export default function DashboardClient({ session }: { session: Session }) {
                             whiteSpace: "nowrap",
                         }}
                     >
-                        {periodLabel}
+                        {periodLabel.charAt(0).toUpperCase() +
+                            periodLabel.slice(1).toLowerCase()}
                     </span>
                 </div>
 
