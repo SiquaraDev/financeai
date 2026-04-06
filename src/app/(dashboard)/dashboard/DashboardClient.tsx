@@ -166,8 +166,13 @@ export default function DashboardClient({ session }: { session: Session }) {
         );
 
         try {
-            const startParam = start ? `&start=${start.toISOString()}` : "";
-            const endParam = end ? `&end=${end.toISOString()}` : "";
+            const toLocalISO = (d: Date) => {
+                const pad = (n: number) => String(n).padStart(2, "0");
+                return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+            };
+
+            const startParam = start ? `&start=${toLocalISO(start)}` : "";
+            const endParam = end ? `&end=${toLocalISO(end)}` : "";
             const res = await fetch(
                 `/api/transactions?limit=200${startParam}${endParam}`,
             );
@@ -1191,7 +1196,11 @@ export default function DashboardClient({ session }: { session: Session }) {
                                                 >
                                                     {t.category} ·{" "}
                                                     {format(
-                                                        new Date(t.date),
+                                                        new Date(
+                                                            t.date.split(
+                                                                "T",
+                                                            )[0] + "T12:00:00",
+                                                        ),
                                                         "dd/MM",
                                                     )}
                                                 </p>

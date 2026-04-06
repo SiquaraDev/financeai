@@ -66,10 +66,17 @@ export async function POST(req: NextRequest) {
         );
     }
 
+    const dateStr = parsed.data.date.includes("T")
+        ? parsed.data.date.split("T")[0]
+        : parsed.data.date;
+
+    const [year, month, day] = dateStr.split("-").map(Number);
+    const date = new Date(year, month - 1, day, 12, 0, 0);
+
     const transaction = await prisma.transaction.create({
         data: {
             ...parsed.data,
-            date: new Date(parsed.data.date),
+            date,
             userId: session.user.id,
         },
     });
