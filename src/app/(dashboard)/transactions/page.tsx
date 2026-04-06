@@ -706,7 +706,10 @@ export default function TransactionsPage() {
                                                 }}
                                             >
                                                 {format(
-                                                    new Date(t.date),
+                                                    new Date(
+                                                        t.date.split("T")[0] +
+                                                            "T12:00:00",
+                                                    ),
                                                     "dd/MM/yyyy",
                                                 )}
                                             </td>
@@ -906,7 +909,10 @@ export default function TransactionsPage() {
                                         >
                                             {t.category} ·{" "}
                                             {format(
-                                                new Date(t.date),
+                                                new Date(
+                                                    t.date.split("T")[0] +
+                                                        "T12:00:00",
+                                                ),
                                                 "dd/MM/yyyy",
                                             )}
                                         </p>
