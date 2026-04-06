@@ -316,6 +316,7 @@ export default function TransactionsPage() {
                 whiteSpace: "nowrap",
                 cursor: "pointer",
                 userSelect: "none",
+                verticalAlign: "middle",
                 transition: "color var(--transition-base)",
             }}
             onMouseEnter={(e) =>
@@ -578,6 +579,7 @@ export default function TransactionsPage() {
                                                     "1px solid var(--border-subtle)",
                                                 transition:
                                                     "background var(--transition-base)",
+                                                verticalAlign: "middle",
                                             }}
                                             onMouseEnter={(e) =>
                                                 (e.currentTarget.style.background =
@@ -591,6 +593,7 @@ export default function TransactionsPage() {
                                             <td
                                                 style={{
                                                     padding: ".75rem 1rem",
+                                                    verticalAlign: "middle",
                                                 }}
                                             >
                                                 <div
@@ -1071,6 +1074,7 @@ export default function TransactionsPage() {
                                 fontWeight: 700,
                                 color: "var(--text-primary)",
                                 marginBottom: "1.25rem",
+                                marginTop: "1rem",
                                 letterSpacing: "-0.02em",
                             }}
                         >
