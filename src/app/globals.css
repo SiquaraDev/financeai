@@ -843,3 +843,9 @@ select option {
         display: block;
     }
 }
+
+@media (max-width: 320px) {
+    .tx-cards-wrapper {
+        font-size: var(--text-xs);
+    }
+}

@@ -823,12 +823,12 @@ export default function TransactionsPage() {
                                 <div
                                     key={t.id}
                                     style={{
-                                        padding: ".875rem 1rem",
+                                        padding: ".75rem .625rem",
                                         borderBottom:
                                             "1px solid var(--border-subtle)",
                                         display: "flex",
                                         alignItems: "center",
-                                        gap: ".75rem",
+                                        gap: ".5rem",
                                     }}
                                 >
                                     <div
@@ -918,12 +918,13 @@ export default function TransactionsPage() {
                                             alignItems: "flex-end",
                                             gap: ".375rem",
                                             flexShrink: 0,
+                                            minWidth: 0,
                                         }}
                                     >
                                         <span
                                             className="font-mono"
                                             style={{
-                                                fontSize: "var(--text-sm)",
+                                                fontSize: "var(--text-xs)",
                                                 fontWeight: 600,
                                                 color:
                                                     t.type === "INCOME"
@@ -938,7 +939,7 @@ export default function TransactionsPage() {
                                         <div
                                             style={{
                                                 display: "flex",
-                                                gap: ".375rem",
+                                                gap: ".25rem",
                                             }}
                                         >
                                             <button
@@ -951,7 +952,7 @@ export default function TransactionsPage() {
                                                         "var(--accent-brand-glow)",
                                                     border: "1px solid var(--border-glow)",
                                                     cursor: "pointer",
-                                                    padding: "3px 8px",
+                                                    padding: "3px 6px",
                                                     borderRadius:
                                                         "var(--radius-sm)",
                                                 }}
@@ -970,7 +971,7 @@ export default function TransactionsPage() {
                                                         "var(--color-danger-bg)",
                                                     border: "1px solid var(--color-danger-border)",
                                                     cursor: "pointer",
-                                                    padding: "3px 8px",
+                                                    padding: "3px 6px",
                                                     borderRadius:
                                                         "var(--radius-sm)",
                                                 }}
@@ -1470,12 +1471,15 @@ export default function TransactionsPage() {
                                         style={{
                                             fontSize: "var(--text-xs)",
                                             fontWeight: 600,
-                                            padding: "2px 8px",
+                                            padding: "2px 0",
+                                            width: "80px",
+                                            textAlign: "center",
                                             borderRadius: "var(--radius-full)",
                                             color: opt.color,
                                             background: opt.bg,
                                             border: `1px solid ${opt.border}`,
                                             whiteSpace: "nowrap",
+                                            flexShrink: 0,
                                         }}
                                     >
                                         {opt.label}
@@ -1499,58 +1503,6 @@ export default function TransactionsPage() {
                                     />
                                 </label>
                             ))}
-
-                            <button
-                                onClick={() => {
-                                    setShowImport(false);
-                                    openCreate();
-                                }}
-                                style={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    gap: ".75rem",
-                                    padding: ".75rem 1rem",
-                                    borderRadius: "var(--radius-lg)",
-                                    border: "1px solid var(--border-subtle)",
-                                    cursor: "pointer",
-                                    background: "transparent",
-                                    transition:
-                                        "border-color var(--transition-base)",
-                                    width: "100%",
-                                    textAlign: "left",
-                                }}
-                                onMouseEnter={(e) =>
-                                    (e.currentTarget.style.borderColor =
-                                        "var(--border)")
-                                }
-                                onMouseLeave={(e) =>
-                                    (e.currentTarget.style.borderColor =
-                                        "var(--border-subtle)")
-                                }
-                            >
-                                <span
-                                    style={{
-                                        fontSize: "var(--text-xs)",
-                                        fontWeight: 600,
-                                        padding: "2px 8px",
-                                        borderRadius: "var(--radius-full)",
-                                        color: "var(--accent-brand-light)",
-                                        background: "var(--accent-brand-glow)",
-                                        border: "1px solid var(--border-glow)",
-                                        whiteSpace: "nowrap",
-                                    }}
-                                >
-                                    Formulário
-                                </span>
-                                <span
-                                    style={{
-                                        fontSize: "var(--text-sm)",
-                                        color: "var(--text-secondary)",
-                                    }}
-                                >
-                                    Adicionar manualmente
-                                </span>
-                            </button>
                         </div>
 
                         {importError && (
