@@ -1,3 +1,6 @@
+import EmptyState from "@/components/ui/EmptyState";
+import { formatCurrency } from "@/lib/formatters";
+
 const COLORS = [
     "var(--accent-brand-light)",
     "var(--accent-teal-light)",
@@ -5,12 +8,6 @@ const COLORS = [
     "var(--color-success-light)",
     "var(--color-info-light)",
 ];
-
-const fmt = (v: number) =>
-    new Intl.NumberFormat("pt-BR", {
-        style: "currency",
-        currency: "BRL",
-    }).format(v);
 
 interface CategoryExpenseListProps {
     byCategory: Record<string, number>;
@@ -22,40 +19,7 @@ export default function CategoryExpenseList({
     totalExpense,
 }: CategoryExpenseListProps) {
     if (Object.keys(byCategory).length === 0) {
-        return (
-            <div
-                style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    padding: "1.5rem 0",
-                    gap: ".5rem",
-                }}
-            >
-                <svg
-                    width="28"
-                    height="28"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="var(--text-dim)"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                >
-                    <circle cx="12" cy="12" r="10" />
-                    <line x1="12" y1="8" x2="12" y2="12" />
-                    <line x1="12" y1="16" x2="12.01" y2="16" />
-                </svg>
-                <p
-                    style={{
-                        fontSize: "var(--text-sm)",
-                        color: "var(--text-muted)",
-                    }}
-                >
-                    Nenhum gasto no período
-                </p>
-            </div>
-        );
+        return <EmptyState title="Nenhum gasto no período" />;
     }
 
     return (
@@ -68,6 +32,7 @@ export default function CategoryExpenseList({
                 .map(([cat, value], i) => {
                     const pct = Math.round((value / totalExpense) * 100);
                     const color = COLORS[i % COLORS.length];
+
                     return (
                         <div key={cat} className="category-row">
                             <div
@@ -117,10 +82,11 @@ export default function CategoryExpenseList({
                                             fontWeight: 600,
                                         }}
                                     >
-                                        {fmt(value)}
+                                        {formatCurrency(value)}
                                     </span>
                                 </div>
                             </div>
+
                             <div
                                 style={{
                                     height: "3px",

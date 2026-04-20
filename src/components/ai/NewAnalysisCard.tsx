@@ -37,7 +37,6 @@ export default function NewAnalysisCard({
             className="card-glass animate-fade-in delay-75"
             style={{ padding: 0, overflow: "hidden", flexShrink: 0 }}
         >
-            {/* Accent top */}
             <div
                 style={{
                     padding:
@@ -59,7 +58,6 @@ export default function NewAnalysisCard({
                         "0 clamp(.875rem,3vw,1.25rem) clamp(.875rem,3vw,1.25rem)",
                 }}
             >
-                {/* Título */}
                 <div
                     style={{
                         display: "flex",
@@ -97,7 +95,6 @@ export default function NewAnalysisCard({
                     </h2>
                 </div>
 
-                {/* Label período */}
                 <p
                     style={{
                         fontSize: "var(--text-xs)",
@@ -111,7 +108,6 @@ export default function NewAnalysisCard({
                     Período
                 </p>
 
-                {/* Datas */}
                 <div
                     style={{
                         display: "grid",
@@ -157,7 +153,6 @@ export default function NewAnalysisCard({
                     ))}
                 </div>
 
-                {/* Atalhos */}
                 <p
                     style={{
                         fontSize: "var(--text-xs)",
@@ -210,7 +205,6 @@ export default function NewAnalysisCard({
                     })}
                 </div>
 
-                {/* Botão */}
                 <button
                     onClick={onAnalyze}
                     disabled={analyzing}

@@ -1,6 +1,7 @@
 "use client";
 
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
+import { formatCurrency } from "@/lib/formatters";
 import type { CategoryData } from "./ChartRenderer";
 
 const COLORS = [
@@ -12,13 +13,7 @@ const COLORS = [
     "#D85A30",
 ];
 
-const fmt = (v: number) =>
-    new Intl.NumberFormat("pt-BR", {
-        style: "currency",
-        currency: "BRL",
-    }).format(v);
-
-const tooltipStyle: React.CSSProperties = {
+const TOOLTIP_STYLE: React.CSSProperties = {
     background: "var(--bg-card)",
     border: "1px solid var(--border)",
     borderRadius: "var(--radius-md)",
@@ -53,13 +48,12 @@ export default function CategoryPieSection({ data }: { data: CategoryData[] }) {
                         ))}
                     </Pie>
                     <Tooltip
-                        formatter={(v: number) => fmt(v)}
-                        contentStyle={tooltipStyle}
+                        formatter={(v: number) => formatCurrency(v)}
+                        contentStyle={TOOLTIP_STYLE}
                     />
                 </PieChart>
             </ResponsiveContainer>
 
-            {/* Legenda */}
             <div
                 style={{
                     display: "flex",
@@ -118,7 +112,7 @@ export default function CategoryPieSection({ data }: { data: CategoryData[] }) {
                                 flexShrink: 0,
                             }}
                         >
-                            {fmt(cat.value)}
+                            {formatCurrency(cat.value)}
                         </span>
                     </div>
                 ))}

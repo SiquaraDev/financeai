@@ -18,7 +18,6 @@ export default function ChatMessage({ role, content }: ChatMessageProps) {
                 alignItems: "flex-end",
             }}
         >
-            {/* Avatar IA */}
             {!isUser && (
                 <div
                     style={{
@@ -38,7 +37,6 @@ export default function ChatMessage({ role, content }: ChatMessageProps) {
                 </div>
             )}
 
-            {/* Balão */}
             <div
                 style={{
                     maxWidth: "82%",
@@ -64,7 +62,6 @@ export default function ChatMessage({ role, content }: ChatMessageProps) {
                 {content}
             </div>
 
-            {/* Avatar usuário */}
             {isUser && (
                 <div
                     style={{

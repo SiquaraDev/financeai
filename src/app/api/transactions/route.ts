@@ -28,7 +28,6 @@ export async function GET(req: NextRequest) {
     const where = {
         userId: session.user.id,
         ...(type ? { type: type as "INCOME" | "EXPENSE" } : {}),
-        //Filtra por intervalo de datas quando informado
         ...(start || end
             ? {
                   date: {

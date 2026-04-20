@@ -2,6 +2,8 @@
 
 import { useMemo } from "react";
 import { format } from "date-fns";
+import Badge from "@/components/ui/Badge";
+import { formatCurrency, parseSafeDate } from "@/lib/formatters";
 
 export type SortColumn = "title" | "category" | "date" | "amount" | null;
 export type SortDirection = "asc" | "desc";
@@ -25,12 +27,6 @@ interface TransactionTableProps {
     onEdit: (t: Transaction) => void;
     onDelete: (id: string) => void;
 }
-
-const fmt = (v: number) =>
-    new Intl.NumberFormat("pt-BR", {
-        style: "currency",
-        currency: "BRL",
-    }).format(v);
 
 function SortIcon({
     column,
@@ -58,6 +54,7 @@ function SortIcon({
                 width="7"
                 height="5"
                 viewBox="0 0 7 5"
+                aria-hidden
                 fill={
                     active && sortDirection === "asc"
                         ? "var(--accent-brand-light)"
@@ -70,6 +67,7 @@ function SortIcon({
                 width="7"
                 height="5"
                 viewBox="0 0 7 5"
+                aria-hidden
                 fill={
                     active && sortDirection === "desc"
                         ? "var(--accent-brand-light)"
@@ -82,13 +80,79 @@ function SortIcon({
     );
 }
 
-const TH_COLS: { col: SortColumn; label: string; align?: "left" | "right" }[] =
-    [
-        { col: "title", label: "Descrição" },
-        { col: "category", label: "Categoria" },
-        { col: "date", label: "Data" },
-        { col: "amount", label: "Valor", align: "right" },
-    ];
+function TypeIcon({ isIncome }: { isIncome: boolean }) {
+    return (
+        <svg
+            width="11"
+            height="11"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden
+        >
+            {isIncome ? (
+                <>
+                    <line x1="12" y1="19" x2="12" y2="5" />
+                    <polyline points="5 12 12 5 19 12" />
+                </>
+            ) : (
+                <>
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <polyline points="19 12 12 19 5 12" />
+                </>
+            )}
+        </svg>
+    );
+}
+
+const TH_COLS: {
+    col: SortColumn;
+    label: string;
+    align?: "left" | "right";
+}[] = [
+    { col: "title", label: "Descrição" },
+    { col: "category", label: "Categoria" },
+    { col: "date", label: "Data" },
+    { col: "amount", label: "Valor", align: "right" },
+];
+
+function sortTransactions(
+    transactions: Transaction[],
+    col: SortColumn,
+    dir: SortDirection,
+): Transaction[] {
+    if (!col) return transactions;
+    return [...transactions].sort((a, b) => {
+        let va: string | number;
+        let vb: string | number;
+        switch (col) {
+            case "title":
+                va = a.title.toLowerCase();
+                vb = b.title.toLowerCase();
+                break;
+            case "category":
+                va = a.category.toLowerCase();
+                vb = b.category.toLowerCase();
+                break;
+            case "date":
+                va = new Date(a.date).getTime();
+                vb = new Date(b.date).getTime();
+                break;
+            case "amount":
+                va = Number(a.amount);
+                vb = Number(b.amount);
+                break;
+            default:
+                return 0;
+        }
+        if (va < vb) return dir === "asc" ? -1 : 1;
+        if (va > vb) return dir === "asc" ? 1 : -1;
+        return 0;
+    });
+}
 
 export default function TransactionTable({
     transactions,
@@ -98,36 +162,10 @@ export default function TransactionTable({
     onEdit,
     onDelete,
 }: TransactionTableProps) {
-    const sorted = useMemo(() => {
-        if (!sortColumn) return transactions;
-        return [...transactions].sort((a, b) => {
-            let va: string | number;
-            let vb: string | number;
-            switch (sortColumn) {
-                case "title":
-                    va = a.title.toLowerCase();
-                    vb = b.title.toLowerCase();
-                    break;
-                case "category":
-                    va = a.category.toLowerCase();
-                    vb = b.category.toLowerCase();
-                    break;
-                case "date":
-                    va = new Date(a.date).getTime();
-                    vb = new Date(b.date).getTime();
-                    break;
-                case "amount":
-                    va = Number(a.amount);
-                    vb = Number(b.amount);
-                    break;
-                default:
-                    return 0;
-            }
-            if (va < vb) return sortDirection === "asc" ? -1 : 1;
-            if (va > vb) return sortDirection === "asc" ? 1 : -1;
-            return 0;
-        });
-    }, [transactions, sortColumn, sortDirection]);
+    const sorted = useMemo(
+        () => sortTransactions(transactions, sortColumn, sortDirection),
+        [transactions, sortColumn, sortDirection],
+    );
 
     return (
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
@@ -164,7 +202,6 @@ export default function TransactionTable({
                             />
                         </th>
                     ))}
-                    {/* Coluna de ações — sem ordenação */}
                     <th
                         style={{
                             padding: ".75rem 1rem",
@@ -174,6 +211,7 @@ export default function TransactionTable({
                     />
                 </tr>
             </thead>
+
             <tbody>
                 {sorted.map((t) => {
                     const isIncome = t.type === "INCOME";
@@ -192,19 +230,10 @@ export default function TransactionTable({
                             key={t.id}
                             style={{
                                 borderBottom: "1px solid var(--border-subtle)",
-                                transition: "background var(--transition-base)",
                                 verticalAlign: "middle",
                             }}
-                            onMouseEnter={(e) =>
-                                (e.currentTarget.style.background =
-                                    "var(--bg-elevated)")
-                            }
-                            onMouseLeave={(e) =>
-                                (e.currentTarget.style.background =
-                                    "transparent")
-                            }
+                            className="tx-table-row"
                         >
-                            {/* Descrição */}
                             <td
                                 style={{
                                     padding: ".75rem 1rem",
@@ -232,38 +261,7 @@ export default function TransactionTable({
                                             color,
                                         }}
                                     >
-                                        <svg
-                                            width="11"
-                                            height="11"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            strokeWidth="2.5"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                        >
-                                            {isIncome ? (
-                                                <>
-                                                    <line
-                                                        x1="12"
-                                                        y1="19"
-                                                        x2="12"
-                                                        y2="5"
-                                                    />
-                                                    <polyline points="5 12 12 5 19 12" />
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <line
-                                                        x1="12"
-                                                        y1="5"
-                                                        x2="12"
-                                                        y2="19"
-                                                    />
-                                                    <polyline points="19 12 12 19 5 12" />
-                                                </>
-                                            )}
-                                        </svg>
+                                        <TypeIcon isIncome={isIncome} />
                                     </div>
                                     <span
                                         style={{
@@ -277,25 +275,10 @@ export default function TransactionTable({
                                 </div>
                             </td>
 
-                            {/* Categoria */}
                             <td style={{ padding: ".75rem 1rem" }}>
-                                <span
-                                    style={{
-                                        fontSize: "var(--text-xs)",
-                                        fontWeight: 500,
-                                        padding: "2px 8px",
-                                        borderRadius: "var(--radius-full)",
-                                        background: "var(--bg-elevated)",
-                                        border: "1px solid var(--border-subtle)",
-                                        color: "var(--text-secondary)",
-                                        whiteSpace: "nowrap",
-                                    }}
-                                >
-                                    {t.category}
-                                </span>
+                                <Badge variant="neutral">{t.category}</Badge>
                             </td>
 
-                            {/* Data */}
                             <td
                                 style={{
                                     padding: ".75rem 1rem",
@@ -304,15 +287,9 @@ export default function TransactionTable({
                                     whiteSpace: "nowrap",
                                 }}
                             >
-                                {format(
-                                    new Date(
-                                        t.date.split("T")[0] + "T12:00:00",
-                                    ),
-                                    "dd/MM/yyyy",
-                                )}
+                                {format(parseSafeDate(t.date), "dd/MM/yyyy")}
                             </td>
 
-                            {/* Valor */}
                             <td
                                 style={{
                                     padding: ".75rem 1rem",
@@ -329,11 +306,10 @@ export default function TransactionTable({
                                     }}
                                 >
                                     {isIncome ? "+" : "-"}
-                                    {fmt(Number(t.amount))}
+                                    {formatCurrency(Number(t.amount))}
                                 </span>
                             </td>
 
-                            {/* Ações */}
                             <td
                                 style={{
                                     padding: ".75rem 1rem",
@@ -349,51 +325,13 @@ export default function TransactionTable({
                                 >
                                     <button
                                         onClick={() => onEdit(t)}
-                                        style={{
-                                            fontSize: "var(--text-xs)",
-                                            fontWeight: 500,
-                                            color: "var(--accent-brand-light)",
-                                            background: "none",
-                                            border: "none",
-                                            cursor: "pointer",
-                                            padding: "4px 8px",
-                                            borderRadius: "var(--radius-sm)",
-                                            transition:
-                                                "background var(--transition-base)",
-                                        }}
-                                        onMouseEnter={(e) =>
-                                            (e.currentTarget.style.background =
-                                                "var(--accent-brand-glow)")
-                                        }
-                                        onMouseLeave={(e) =>
-                                            (e.currentTarget.style.background =
-                                                "none")
-                                        }
+                                        className="tx-action-btn tx-action-btn--edit"
                                     >
                                         Editar
                                     </button>
                                     <button
                                         onClick={() => onDelete(t.id)}
-                                        style={{
-                                            fontSize: "var(--text-xs)",
-                                            fontWeight: 500,
-                                            color: "var(--color-danger-light)",
-                                            background: "none",
-                                            border: "none",
-                                            cursor: "pointer",
-                                            padding: "4px 8px",
-                                            borderRadius: "var(--radius-sm)",
-                                            transition:
-                                                "background var(--transition-base)",
-                                        }}
-                                        onMouseEnter={(e) =>
-                                            (e.currentTarget.style.background =
-                                                "var(--color-danger-bg)")
-                                        }
-                                        onMouseLeave={(e) =>
-                                            (e.currentTarget.style.background =
-                                                "none")
-                                        }
+                                        className="tx-action-btn tx-action-btn--delete"
                                     >
                                         Excluir
                                     </button>

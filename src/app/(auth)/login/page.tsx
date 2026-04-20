@@ -92,7 +92,6 @@ export default function LoginPage() {
         @media (min-width: 1024px) { .login-mobile-logo { display: none !important; } }
       `}</style>
 
-            {/* ── LEFT — brand / stats (desktop only) ── */}
             <div
                 className="login-aside animate-fade-in"
                 style={{
@@ -102,7 +101,6 @@ export default function LoginPage() {
                     gap: "2rem",
                 }}
             >
-                {/* Logo + tagline */}
                 <div>
                     <div
                         style={{
@@ -163,7 +161,6 @@ export default function LoginPage() {
                     </p>
                 </div>
 
-                {/* Stats */}
                 <div
                     style={{
                         display: "flex",
@@ -221,7 +218,6 @@ export default function LoginPage() {
                     ))}
                 </div>
 
-                {/* Segurança */}
                 <p
                     className="animate-fade-in delay-300"
                     style={{
@@ -237,7 +233,6 @@ export default function LoginPage() {
                 </p>
             </div>
 
-            {/* ── RIGHT — card ── */}
             <div
                 className="animate-fade-in-scale"
                 style={{ width: "100%", maxWidth: "420px" }}
@@ -253,7 +248,6 @@ export default function LoginPage() {
                     <div className="accent-bar-brand" />
 
                     <div style={{ padding: "2rem" }}>
-                        {/* Mobile logo */}
                         <div
                             className="login-mobile-logo"
                             style={{

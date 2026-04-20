@@ -1,4 +1,6 @@
 import { format } from "date-fns";
+import Badge from "@/components/ui/Badge";
+import { formatCurrency, parseSafeDate } from "@/lib/formatters";
 import type { Transaction } from "./TransactionTable";
 
 interface TransactionCardListProps {
@@ -7,11 +9,33 @@ interface TransactionCardListProps {
     onDelete: (id: string) => void;
 }
 
-const fmt = (v: number) =>
-    new Intl.NumberFormat("pt-BR", {
-        style: "currency",
-        currency: "BRL",
-    }).format(v);
+function TypeIcon({ isIncome }: { isIncome: boolean }) {
+    return (
+        <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden
+        >
+            {isIncome ? (
+                <>
+                    <line x1="12" y1="19" x2="12" y2="5" />
+                    <polyline points="5 12 12 5 19 12" />
+                </>
+            ) : (
+                <>
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <polyline points="19 12 12 19 5 12" />
+                </>
+            )}
+        </svg>
+    );
+}
 
 export default function TransactionCardList({
     transactions,
@@ -43,7 +67,6 @@ export default function TransactionCardList({
                             gap: ".5rem",
                         }}
                     >
-                        {/* Ícone */}
                         <div
                             style={{
                                 width: "36px",
@@ -58,31 +81,9 @@ export default function TransactionCardList({
                                 color,
                             }}
                         >
-                            <svg
-                                width="14"
-                                height="14"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2.5"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                            >
-                                {isIncome ? (
-                                    <>
-                                        <line x1="12" y1="19" x2="12" y2="5" />
-                                        <polyline points="5 12 12 5 19 12" />
-                                    </>
-                                ) : (
-                                    <>
-                                        <line x1="12" y1="5" x2="12" y2="19" />
-                                        <polyline points="19 12 12 19 5 12" />
-                                    </>
-                                )}
-                            </svg>
+                            <TypeIcon isIncome={isIncome} />
                         </div>
 
-                        {/* Info */}
                         <div style={{ flex: 1, minWidth: 0 }}>
                             <p
                                 style={{
@@ -104,16 +105,10 @@ export default function TransactionCardList({
                                 }}
                             >
                                 {t.category} ·{" "}
-                                {format(
-                                    new Date(
-                                        t.date.split("T")[0] + "T12:00:00",
-                                    ),
-                                    "dd/MM/yyyy",
-                                )}
+                                {format(parseSafeDate(t.date), "dd/MM/yyyy")}
                             </p>
                         </div>
 
-                        {/* Valor + ações */}
                         <div
                             style={{
                                 display: "flex",
@@ -133,36 +128,19 @@ export default function TransactionCardList({
                                 }}
                             >
                                 {isIncome ? "+" : "-"}
-                                {fmt(Number(t.amount))}
+                                {formatCurrency(Number(t.amount))}
                             </span>
+
                             <div style={{ display: "flex", gap: ".25rem" }}>
                                 <button
                                     onClick={() => onEdit(t)}
-                                    style={{
-                                        fontSize: "10px",
-                                        fontWeight: 500,
-                                        color: "var(--accent-brand-light)",
-                                        background: "var(--accent-brand-glow)",
-                                        border: "1px solid var(--border-glow)",
-                                        cursor: "pointer",
-                                        padding: "3px 6px",
-                                        borderRadius: "var(--radius-sm)",
-                                    }}
+                                    className="tx-action-btn tx-action-btn--edit"
                                 >
                                     Editar
                                 </button>
                                 <button
                                     onClick={() => onDelete(t.id)}
-                                    style={{
-                                        fontSize: "10px",
-                                        fontWeight: 500,
-                                        color: "var(--color-danger-light)",
-                                        background: "var(--color-danger-bg)",
-                                        border: "1px solid var(--color-danger-border)",
-                                        cursor: "pointer",
-                                        padding: "3px 6px",
-                                        borderRadius: "var(--radius-sm)",
-                                    }}
+                                    className="tx-action-btn tx-action-btn--delete"
                                 >
                                     Excluir
                                 </button>

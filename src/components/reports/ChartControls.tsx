@@ -40,7 +40,6 @@ export default function ChartControls({
                 marginBottom: "1.25rem",
             }}
         >
-            {/* Tipo de gráfico */}
             <div
                 style={{
                     display: "flex",
@@ -103,7 +102,6 @@ export default function ChartControls({
                 </div>
             </div>
 
-            {/* Período */}
             <div
                 style={{
                     display: "flex",

@@ -4,7 +4,6 @@ interface StatCardProps {
     label: string;
     value: string;
     description: string;
-    /** Ícone SVG — usa currentColor, herda a cor do container */
     icon: React.ReactNode;
     iconBg: string;
     iconBorder: string;

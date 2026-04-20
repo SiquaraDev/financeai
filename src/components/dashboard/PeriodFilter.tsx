@@ -50,7 +50,6 @@ export default function PeriodFilter({
                 overflow: "hidden",
             }}
         >
-            {/* Título + período ativo */}
             <div
                 style={{
                     display: "flex",
@@ -125,7 +124,6 @@ export default function PeriodFilter({
                 </span>
             </div>
 
-            {/* Botões */}
             <div className="filter-bar">
                 {FILTER_OPTIONS.map(({ key, label }) => (
                     <button
@@ -138,7 +136,6 @@ export default function PeriodFilter({
                 ))}
             </div>
 
-            {/* Datas customizadas */}
             {activeFilter === "custom" && (
                 <div className="custom-dates animate-fade-in">
                     {[

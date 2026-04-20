@@ -1,0 +1,255 @@
+"use client";
+
+import { useState, useEffect, useCallback } from "react";
+import * as XLSX from "xlsx";
+import type { Transaction } from "./useDashboardStats";
+
+export type { Transaction };
+
+export type FilterType = "ALL" | "INCOME" | "EXPENSE";
+
+export interface TransactionFormData {
+    title: string;
+    amount: string;
+    type: "INCOME" | "EXPENSE";
+    category: string;
+    date: string;
+    description: string;
+}
+
+export const EMPTY_FORM: TransactionFormData = {
+    title: "",
+    amount: "",
+    type: "EXPENSE",
+    category: "",
+    date: new Date().toISOString().split("T")[0],
+    description: "",
+};
+
+interface UseTransactionsReturn {
+    transactions: Transaction[];
+    total: number;
+    page: number;
+    filter: FilterType;
+    loading: boolean;
+    setPage: (p: number) => void;
+    setFilter: (f: FilterType) => void;
+    refetch: () => void;
+
+    showModal: boolean;
+    showImport: boolean;
+    editingId: string | null;
+    form: TransactionFormData;
+    saving: boolean;
+    importError: string;
+
+    openCreate: () => void;
+    openEdit: (t: Transaction) => void;
+    closeModal: () => void;
+    openImport: () => void;
+    closeImport: () => void;
+    updateForm: (updates: Partial<TransactionFormData>) => void;
+    handleSave: () => Promise<void>;
+    handleDelete: (id: string) => Promise<void>;
+    handleFileImport: (
+        e: React.ChangeEvent<HTMLInputElement>,
+        type: "json" | "excel" | "pdf",
+    ) => void;
+}
+
+export function useTransactions(): UseTransactionsReturn {
+    const [transactions, setTransactions] = useState<Transaction[]>([]);
+    const [total, setTotal] = useState(0);
+    const [page, setPage] = useState(1);
+    const [filter, setFilter] = useState<FilterType>("ALL");
+    const [loading, setLoading] = useState(true);
+
+    const [showModal, setShowModal] = useState(false);
+    const [showImport, setShowImport] = useState(false);
+    const [editingId, setEditingId] = useState<string | null>(null);
+    const [form, setForm] = useState<TransactionFormData>(EMPTY_FORM);
+    const [saving, setSaving] = useState(false);
+    const [importError, setImportError] = useState("");
+
+    const fetchTransactions = useCallback(async () => {
+        setLoading(true);
+        const params = new URLSearchParams({ page: String(page), limit: "15" });
+        if (filter !== "ALL") params.set("type", filter);
+        const res = await fetch(`/api/transactions?${params}`);
+        const data = await res.json();
+        setTransactions(data.transactions ?? []);
+        setTotal(data.total ?? 0);
+        setLoading(false);
+    }, [page, filter]);
+
+    useEffect(() => {
+        fetchTransactions();
+    }, [fetchTransactions]);
+
+    const handleSetFilter = useCallback((f: FilterType) => {
+        setFilter(f);
+        setPage(1);
+    }, []);
+
+    const openCreate = useCallback(() => {
+        setForm(EMPTY_FORM);
+        setEditingId(null);
+        setShowModal(true);
+    }, []);
+
+    const openEdit = useCallback((t: Transaction) => {
+        setForm({
+            title: t.title,
+            amount: String(t.amount),
+            type: t.type,
+            category: t.category,
+            date: t.date.split("T")[0],
+            description: t.description ?? "",
+        });
+        setEditingId(t.id);
+        setShowModal(true);
+    }, []);
+
+    const closeModal = useCallback(() => setShowModal(false), []);
+
+    const openImport = useCallback(() => {
+        setImportError("");
+        setShowImport(true);
+    }, []);
+
+    const closeImport = useCallback(() => setShowImport(false), []);
+
+    const updateForm = useCallback((updates: Partial<TransactionFormData>) => {
+        setForm((prev) => ({ ...prev, ...updates }));
+    }, []);
+
+    const handleSave = useCallback(async () => {
+        setSaving(true);
+        const payload = { ...form, amount: parseFloat(form.amount) };
+        const url = editingId
+            ? `/api/transactions/${editingId}`
+            : "/api/transactions";
+        const method = editingId ? "PUT" : "POST";
+        await fetch(url, {
+            method,
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+        });
+        setShowModal(false);
+        setSaving(false);
+        fetchTransactions();
+    }, [form, editingId, fetchTransactions]);
+
+    const handleDelete = useCallback(
+        async (id: string) => {
+            if (!confirm("Excluir esta transação?")) return;
+            await fetch(`/api/transactions/${id}`, { method: "DELETE" });
+            fetchTransactions();
+        },
+        [fetchTransactions],
+    );
+
+    const importJSON = useCallback(
+        async (file: File) => {
+            try {
+                const text = await file.text();
+                const items = JSON.parse(text);
+                const list = Array.isArray(items) ? items : [items];
+                for (const item of list) {
+                    await fetch("/api/transactions", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ ...item, source: "JSON" }),
+                    });
+                }
+                setShowImport(false);
+                fetchTransactions();
+            } catch {
+                setImportError(
+                    "JSON inválido. Verifique o formato do arquivo.",
+                );
+            }
+        },
+        [fetchTransactions],
+    );
+
+    const importExcel = useCallback(
+        async (file: File) => {
+            try {
+                const wb = XLSX.read(await file.arrayBuffer());
+                const rows = XLSX.utils.sheet_to_json(
+                    wb.Sheets[wb.SheetNames[0]],
+                ) as Record<string, unknown>[];
+                for (const row of rows) {
+                    await fetch("/api/transactions", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            title: row["titulo"] ?? row["title"] ?? "Importado",
+                            amount: Number(row["valor"] ?? row["amount"] ?? 0),
+                            type: row["tipo"] ?? row["type"] ?? "EXPENSE",
+                            category:
+                                row["categoria"] ?? row["category"] ?? "Outros",
+                            date:
+                                row["data"] ??
+                                row["date"] ??
+                                new Date().toISOString(),
+                            source: "EXCEL",
+                        }),
+                    });
+                }
+                setShowImport(false);
+                fetchTransactions();
+            } catch {
+                setImportError("Erro ao ler o arquivo Excel.");
+            }
+        },
+        [fetchTransactions],
+    );
+
+    const handleFileImport = useCallback(
+        (
+            e: React.ChangeEvent<HTMLInputElement>,
+            type: "json" | "excel" | "pdf",
+        ) => {
+            const file = e.target.files?.[0];
+            if (!file) return;
+            setImportError("");
+            if (type === "json") importJSON(file);
+            else if (type === "excel") importExcel(file);
+            else
+                setImportError(
+                    "Importação de PDF: implemente extração no backend com pdf-parse.",
+                );
+        },
+        [importJSON, importExcel],
+    );
+
+    return {
+        transactions,
+        total,
+        page,
+        filter,
+        loading,
+        setPage,
+        setFilter: handleSetFilter,
+        refetch: fetchTransactions,
+
+        showModal,
+        showImport,
+        editingId,
+        form,
+        saving,
+        importError,
+
+        openCreate,
+        openEdit,
+        closeModal,
+        openImport,
+        closeImport,
+        updateForm,
+        handleSave,
+        handleDelete,
+        handleFileImport,
+    };
+}

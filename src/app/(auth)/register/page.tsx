@@ -75,7 +75,6 @@ export default function RegisterPage() {
         @media (min-width: 1024px) { .register-mobile-logo  { display: none !important; } }
       `}</style>
 
-            {/* ── LEFT — brand / features (desktop only) ── */}
             <div
                 className="register-aside animate-fade-in"
                 style={{
@@ -145,7 +144,6 @@ export default function RegisterPage() {
                     </p>
                 </div>
 
-                {/* Features */}
                 <div
                     style={{
                         display: "flex",
@@ -193,7 +191,6 @@ export default function RegisterPage() {
                     ))}
                 </div>
 
-                {/* Badge gratuito */}
                 <div
                     className="animate-fade-in delay-300 card-glass"
                     style={{
@@ -229,7 +226,6 @@ export default function RegisterPage() {
                 </div>
             </div>
 
-            {/* ── RIGHT — card ── */}
             <div
                 className="animate-fade-in-scale"
                 style={{ width: "100%", maxWidth: "420px" }}
@@ -250,7 +246,6 @@ export default function RegisterPage() {
                     />
 
                     <div style={{ padding: "2rem" }}>
-                        {/* Mobile logo */}
                         <div
                             className="register-mobile-logo"
                             style={{

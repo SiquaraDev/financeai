@@ -1,6 +1,3 @@
-// Centraliza todos os ícones SVG. Todos usam stroke="currentColor"
-// para herdar a cor do container pai via CSS.
-
 export function IconMail({ size = 15 }: { size?: number }) {
     return (
         <svg
@@ -437,7 +434,6 @@ export function IconDashboard({ size = 16 }: { size?: number }) {
     );
 }
 
-// ─── Ícone da Google (usa fill específico, não currentColor) ──
 export function GoogleLogo() {
     return (
         <svg width="17" height="17" viewBox="0 0 24 24" aria-hidden>

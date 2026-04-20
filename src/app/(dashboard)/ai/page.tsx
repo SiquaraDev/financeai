@@ -3,6 +3,11 @@
 import { useState, useRef, useEffect } from "react";
 import { format, subMonths, startOfMonth, endOfMonth } from "date-fns";
 
+import PageHeader from "@/components/ui/PageHeader";
+import Card from "@/components/ui/Card";
+import Badge from "@/components/ui/Badge";
+import Button from "@/components/ui/Button";
+import EmptyState from "@/components/ui/EmptyState";
 import NewAnalysisCard, {
     type Shortcut,
 } from "@/components/ai/NewAnalysisCard";
@@ -23,26 +28,27 @@ interface AnalysisResult {
 
 function applyShortcut(shortcut: Shortcut): { start: string; end: string } {
     const now = new Date();
+    const fmt = (d: Date) => format(d, "yyyy-MM-dd");
     switch (shortcut) {
         case "last_month":
             return {
-                start: format(startOfMonth(subMonths(now, 1)), "yyyy-MM-dd"),
-                end: format(endOfMonth(subMonths(now, 1)), "yyyy-MM-dd"),
+                start: fmt(startOfMonth(subMonths(now, 1))),
+                end: fmt(endOfMonth(subMonths(now, 1))),
             };
         case "3_months":
             return {
-                start: format(startOfMonth(subMonths(now, 2)), "yyyy-MM-dd"),
-                end: format(endOfMonth(now), "yyyy-MM-dd"),
+                start: fmt(startOfMonth(subMonths(now, 2))),
+                end: fmt(endOfMonth(now)),
             };
         case "6_months":
             return {
-                start: format(startOfMonth(subMonths(now, 5)), "yyyy-MM-dd"),
-                end: format(endOfMonth(now), "yyyy-MM-dd"),
+                start: fmt(startOfMonth(subMonths(now, 5))),
+                end: fmt(endOfMonth(now)),
             };
         case "year":
             return {
-                start: format(startOfMonth(subMonths(now, 11)), "yyyy-MM-dd"),
-                end: format(endOfMonth(now), "yyyy-MM-dd"),
+                start: fmt(startOfMonth(subMonths(now, 11))),
+                end: fmt(endOfMonth(now)),
             };
     }
 }
@@ -85,7 +91,7 @@ export default function AiPage() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ action: "analyze", startDate, endDate }),
             });
-            const data = await res.json();
+            const data: AnalysisResult = await res.json();
             setAnalysis(data);
             setMessages([
                 {
@@ -108,12 +114,10 @@ export default function AiPage() {
         setMessages((prev) => [...prev, { role: "user", content: userMsg }]);
         setChatLoading(true);
 
-        const historyToSend = messages
-            .slice(1)
-            .map((m) => ({
-                role: m.role === "assistant" ? "model" : "user",
-                parts: m.content,
-            }));
+        const historyToSend = messages.slice(1).map((m) => ({
+            role: m.role === "assistant" ? "model" : "user",
+            parts: m.content,
+        }));
 
         try {
             const res = await fetch("/api/ai", {
@@ -172,77 +176,54 @@ export default function AiPage() {
         >
             <style>{`
         .ai-layout {
-          display: grid; grid-template-columns: 340px 1fr;
+          display: grid;
+          grid-template-columns: 340px 1fr;
           gap: clamp(.5rem, 2vw, 1rem);
-          height: calc(100dvh - 120px); min-height: 500px;
+          height: calc(100dvh - 120px);
+          min-height: 500px;
         }
         .ai-left { display: flex; flex-direction: column; gap: clamp(.5rem, 2vw, 1rem); overflow-y: auto; min-width: 0; }
         .ai-chat { display: flex; flex-direction: column; min-height: 0; }
         .ai-messages { flex: 1; overflow-y: auto; padding: clamp(.75rem,2vw,1.25rem); display: flex; flex-direction: column; gap: .75rem; scroll-behavior: smooth; }
         .ai-textarea { flex: 1; resize: none; min-height: 42px; max-height: 120px; line-height: 1.5; overflow-y: auto; padding: 10px 14px 0px !important; border: none !important; box-shadow: none !important; background: transparent !important; border-radius: var(--radius-md) !important; width: 100%; }
         .ai-textarea:focus { border: none !important; box-shadow: none !important; outline: none !important; }
-        .ai-textarea::-webkit-scrollbar { width: 5px; }
-        .ai-textarea::-webkit-scrollbar-thumb { background: var(--border); border-radius: var(--radius-full); }
         @media (max-width: 900px) { .ai-layout { grid-template-columns: 1fr; height: auto; min-height: unset; } .ai-chat { height: 520px; } }
         @media (max-width: 480px) { .ai-chat { height: 460px; } }
-        @media (max-width: 360px) { .ai-chat { height: 400px; } }
       `}</style>
 
-            {/* Header */}
-            <div
-                className="animate-fade-in"
-                style={{ marginBottom: "clamp(.75rem, 3vw, 1.5rem)" }}
-            >
-                <div
-                    style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: ".625rem",
-                        marginBottom: "var(--space-1)",
-                    }}
-                >
+            <PageHeader
+                title={
                     <div
-                        className="animate-pulse-teal"
                         style={{
-                            width: "32px",
-                            height: "32px",
-                            borderRadius: "var(--radius-md)",
-                            background: "var(--accent-teal-glow)",
-                            border: "1px solid rgba(20,184,166,.3)",
                             display: "flex",
                             alignItems: "center",
-                            justifyContent: "center",
-                            color: "var(--accent-teal-light)",
-                            flexShrink: 0,
+                            gap: ".625rem",
                         }}
                     >
-                        <GeminiIcon size={16} />
-                    </div>
-                    <h1
-                        className="font-display"
-                        style={{
-                            fontSize: "clamp(18px, 5vw, 30px)",
-                            fontWeight: 800,
-                            color: "var(--text-primary)",
-                            letterSpacing: "-0.03em",
-                            lineHeight: 1.2,
-                        }}
-                    >
+                        <div
+                            className="animate-pulse-teal"
+                            style={{
+                                width: "32px",
+                                height: "32px",
+                                borderRadius: "var(--radius-md)",
+                                background: "var(--accent-teal-glow)",
+                                border: "1px solid rgba(20,184,166,.3)",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                color: "var(--accent-teal-light)",
+                                flexShrink: 0,
+                            }}
+                        >
+                            <GeminiIcon size={16} />
+                        </div>
                         IA Gemini
-                    </h1>
-                </div>
-                <p
-                    style={{
-                        fontSize: "var(--text-sm)",
-                        color: "var(--text-secondary)",
-                    }}
-                >
-                    Análise financeira inteligente com Gemini 3 Flash
-                </p>
-            </div>
+                    </div>
+                }
+                subtitle="Análise financeira inteligente com Gemini 3 Flash"
+            />
 
             <div className="ai-layout">
-                {/* ── Coluna esquerda ── */}
                 <div className="ai-left">
                     <NewAnalysisCard
                         startDate={startDate}
@@ -257,12 +238,10 @@ export default function AiPage() {
                     {analysis && <AnalysisResultCard analysis={analysis} />}
                 </div>
 
-                {/* ── Chat ── */}
                 <div
                     className="card-glass ai-chat animate-fade-in delay-150"
                     style={{ overflow: "hidden" }}
                 >
-                    {/* Header do chat */}
                     <div
                         style={{
                             padding:
@@ -313,95 +292,41 @@ export default function AiPage() {
                                     : "Execute uma análise primeiro"}
                             </p>
                         </div>
-                        {/* Status pill */}
                         <div style={{ marginLeft: "auto", flexShrink: 0 }}>
-                            <span
-                                style={{
-                                    display: "inline-flex",
-                                    alignItems: "center",
-                                    gap: "5px",
-                                    padding: "3px 10px",
-                                    borderRadius: "var(--radius-full)",
-                                    fontSize: "10px",
-                                    fontWeight: 600,
-                                    background: analysis
-                                        ? "var(--color-success-bg)"
-                                        : "var(--bg-elevated)",
-                                    border: `1px solid ${analysis ? "var(--color-success-border)" : "var(--border-subtle)"}`,
-                                    color: analysis
-                                        ? "var(--color-success-light)"
-                                        : "var(--text-muted)",
-                                }}
+                            <Badge
+                                variant={analysis ? "success" : "neutral"}
+                                dot
                             >
-                                <span
-                                    style={{
-                                        width: "5px",
-                                        height: "5px",
-                                        borderRadius: "50%",
-                                        background: analysis
-                                            ? "var(--color-success-light)"
-                                            : "var(--text-dim)",
-                                    }}
-                                />
                                 {analysis ? "Ativo" : "Aguardando"}
-                            </span>
+                            </Badge>
                         </div>
                     </div>
 
-                    {/* Mensagens */}
                     <div className="ai-messages">
                         {messages.length === 0 && !analysis && (
-                            <div
-                                style={{
-                                    flex: 1,
-                                    display: "flex",
-                                    flexDirection: "column",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    gap: "var(--space-3)",
-                                    padding: "2rem",
-                                    textAlign: "center",
-                                }}
-                            >
-                                <div
-                                    className="animate-pulse-teal"
-                                    style={{
-                                        width: "52px",
-                                        height: "52px",
-                                        borderRadius: "var(--radius-full)",
-                                        background: "var(--accent-teal-glow)",
-                                        border: "1px solid rgba(20,184,166,.25)",
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        color: "var(--accent-teal-light)",
-                                    }}
-                                >
-                                    <GeminiIcon size={22} />
-                                </div>
-                                <div>
-                                    <p
-                                        className="font-display"
+                            <EmptyState
+                                icon={
+                                    <div
+                                        className="animate-pulse-teal"
                                         style={{
-                                            fontSize: "var(--text-sm)",
-                                            fontWeight: 600,
-                                            color: "var(--text-secondary)",
-                                            marginBottom: "var(--space-1)",
+                                            width: "52px",
+                                            height: "52px",
+                                            borderRadius: "var(--radius-full)",
+                                            background:
+                                                "var(--accent-teal-glow)",
+                                            border: "1px solid rgba(20,184,166,.25)",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            color: "var(--accent-teal-light)",
                                         }}
                                     >
-                                        Execute uma análise para começar o chat
-                                    </p>
-                                    <p
-                                        style={{
-                                            fontSize: "var(--text-xs)",
-                                            color: "var(--text-muted)",
-                                        }}
-                                    >
-                                        O Gemini vai analisar suas finanças e
-                                        responder suas dúvidas
-                                    </p>
-                                </div>
-                            </div>
+                                        <GeminiIcon size={22} />
+                                    </div>
+                                }
+                                title="Execute uma análise para começar o chat"
+                                description="O Gemini vai analisar suas finanças e responder suas dúvidas"
+                            />
                         )}
 
                         {messages.map((msg, i) => (
@@ -412,7 +337,6 @@ export default function AiPage() {
                             />
                         ))}
 
-                        {/* Typing indicator */}
                         {chatLoading && (
                             <div
                                 className="animate-fade-in"
@@ -454,13 +378,10 @@ export default function AiPage() {
                         <div ref={messagesEndRef} />
                     </div>
 
-                    {/* Input */}
                     <div
                         style={{
-                            paddingTop: "clamp(.625rem,2vw,1rem)",
-                            paddingLeft: "clamp(.75rem,2vw,1.25rem)",
-                            paddingRight: "clamp(.75rem,2vw,1.25rem)",
-                            paddingBottom: 0,
+                            padding:
+                                "clamp(.625rem,2vw,1rem) clamp(.75rem,2vw,1.25rem) 0",
                             borderTop: "1px solid var(--border-subtle)",
                             flexShrink: 0,
                         }}
@@ -472,7 +393,6 @@ export default function AiPage() {
                                 alignItems: "flex-end",
                             }}
                         >
-                            {/* Wrapper com focus ring */}
                             <div
                                 style={{
                                     flex: 1,
@@ -510,18 +430,21 @@ export default function AiPage() {
                                     rows={1}
                                 />
                             </div>
-                            <button
+
+                            <Button
+                                variant="primary"
                                 onClick={handleChat}
                                 disabled={
                                     !input.trim() || !analysis || chatLoading
                                 }
-                                className="btn-primary"
+                                loading={chatLoading}
+                                icon={
+                                    !chatLoading ? (
+                                        <IconSend size={14} />
+                                    ) : undefined
+                                }
                                 style={{
                                     padding: "10px 14px",
-                                    borderRadius: "var(--radius-md)",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
                                     flexShrink: 0,
                                     opacity:
                                         !input.trim() ||
@@ -531,13 +454,7 @@ export default function AiPage() {
                                             : 1,
                                     minWidth: "44px",
                                 }}
-                            >
-                                {chatLoading ? (
-                                    <IconSpinner size={14} />
-                                ) : (
-                                    <IconSend size={14} />
-                                )}
-                            </button>
+                            />
                         </div>
                         <p
                             style={{

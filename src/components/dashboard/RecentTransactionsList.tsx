@@ -1,4 +1,6 @@
 import { format } from "date-fns";
+import EmptyState from "@/components/ui/EmptyState";
+import { formatCurrency, parseSafeDate } from "@/lib/formatters";
 
 interface Transaction {
     id: string;
@@ -9,52 +11,43 @@ interface Transaction {
     date: string;
 }
 
-const fmt = (v: number) =>
-    new Intl.NumberFormat("pt-BR", {
-        style: "currency",
-        currency: "BRL",
-    }).format(v);
+interface RecentTransactionsListProps {
+    transactions: Transaction[];
+}
+
+function TxIcon({ isIncome }: { isIncome: boolean }) {
+    return (
+        <svg
+            width="12"
+            height="12"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden
+        >
+            {isIncome ? (
+                <>
+                    <line x1="12" y1="19" x2="12" y2="5" />
+                    <polyline points="5 12 12 5 19 12" />
+                </>
+            ) : (
+                <>
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <polyline points="19 12 12 19 5 12" />
+                </>
+            )}
+        </svg>
+    );
+}
 
 export default function RecentTransactionsList({
     transactions,
-}: {
-    transactions: Transaction[];
-}) {
+}: RecentTransactionsListProps) {
     if (transactions.length === 0) {
-        return (
-            <div
-                style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    padding: "1.5rem 0",
-                    gap: ".5rem",
-                }}
-            >
-                <svg
-                    width="28"
-                    height="28"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="var(--text-dim)"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                >
-                    <rect x="2" y="3" width="20" height="14" rx="2" />
-                    <line x1="8" y1="21" x2="16" y2="21" />
-                    <line x1="12" y1="17" x2="12" y2="21" />
-                </svg>
-                <p
-                    style={{
-                        fontSize: "var(--text-sm)",
-                        color: "var(--text-muted)",
-                    }}
-                >
-                    Nenhuma transação no período
-                </p>
-            </div>
-        );
+        return <EmptyState title="Nenhuma transação no período" />;
     }
 
     return (
@@ -70,6 +63,7 @@ export default function RecentTransactionsList({
                 const border = isIncome
                     ? "var(--color-success-border)"
                     : "var(--color-danger-border)";
+
                 return (
                     <div key={t.id} className="tx-row">
                         <div
@@ -95,38 +89,7 @@ export default function RecentTransactionsList({
                                     color,
                                 }}
                             >
-                                <svg
-                                    width="12"
-                                    height="12"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="2.5"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                >
-                                    {isIncome ? (
-                                        <>
-                                            <line
-                                                x1="12"
-                                                y1="19"
-                                                x2="12"
-                                                y2="5"
-                                            />
-                                            <polyline points="5 12 12 5 19 12" />
-                                        </>
-                                    ) : (
-                                        <>
-                                            <line
-                                                x1="12"
-                                                y1="5"
-                                                x2="12"
-                                                y2="19"
-                                            />
-                                            <polyline points="19 12 12 19 5 12" />
-                                        </>
-                                    )}
-                                </svg>
+                                <TxIcon isIncome={isIncome} />
                             </div>
                             <div style={{ minWidth: 0 }}>
                                 <p
@@ -149,15 +112,11 @@ export default function RecentTransactionsList({
                                     }}
                                 >
                                     {t.category} ·{" "}
-                                    {format(
-                                        new Date(
-                                            t.date.split("T")[0] + "T12:00:00",
-                                        ),
-                                        "dd/MM",
-                                    )}
+                                    {format(parseSafeDate(t.date), "dd/MM")}
                                 </p>
                             </div>
                         </div>
+
                         <span
                             className="font-mono"
                             style={{
@@ -169,7 +128,7 @@ export default function RecentTransactionsList({
                             }}
                         >
                             {isIncome ? "+" : "-"}
-                            {fmt(Number(t.amount))}
+                            {formatCurrency(Number(t.amount))}
                         </span>
                     </div>
                 );

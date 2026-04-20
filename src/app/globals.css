@@ -1,54 +1,44 @@
 @import "tailwindcss";
 @import url("https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Mono:wght@400;500&display=swap");
 
-/* ============================================================
-   DESIGN TOKENS — FinanceAI
-   Paleta: Midnight Navy base · Sapphire accent · Teal AI glow
-   ============================================================ */
 :root {
-    /* ── Backgrounds ────────────────────────────────────────── */
-    --bg-base: #04090f; /* Quase preto, quente — canvas principal     */
-    --bg-surface: #080f1a; /* Painéis laterais, navbars                  */
-    --bg-card: #0c1524; /* Cards, modais, dropdowns                   */
-    --bg-card-hover: #101d30; /* Estado hover de cards                      */
-    --bg-elevated: #132338; /* Elementos acima do card (inputs, tags)     */
-    --bg-overlay: rgba(4, 9, 15, 0.82); /* Backdrops e overlays            */
+    --bg-base: #04090f;
+    --bg-surface: #080f1a;
+    --bg-card: #0c1524;
+    --bg-card-hover: #101d30;
+    --bg-elevated: #132338;
+    --bg-overlay: rgba(4, 9, 15, 0.82);
 
-    /* ── Borders ────────────────────────────────────────────── */
-    --border: #1a3352; /* Borda padrão                               */
-    --border-subtle: #0f2038; /* Divisores internos, separadores            */
-    --border-strong: #254d7a; /* Bordas de foco / destaque                  */
-    --border-glow: rgba(56, 139, 253, 0.35); /* Borda com glow azul        */
+    --border: #1a3352;
+    --border-subtle: #0f2038;
+    --border-strong: #254d7a;
+    --border-glow: rgba(56, 139, 253, 0.35);
 
-    /* ── Brand / Primary — Sapphire Blue ────────────────────── */
     --brand-50: #e8f2ff;
     --brand-100: #c8dffe;
     --brand-200: #93bffd;
     --brand-300: #5e9ffc;
-    --brand-400: #388bfb; /* ← accent principal claro                   */
-    --brand-500: #1a6ff0; /* ← CTA, botões primários                    */
+    --brand-400: #388bfb;
+    --brand-500: #1a6ff0;
     --brand-600: #1258c7;
     --brand-700: #0d429e;
     --brand-800: #092e74;
     --brand-900: #051a47;
 
-    /* Aliases para uso rápido */
     --accent-brand: var(--brand-500);
     --accent-brand-light: var(--brand-400);
     --accent-brand-glow: rgba(26, 111, 240, 0.2);
     --accent-brand-glow-lg: rgba(26, 111, 240, 0.1);
 
-    /* ── AI Glow — Teal / Cyan ───────────────────────────────── */
     --teal-300: #5ee8d6;
     --teal-400: #2dd4bc;
-    --teal-500: #14b8a6; /* ← cor "IA", indicadores ativos             */
+    --teal-500: #14b8a6;
     --teal-600: #0d9488;
 
     --accent-teal: var(--teal-500);
     --accent-teal-light: var(--teal-400);
     --accent-teal-glow: rgba(20, 184, 166, 0.18);
 
-    /* ── Semantic — Success (Green) ─────────────────────────── */
     --green-400: #34d399;
     --green-500: #10b981;
     --green-600: #059669;
@@ -58,7 +48,6 @@
     --color-success-bg: rgba(16, 185, 129, 0.1);
     --color-success-border: rgba(16, 185, 129, 0.22);
 
-    /* ── Semantic — Danger (Red) ─────────────────────────────── */
     --red-400: #f87171;
     --red-500: #ef4444;
     --red-600: #dc2626;
@@ -68,7 +57,6 @@
     --color-danger-bg: rgba(239, 68, 68, 0.1);
     --color-danger-border: rgba(239, 68, 68, 0.22);
 
-    /* ── Semantic — Warning (Amber) ──────────────────────────── */
     --amber-400: #fbbf24;
     --amber-500: #f59e0b;
 
@@ -77,7 +65,6 @@
     --color-warning-bg: rgba(245, 158, 11, 0.1);
     --color-warning-border: rgba(245, 158, 11, 0.22);
 
-    /* ── Semantic — Info (Violet) ────────────────────────────── */
     --violet-400: #a78bfa;
     --violet-500: #8b5cf6;
 
@@ -86,15 +73,13 @@
     --color-info-bg: rgba(139, 92, 246, 0.1);
     --color-info-border: rgba(139, 92, 246, 0.22);
 
-    /* ── Typography ──────────────────────────────────────────── */
-    --text-primary: #e2ecfb; /* Títulos, valores, texto principal           */
-    --text-secondary: #7fa8d4; /* Labels, subtítulos, texto de suporte        */
-    --text-muted: #3d6080; /* Placeholders, metadados                     */
-    --text-dim: #1f3d5a; /* Decorativo, quase invisível                 */
-    --text-inverse: #04090f; /* Texto sobre fundos claros (badges, etc.)    */
-    --text-on-brand: #ffffff; /* Texto sobre botões de cor                   */
+    --text-primary: #e2ecfb;
+    --text-secondary: #7fa8d4;
+    --text-muted: #3d6080;
+    --text-dim: #1f3d5a;
+    --text-inverse: #04090f;
+    --text-on-brand: #ffffff;
 
-    /* ── Gradients ───────────────────────────────────────────── */
     --gradient-brand: linear-gradient(
         135deg,
         var(--brand-500) 0%,
@@ -118,7 +103,6 @@
     );
     --gradient-danger: linear-gradient(135deg, var(--red-500), #f97316);
 
-    /* ── Shadows ─────────────────────────────────────────────── */
     --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
     --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5), 0 1px 4px rgba(0, 0, 0, 0.3);
     --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.6), 0 2px 8px rgba(0, 0, 0, 0.3);
@@ -127,18 +111,16 @@
     --shadow-teal: 0 4px 20px rgba(20, 184, 166, 0.3);
     --shadow-card: 0 0 0 1px var(--border), var(--shadow-md);
 
-    /* ── Spacing scale (rem) ─────────────────────────────────── */
-    --space-1: 0.25rem; /*  4px */
-    --space-2: 0.5rem; /*  8px */
-    --space-3: 0.75rem; /* 12px */
-    --space-4: 1rem; /* 16px */
-    --space-5: 1.25rem; /* 20px */
-    --space-6: 1.5rem; /* 24px */
-    --space-8: 2rem; /* 32px */
-    --space-10: 2.5rem; /* 40px */
-    --space-12: 3rem; /* 48px */
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.25rem;
+    --space-6: 1.5rem;
+    --space-8: 2rem;
+    --space-10: 2.5rem;
+    --space-12: 3rem;
 
-    /* ── Border radius ───────────────────────────────────────── */
     --radius-sm: 6px;
     --radius-md: 10px;
     --radius-lg: 14px;
@@ -146,30 +128,25 @@
     --radius-2xl: 24px;
     --radius-full: 9999px;
 
-    /* ── Typography scale ────────────────────────────────────── */
     --font-display: "Syne", sans-serif;
     --font-body: "DM Sans", sans-serif;
     --font-mono: "DM Mono", monospace;
 
-    --text-xs: 0.72rem; /* 11.5px */
-    --text-sm: 0.8125rem; /* 13px   */
-    --text-base: 0.9375rem; /* 15px   */
-    --text-lg: 1.0625rem; /* 17px   */
-    --text-xl: 1.25rem; /* 20px   */
-    --text-2xl: 1.5rem; /* 24px   */
-    --text-3xl: 1.875rem; /* 30px   */
-    --text-4xl: 2.25rem; /* 36px   */
+    --text-xs: 0.72rem;
+    --text-sm: 0.8125rem;
+    --text-base: 0.9375rem;
+    --text-lg: 1.0625rem;
+    --text-xl: 1.25rem;
+    --text-2xl: 1.5rem;
+    --text-3xl: 1.875rem;
+    --text-4xl: 2.25rem;
 
-    /* ── Transitions ─────────────────────────────────────────── */
     --transition-fast: 100ms ease;
     --transition-base: 180ms ease;
     --transition-slow: 320ms cubic-bezier(0.16, 1, 0.3, 1);
     --transition-spring: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* ============================================================
-   RESET & BASE
-   ============================================================ */
 *,
 *::before,
 *::after {
@@ -194,9 +171,6 @@ body {
     line-height: 1.6;
 }
 
-/* ============================================================
-   TYPOGRAPHY
-   ============================================================ */
 h1,
 h2,
 h3,
@@ -220,9 +194,6 @@ samp {
     font-family: var(--font-mono);
 }
 
-/* ============================================================
-   SCROLLBAR
-   ============================================================ */
 ::-webkit-scrollbar {
     width: 5px;
     height: 5px;
@@ -239,17 +210,11 @@ samp {
     background: var(--border-strong);
 }
 
-/* ============================================================
-   SELECTION
-   ============================================================ */
 ::selection {
     background: var(--accent-brand-glow);
     color: var(--brand-300);
 }
 
-/* ============================================================
-   FORM ELEMENTS
-   ============================================================ */
 input,
 select,
 textarea {
@@ -284,11 +249,6 @@ select option {
     color: var(--text-primary);
 }
 
-/* ============================================================
-   BUTTONS — base tokens (use estas classes como base)
-   ============================================================ */
-
-/* Primary: brand gradient */
 .btn-primary {
     background: var(--gradient-brand);
     color: var(--text-on-brand);
@@ -320,7 +280,6 @@ select option {
     cursor: not-allowed;
 }
 
-/* Ghost: subtle border */
 .btn-ghost {
     background: transparent;
     color: var(--text-secondary);
@@ -342,7 +301,6 @@ select option {
     color: var(--text-primary);
 }
 
-/* Danger */
 .btn-danger {
     background: var(--color-danger-bg);
     color: var(--color-danger-light);
@@ -362,9 +320,6 @@ select option {
     border-color: rgba(239, 68, 68, 0.4);
 }
 
-/* ============================================================
-   CARDS
-   ============================================================ */
 .card {
     background: var(--bg-card);
     border: 1px solid var(--border-subtle);
@@ -387,9 +342,6 @@ select option {
     box-shadow: var(--shadow-lg);
 }
 
-/* ============================================================
-   BADGES / TAGS
-   ============================================================ */
 .badge {
     display: inline-flex;
     align-items: center;
@@ -427,9 +379,6 @@ select option {
     border: 1px solid rgba(20, 184, 166, 0.25);
 }
 
-/* ============================================================
-   UTILITY — Background patterns
-   ============================================================ */
 .bg-grid {
     background-image:
         linear-gradient(rgba(26, 111, 240, 0.05) 1px, transparent 1px),
@@ -456,10 +405,6 @@ select option {
     pointer-events: none;
     border-radius: inherit;
 }
-
-/* ============================================================
-   UTILITY — Glows & accents
-   ============================================================ */
 .glow-brand {
     box-shadow:
         0 0 24px rgba(26, 111, 240, 0.35),
@@ -488,9 +433,6 @@ select option {
     border-radius: var(--radius-full);
 }
 
-/* ============================================================
-   ANIMATIONS
-   ============================================================ */
 @keyframes fade-in {
     from {
         opacity: 0;
@@ -591,7 +533,6 @@ select option {
     animation: spin 0.8s linear infinite;
 }
 
-/* Stagger helpers */
 .delay-75 {
     animation-delay: 75ms;
 }
@@ -605,9 +546,6 @@ select option {
     animation-delay: 300ms;
 }
 
-/* ============================================================
-   NUMBER / MONO FONT
-   ============================================================ */
 .font-mono {
     font-family: var(--font-mono) !important;
     font-variant-numeric: tabular-nums;
@@ -616,9 +554,6 @@ select option {
     font-family: var(--font-display) !important;
 }
 
-/* ============================================================
-   INCOME / EXPENSE SEMANTIC COLORS (shorthand)
-   ============================================================ */
 .text-income {
     color: var(--color-success-light);
 }
@@ -642,18 +577,12 @@ select option {
     background: var(--color-danger-bg);
 }
 
-/* ============================================================
-   FOCUS VISIBLE (acessibilidade)
-   ============================================================ */
 :focus-visible {
     outline: 2px solid var(--brand-400);
     outline-offset: 3px;
     border-radius: var(--radius-sm);
 }
 
-/* ============================================================
-   CHART / RECHARTS OVERRIDES
-   ============================================================ */
 .recharts-tooltip-wrapper .recharts-default-tooltip {
     background: var(--bg-card) !important;
     border: 1px solid var(--border) !important;
@@ -678,9 +607,6 @@ select option {
     font-size: 11px !important;
 }
 
-/* ============================================================
-   LOADING SKELETON
-   ============================================================ */
 .skeleton {
     background: linear-gradient(
         90deg,
@@ -693,7 +619,6 @@ select option {
     border-radius: var(--radius-md);
 }
 
-/* ── Dashboard Layout ── */
 .sidebar {
     width: 220px;
     flex-shrink: 0;
@@ -827,7 +752,6 @@ select option {
     }
 }
 
-/* ── Transactions ── */
 .tx-table-wrapper {
     display: block;
 }
@@ -847,5 +771,100 @@ select option {
 @media (max-width: 320px) {
     .tx-cards-wrapper {
         font-size: var(--text-xs);
+    }
+}
+
+.tx-table-row {
+    transition: background var(--transition-base);
+}
+.tx-table-row:hover {
+    background: var(--bg-elevated);
+}
+
+.tx-action-btn {
+    font-size: var(--text-xs);
+    font-weight: 500;
+    font-family: var(--font-body);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    transition:
+        background var(--transition-base),
+        color var(--transition-base);
+}
+
+.tx-action-btn--edit {
+    color: var(--accent-brand-light);
+}
+.tx-action-btn--edit:hover {
+    background: var(--accent-brand-glow);
+}
+
+.tx-action-btn--delete {
+    color: var(--color-danger-light);
+}
+.tx-action-btn--delete:hover {
+    background: var(--color-danger-bg);
+}
+
+.bottom-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(0.5rem, 2vw, 1rem);
+}
+@media (max-width: 780px) {
+    .bottom-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@keyframes count-up {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.stat-card {
+    background: rgba(12, 21, 36, 0.72);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-xl);
+    backdrop-filter: blur(20px);
+    padding: clamp(0.875rem, 3vw, 1.5rem);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    transition:
+        border-color var(--transition-base),
+        background var(--transition-base);
+    animation: count-up 0.4s ease forwards;
+    min-width: 0;
+}
+.stat-card:hover {
+    border-color: var(--border);
+    background: rgba(16, 29, 48, 0.8);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(0.5rem, 2vw, 1rem);
+    margin-bottom: clamp(0.75rem, 2vw, 1.5rem);
+}
+@media (max-width: 780px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .reports-cat-grid {
+        grid-template-columns: 1fr !important;
     }
 }

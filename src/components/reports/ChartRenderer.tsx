@@ -19,6 +19,8 @@ import {
     Legend,
     ResponsiveContainer,
 } from "recharts";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { formatCurrency, formatCurrencyCompact } from "@/lib/formatters";
 import type { ChartType } from "./ChartControls";
 
 export interface MonthData {
@@ -40,7 +42,7 @@ interface ChartRendererProps {
     loading: boolean;
 }
 
-const COLORS = [
+const PIE_COLORS = [
     "#378ADD",
     "#1D9E75",
     "#EF9F27",
@@ -49,19 +51,13 @@ const COLORS = [
     "#D85A30",
 ];
 
-const fmt = (v: number) =>
-    new Intl.NumberFormat("pt-BR", {
-        style: "currency",
-        currency: "BRL",
-    }).format(v);
-
-const axisTickStyle = {
+const AXIS_TICK_STYLE = {
     fill: "var(--text-muted)",
     fontSize: 11,
     fontFamily: "var(--font-mono)",
 };
 
-const tooltipStyle: React.CSSProperties = {
+const TOOLTIP_STYLE: React.CSSProperties = {
     background: "var(--bg-card)",
     border: "1px solid var(--border)",
     borderRadius: "var(--radius-md)",
@@ -71,221 +67,179 @@ const tooltipStyle: React.CSSProperties = {
     fontFamily: "var(--font-body)",
 };
 
-const legendStyle = {
+const LEGEND_STYLE = {
     fontSize: "12px",
     color: "var(--text-secondary)",
     fontFamily: "var(--font-body)",
 };
 
-function LoadingChart({ height = 300 }: { height?: number }) {
+function PieVariant({ data }: { data: CategoryData[] }) {
     return (
-        <div
-            style={{
-                height,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "var(--space-2)",
-            }}
-        >
-            <svg
-                className="animate-spin"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="var(--text-muted)"
-                strokeWidth="2.5"
-            >
-                <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-            </svg>
-            <span
-                style={{
-                    fontSize: "var(--text-sm)",
-                    color: "var(--text-muted)",
-                }}
-            >
-                Carregando...
-            </span>
-        </div>
+        <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+                <Pie
+                    data={data}
+                    dataKey="value"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={110}
+                    label={({ name, percent }) =>
+                        `${name} ${(percent * 100).toFixed(0)}%`
+                    }
+                >
+                    {data.map((_, i) => (
+                        <Cell
+                            key={i}
+                            fill={PIE_COLORS[i % PIE_COLORS.length]}
+                        />
+                    ))}
+                </Pie>
+                <Tooltip
+                    formatter={(v: number) => formatCurrency(v)}
+                    contentStyle={TOOLTIP_STYLE}
+                />
+            </PieChart>
+        </ResponsiveContainer>
     );
 }
 
-export default function ChartRenderer({
-    chartType,
-    monthlyData,
-    categoryData,
-    loading,
-}: ChartRendererProps) {
-    if (loading) return <LoadingChart />;
-
-    if (chartType === "pie") {
-        return (
-            <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                    <Pie
-                        data={categoryData}
-                        dataKey="value"
-                        nameKey="name"
-                        cx="50%"
-                        cy="50%"
-                        outerRadius={110}
-                        label={({ name, percent }) =>
-                            `${name} ${(percent * 100).toFixed(0)}%`
-                        }
-                    >
-                        {categoryData.map((_, i) => (
-                            <Cell key={i} fill={COLORS[i % COLORS.length]} />
-                        ))}
-                    </Pie>
-                    <Tooltip
-                        formatter={(v: number) => fmt(v)}
-                        contentStyle={tooltipStyle}
-                    />
-                </PieChart>
-            </ResponsiveContainer>
-        );
-    }
-
-    if (chartType === "scatter") {
-        return (
-            <ResponsiveContainer width="100%" height={300}>
-                <ScatterChart>
-                    <CartesianGrid
-                        strokeDasharray="3 3"
-                        stroke="var(--border-subtle)"
-                    />
-                    <XAxis
-                        dataKey="gastos"
-                        name="Gastos"
-                        tickFormatter={(v) => `R$${(v / 1000).toFixed(0)}k`}
-                        tick={axisTickStyle}
-                    />
-                    <YAxis
-                        dataKey="receitas"
-                        name="Receitas"
-                        tickFormatter={(v) => `R$${(v / 1000).toFixed(0)}k`}
-                        tick={axisTickStyle}
-                    />
-                    <Tooltip
-                        cursor={{ strokeDasharray: "3 3" }}
-                        formatter={(v: number) => fmt(v)}
-                        contentStyle={tooltipStyle}
-                    />
-                    <Scatter
-                        data={monthlyData}
-                        fill="var(--accent-brand-light)"
-                    />
-                </ScatterChart>
-            </ResponsiveContainer>
-        );
-    }
-
-    if (chartType === "area") {
-        return (
-            <ResponsiveContainer width="100%" height={300}>
-                <AreaChart data={monthlyData}>
-                    <CartesianGrid
-                        strokeDasharray="3 3"
-                        stroke="var(--border-subtle)"
-                    />
-                    <XAxis dataKey="month" tick={axisTickStyle} />
-                    <YAxis
-                        tickFormatter={(v) => `R$${(v / 1000).toFixed(0)}k`}
-                        tick={axisTickStyle}
-                    />
-                    <Tooltip
-                        formatter={(v: number) => fmt(v)}
-                        contentStyle={tooltipStyle}
-                    />
-                    <Legend wrapperStyle={legendStyle} />
-                    <Area
-                        type="monotone"
-                        dataKey="receitas"
-                        stroke="var(--color-success-light)"
-                        fill="var(--color-success-bg)"
-                        name="Receitas"
-                        strokeWidth={2}
-                    />
-                    <Area
-                        type="monotone"
-                        dataKey="gastos"
-                        stroke="var(--color-danger-light)"
-                        fill="var(--color-danger-bg)"
-                        name="Gastos"
-                        strokeWidth={2}
-                    />
-                </AreaChart>
-            </ResponsiveContainer>
-        );
-    }
-
-    if (chartType === "line") {
-        return (
-            <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={monthlyData}>
-                    <CartesianGrid
-                        strokeDasharray="3 3"
-                        stroke="var(--border-subtle)"
-                    />
-                    <XAxis dataKey="month" tick={axisTickStyle} />
-                    <YAxis
-                        tickFormatter={(v) => `R$${(v / 1000).toFixed(0)}k`}
-                        tick={axisTickStyle}
-                    />
-                    <Tooltip
-                        formatter={(v: number) => fmt(v)}
-                        contentStyle={tooltipStyle}
-                    />
-                    <Legend wrapperStyle={legendStyle} />
-                    <Line
-                        type="monotone"
-                        dataKey="receitas"
-                        stroke="var(--color-success-light)"
-                        strokeWidth={2}
-                        dot={{ r: 3, fill: "var(--color-success-light)" }}
-                        name="Receitas"
-                    />
-                    <Line
-                        type="monotone"
-                        dataKey="gastos"
-                        stroke="var(--color-danger-light)"
-                        strokeWidth={2}
-                        dot={{ r: 3, fill: "var(--color-danger-light)" }}
-                        name="Gastos"
-                    />
-                    <Line
-                        type="monotone"
-                        dataKey="saldo"
-                        stroke="var(--accent-brand-light)"
-                        strokeWidth={2}
-                        strokeDasharray="5 5"
-                        dot={{ r: 3, fill: "var(--accent-brand-light)" }}
-                        name="Saldo"
-                    />
-                </LineChart>
-            </ResponsiveContainer>
-        );
-    }
-
-    // bar — default
+function ScatterVariant({ data }: { data: MonthData[] }) {
     return (
         <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={monthlyData}>
+            <ScatterChart>
                 <CartesianGrid
                     strokeDasharray="3 3"
                     stroke="var(--border-subtle)"
                 />
-                <XAxis dataKey="month" tick={axisTickStyle} />
+                <XAxis
+                    dataKey="gastos"
+                    name="Gastos"
+                    tickFormatter={formatCurrencyCompact}
+                    tick={AXIS_TICK_STYLE}
+                />
                 <YAxis
-                    tickFormatter={(v) => `R$${(v / 1000).toFixed(0)}k`}
-                    tick={axisTickStyle}
+                    dataKey="receitas"
+                    name="Receitas"
+                    tickFormatter={formatCurrencyCompact}
+                    tick={AXIS_TICK_STYLE}
                 />
                 <Tooltip
-                    formatter={(v: number) => fmt(v)}
-                    contentStyle={tooltipStyle}
+                    cursor={{ strokeDasharray: "3 3" }}
+                    formatter={(v: number) => formatCurrency(v)}
+                    contentStyle={TOOLTIP_STYLE}
                 />
-                <Legend wrapperStyle={legendStyle} />
+                <Scatter data={data} fill="var(--accent-brand-light)" />
+            </ScatterChart>
+        </ResponsiveContainer>
+    );
+}
+
+function AreaVariant({ data }: { data: MonthData[] }) {
+    return (
+        <ResponsiveContainer width="100%" height={300}>
+            <AreaChart data={data}>
+                <CartesianGrid
+                    strokeDasharray="3 3"
+                    stroke="var(--border-subtle)"
+                />
+                <XAxis dataKey="month" tick={AXIS_TICK_STYLE} />
+                <YAxis
+                    tickFormatter={formatCurrencyCompact}
+                    tick={AXIS_TICK_STYLE}
+                />
+                <Tooltip
+                    formatter={(v: number) => formatCurrency(v)}
+                    contentStyle={TOOLTIP_STYLE}
+                />
+                <Legend wrapperStyle={LEGEND_STYLE} />
+                <Area
+                    type="monotone"
+                    dataKey="receitas"
+                    stroke="var(--color-success-light)"
+                    fill="var(--color-success-bg)"
+                    name="Receitas"
+                    strokeWidth={2}
+                />
+                <Area
+                    type="monotone"
+                    dataKey="gastos"
+                    stroke="var(--color-danger-light)"
+                    fill="var(--color-danger-bg)"
+                    name="Gastos"
+                    strokeWidth={2}
+                />
+            </AreaChart>
+        </ResponsiveContainer>
+    );
+}
+
+function LineVariant({ data }: { data: MonthData[] }) {
+    return (
+        <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={data}>
+                <CartesianGrid
+                    strokeDasharray="3 3"
+                    stroke="var(--border-subtle)"
+                />
+                <XAxis dataKey="month" tick={AXIS_TICK_STYLE} />
+                <YAxis
+                    tickFormatter={formatCurrencyCompact}
+                    tick={AXIS_TICK_STYLE}
+                />
+                <Tooltip
+                    formatter={(v: number) => formatCurrency(v)}
+                    contentStyle={TOOLTIP_STYLE}
+                />
+                <Legend wrapperStyle={LEGEND_STYLE} />
+                <Line
+                    type="monotone"
+                    dataKey="receitas"
+                    stroke="var(--color-success-light)"
+                    strokeWidth={2}
+                    dot={{ r: 3, fill: "var(--color-success-light)" }}
+                    name="Receitas"
+                />
+                <Line
+                    type="monotone"
+                    dataKey="gastos"
+                    stroke="var(--color-danger-light)"
+                    strokeWidth={2}
+                    dot={{ r: 3, fill: "var(--color-danger-light)" }}
+                    name="Gastos"
+                />
+                <Line
+                    type="monotone"
+                    dataKey="saldo"
+                    stroke="var(--accent-brand-light)"
+                    strokeWidth={2}
+                    strokeDasharray="5 5"
+                    dot={{ r: 3, fill: "var(--accent-brand-light)" }}
+                    name="Saldo"
+                />
+            </LineChart>
+        </ResponsiveContainer>
+    );
+}
+
+function BarVariant({ data }: { data: MonthData[] }) {
+    return (
+        <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={data}>
+                <CartesianGrid
+                    strokeDasharray="3 3"
+                    stroke="var(--border-subtle)"
+                />
+                <XAxis dataKey="month" tick={AXIS_TICK_STYLE} />
+                <YAxis
+                    tickFormatter={formatCurrencyCompact}
+                    tick={AXIS_TICK_STYLE}
+                />
+                <Tooltip
+                    formatter={(v: number) => formatCurrency(v)}
+                    contentStyle={TOOLTIP_STYLE}
+                />
+                <Legend wrapperStyle={LEGEND_STYLE} />
                 <Bar
                     dataKey="receitas"
                     fill="var(--color-success-light)"
@@ -301,4 +255,26 @@ export default function ChartRenderer({
             </BarChart>
         </ResponsiveContainer>
     );
+}
+
+export default function ChartRenderer({
+    chartType,
+    monthlyData,
+    categoryData,
+    loading,
+}: ChartRendererProps) {
+    if (loading) return <LoadingSpinner height={300} label="Carregando..." />;
+
+    switch (chartType) {
+        case "pie":
+            return <PieVariant data={categoryData} />;
+        case "scatter":
+            return <ScatterVariant data={monthlyData} />;
+        case "area":
+            return <AreaVariant data={monthlyData} />;
+        case "line":
+            return <LineVariant data={monthlyData} />;
+        default:
+            return <BarVariant data={monthlyData} />;
+    }
 }

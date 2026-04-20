@@ -3,7 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const navItems = [
+interface NavItem {
+    href: string;
+    label: string;
+    icon: React.ReactNode;
+}
+
+const NAV_ITEMS: NavItem[] = [
     {
         href: "/dashboard",
         label: "Dashboard",
@@ -17,6 +23,7 @@ const navItems = [
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
+                aria-hidden
             >
                 <rect x="3" y="3" width="7" height="7" />
                 <rect x="14" y="3" width="7" height="7" />
@@ -38,6 +45,7 @@ const navItems = [
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
+                aria-hidden
             >
                 <line x1="12" y1="1" x2="12" y2="23" />
                 <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
@@ -57,6 +65,7 @@ const navItems = [
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
+                aria-hidden
             >
                 <line x1="18" y1="20" x2="18" y2="10" />
                 <line x1="12" y1="20" x2="12" y2="4" />
@@ -77,6 +86,7 @@ const navItems = [
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
+                aria-hidden
             >
                 <path d="M12 2a10 10 0 1 0 10 10" />
                 <path d="M12 8v4l3 3" />
@@ -86,49 +96,12 @@ const navItems = [
     },
 ];
 
-export function NavMobileLinks() {
-    const pathname = usePathname();
-
-    return (
-        <>
-            {navItems.map((item) => {
-                const isActive = pathname === item.href;
-                return (
-                    <Link
-                        key={item.href}
-                        href={item.href}
-                        style={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            width: "36px",
-                            height: "36px",
-                            borderRadius: "var(--radius-md)",
-                            color: isActive
-                                ? "var(--accent-brand-light)"
-                                : "var(--text-muted)",
-                            background: isActive
-                                ? "var(--accent-brand-glow)"
-                                : "transparent",
-                            textDecoration: "none",
-                            transition:
-                                "background var(--transition-base), color var(--transition-base)",
-                        }}
-                    >
-                        {item.icon}
-                    </Link>
-                );
-            })}
-        </>
-    );
-}
-
 export default function NavLinks() {
     const pathname = usePathname();
 
     return (
         <>
-            {navItems.map((item) => {
+            {NAV_ITEMS.map((item) => {
                 const isActive = pathname === item.href;
                 return (
                     <Link
@@ -170,6 +143,44 @@ export default function NavLinks() {
                         >
                             {item.label}
                         </span>
+                    </Link>
+                );
+            })}
+        </>
+    );
+}
+
+export function NavMobileLinks() {
+    const pathname = usePathname();
+
+    return (
+        <>
+            {NAV_ITEMS.map((item) => {
+                const isActive = pathname === item.href;
+                return (
+                    <Link
+                        key={item.href}
+                        href={item.href}
+                        aria-label={item.label}
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            width: "36px",
+                            height: "36px",
+                            borderRadius: "var(--radius-md)",
+                            color: isActive
+                                ? "var(--accent-brand-light)"
+                                : "var(--text-muted)",
+                            background: isActive
+                                ? "var(--accent-brand-glow)"
+                                : "transparent",
+                            textDecoration: "none",
+                            transition:
+                                "background var(--transition-base), color var(--transition-base)",
+                        }}
+                    >
+                        {item.icon}
                     </Link>
                 );
             })}

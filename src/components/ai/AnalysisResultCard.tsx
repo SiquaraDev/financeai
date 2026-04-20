@@ -41,7 +41,6 @@ export default function AnalysisResultCard({
                 flexShrink: 0,
             }}
         >
-            {/* Scroll interno — não vaza pelo border-radius */}
             <div
                 style={{
                     overflowY: "auto",
@@ -50,7 +49,6 @@ export default function AnalysisResultCard({
                     padding: "clamp(.875rem, 3vw, 1.25rem)",
                 }}
             >
-                {/* Accent verde */}
                 <div
                     style={{
                         height: "3px",
@@ -58,7 +56,6 @@ export default function AnalysisResultCard({
                     }}
                 />
 
-                {/* Título */}
                 <div
                     style={{
                         display: "flex",
@@ -106,7 +103,6 @@ export default function AnalysisResultCard({
                     </h2>
                 </div>
 
-                {/* Resumo */}
                 <div
                     style={{
                         background: "var(--accent-brand-glow)",
@@ -127,7 +123,6 @@ export default function AnalysisResultCard({
                     </p>
                 </div>
 
-                {/* Dicas */}
                 <p
                     style={{
                         fontSize: "var(--text-xs)",

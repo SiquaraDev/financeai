@@ -16,7 +16,6 @@ export default function AuthLayout({
             }}
             className="bg-grid"
         >
-            {/* Keyframes */}
             <style>{`
                 @keyframes orb-float {
                     0%, 100% { transform: translateY(0px)   scale(1);    }
@@ -28,7 +27,6 @@ export default function AuthLayout({
                 }
             `}</style>
 
-            {/* Orb 1 — top-left brand */}
             <div
                 aria-hidden
                 style={{
@@ -45,7 +43,6 @@ export default function AuthLayout({
                 }}
             />
 
-            {/* Orb 2 — bottom-right teal */}
             <div
                 aria-hidden
                 style={{
@@ -62,7 +59,6 @@ export default function AuthLayout({
                 }}
             />
 
-            {/* Orb 3 — center soft violet */}
             <div
                 aria-hidden
                 style={{
@@ -79,7 +75,6 @@ export default function AuthLayout({
                 }}
             />
 
-            {/* Content — padding vertical para conteúdo não colar nas bordas */}
             <div
                 style={{
                     position: "relative",

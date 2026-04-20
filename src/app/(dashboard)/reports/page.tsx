@@ -13,6 +13,10 @@ import {
     ResponsiveContainer,
 } from "recharts";
 
+import PageHeader from "@/components/ui/PageHeader";
+import Card from "@/components/ui/Card";
+import SectionHeader from "@/components/ui/SectionHeader";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import ChartControls, {
     type ChartType,
     type PeriodType,
@@ -22,10 +26,10 @@ import ChartRenderer, {
     type CategoryData,
 } from "@/components/reports/ChartRenderer";
 import CategoryPieSection from "@/components/reports/CategoryPieSection";
-import SectionHeader from "@/components/ui/SectionHeader";
 import { IconBarChart, IconActivity, IconPieChart } from "@/components/icons";
+import { formatCurrency, formatCurrencyCompact } from "@/lib/formatters";
 
-const tooltipStyle: React.CSSProperties = {
+const TOOLTIP_STYLE: React.CSSProperties = {
     background: "var(--bg-card)",
     border: "1px solid var(--border)",
     borderRadius: "var(--radius-md)",
@@ -35,21 +39,13 @@ const tooltipStyle: React.CSSProperties = {
     fontFamily: "var(--font-body)",
 };
 
-const axisTickStyle = {
+const AXIS_TICK = {
     fill: "var(--text-muted)",
     fontSize: 11,
     fontFamily: "var(--font-mono)",
 };
 
-const fmt = (v: number) =>
-    new Intl.NumberFormat("pt-BR", {
-        style: "currency",
-        currency: "BRL",
-    }).format(v);
-
-export default function ReportsPage() {
-    const [chartType, setChartType] = useState<ChartType>("bar");
-    const [period, setPeriod] = useState<PeriodType>("monthly");
+function useReportsData(period: PeriodType) {
     const [monthlyData, setMonthlyData] = useState<MonthData[]>([]);
     const [categoryData, setCategoryData] = useState<CategoryData[]>([]);
     const [loading, setLoading] = useState(true);
@@ -71,35 +67,32 @@ export default function ReportsPage() {
             const data = await res.json();
             const txs = data.transactions ?? [];
 
+            type Tx = { type: string; amount: number; category: string };
+
             const income = txs
-                .filter((t: { type: string }) => t.type === "INCOME")
-                .reduce(
-                    (s: number, t: { amount: number }) => s + Number(t.amount),
-                    0,
-                );
+                .filter((t: Tx) => t.type === "INCOME")
+                .reduce((s: number, t: Tx) => s + Number(t.amount), 0);
             const expense = txs
-                .filter((t: { type: string }) => t.type === "EXPENSE")
-                .reduce(
-                    (s: number, t: { amount: number }) => s + Number(t.amount),
-                    0,
-                );
+                .filter((t: Tx) => t.type === "EXPENSE")
+                .reduce((s: number, t: Tx) => s + Number(t.amount), 0);
 
             results.push({
                 month: format(
                     date,
                     period === "monthly" ? "MMM/yy" : "MM/yyyy",
-                    { locale: ptBR },
+                    {
+                        locale: ptBR,
+                    },
                 ),
                 receitas: Math.round(income),
                 gastos: Math.round(expense),
                 saldo: Math.round(income - expense),
             });
-            txs.filter((t: { type: string }) => t.type === "EXPENSE").forEach(
-                (t: { category: string; amount: number }) => {
-                    catMap[t.category] =
-                        (catMap[t.category] || 0) + Number(t.amount);
-                },
-            );
+
+            txs.filter((t: Tx) => t.type === "EXPENSE").forEach((t: Tx) => {
+                catMap[t.category] =
+                    (catMap[t.category] || 0) + Number(t.amount);
+            });
         }
 
         setMonthlyData(results);
@@ -116,6 +109,14 @@ export default function ReportsPage() {
         fetchData();
     }, [fetchData]);
 
+    return { monthlyData, categoryData, loading };
+}
+
+export default function ReportsPage() {
+    const [chartType, setChartType] = useState<ChartType>("bar");
+    const [period, setPeriod] = useState<PeriodType>("monthly");
+    const { monthlyData, categoryData, loading } = useReportsData(period);
+
     return (
         <div
             style={{
@@ -126,64 +127,23 @@ export default function ReportsPage() {
                 boxSizing: "border-box",
             }}
         >
-            <style>{`
-        @media (max-width: 480px) {
-          .reports-cat-grid { grid-template-columns: 1fr !important; }
-        }
-      `}</style>
+            <PageHeader
+                title="Relatórios"
+                subtitle="Visualize seus dados financeiros"
+            />
 
-            {/* Header */}
-            <div
-                className="animate-fade-in"
-                style={{ marginBottom: "clamp(1rem, 3vw, 2rem)" }}
+            <Card
+                variant="glass"
+                accentBar="brand"
+                className="animate-fade-in delay-75"
+                style={{ marginBottom: "clamp(.5rem, 2vw, 1rem)" }}
             >
-                <h1
-                    className="font-display"
-                    style={{
-                        fontSize: "clamp(18px, 5vw, 30px)",
-                        fontWeight: 800,
-                        color: "var(--text-primary)",
-                        letterSpacing: "-0.03em",
-                        lineHeight: 1.2,
-                        marginBottom: "var(--space-1)",
-                    }}
-                >
-                    Relatórios
-                </h1>
-                <p
-                    style={{
-                        fontSize: "var(--text-sm)",
-                        color: "var(--text-secondary)",
-                    }}
-                >
-                    Visualize seus dados financeiros
-                </p>
-            </div>
-
-            {/* Card principal — controles + gráfico */}
-            <div
-                className="card-glass animate-fade-in delay-75"
-                style={{
-                    padding: "clamp(.875rem, 3vw, 1.5rem)",
-                    marginBottom: "clamp(.5rem, 2vw, 1rem)",
-                    overflow: "hidden",
-                }}
-            >
-                <div
-                    style={{
-                        height: "3px",
-                        background: "var(--gradient-brand-h)",
-                        margin: "-clamp(.875rem,3vw,1.5rem) -clamp(.875rem,3vw,1.5rem) clamp(.875rem,3vw,1.5rem)",
-                    }}
-                />
-
                 <ChartControls
                     chartType={chartType}
                     period={period}
                     onChartTypeChange={setChartType}
                     onPeriodChange={setPeriod}
                 />
-
                 <SectionHeader
                     title={
                         chartType === "pie"
@@ -195,24 +155,19 @@ export default function ReportsPage() {
                     iconBorder="var(--border-glow)"
                     iconColor="var(--accent-brand-light)"
                 />
-
                 <ChartRenderer
                     chartType={chartType}
                     monthlyData={monthlyData}
                     categoryData={categoryData}
                     loading={loading}
                 />
-            </div>
+            </Card>
 
-            {/* Evolução do saldo */}
             {chartType !== "pie" && (
-                <div
-                    className="card-glass animate-fade-in delay-150"
-                    style={{
-                        padding: "clamp(.875rem, 3vw, 1.5rem)",
-                        marginBottom: "clamp(.5rem, 2vw, 1rem)",
-                        overflow: "hidden",
-                    }}
+                <Card
+                    variant="glass"
+                    className="animate-fade-in delay-150"
+                    style={{ marginBottom: "clamp(.5rem, 2vw, 1rem)" }}
                 >
                     <SectionHeader
                         title="Evolução do saldo"
@@ -222,26 +177,7 @@ export default function ReportsPage() {
                         iconColor="var(--accent-teal-light)"
                     />
                     {loading ? (
-                        <div
-                            style={{
-                                height: 200,
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                            }}
-                        >
-                            <svg
-                                className="animate-spin"
-                                width="16"
-                                height="16"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="var(--text-muted)"
-                                strokeWidth="2.5"
-                            >
-                                <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-                            </svg>
-                        </div>
+                        <LoadingSpinner height={200} />
                     ) : (
                         <ResponsiveContainer width="100%" height={200}>
                             <AreaChart data={monthlyData}>
@@ -249,16 +185,14 @@ export default function ReportsPage() {
                                     strokeDasharray="3 3"
                                     stroke="var(--border-subtle)"
                                 />
-                                <XAxis dataKey="month" tick={axisTickStyle} />
+                                <XAxis dataKey="month" tick={AXIS_TICK} />
                                 <YAxis
-                                    tickFormatter={(v) =>
-                                        `R$${(v / 1000).toFixed(0)}k`
-                                    }
-                                    tick={axisTickStyle}
+                                    tickFormatter={formatCurrencyCompact}
+                                    tick={AXIS_TICK}
                                 />
                                 <Tooltip
-                                    formatter={(v: number) => fmt(v)}
-                                    contentStyle={tooltipStyle}
+                                    formatter={(v: number) => formatCurrency(v)}
+                                    contentStyle={TOOLTIP_STYLE}
                                 />
                                 <Area
                                     type="monotone"
@@ -271,17 +205,14 @@ export default function ReportsPage() {
                             </AreaChart>
                         </ResponsiveContainer>
                     )}
-                </div>
+                </Card>
             )}
 
-            {/* Gastos por categoria */}
             {chartType !== "pie" && categoryData.length > 0 && (
-                <div
-                    className="card-glass animate-fade-in delay-225"
-                    style={{
-                        padding: "clamp(.875rem, 3vw, 1.5rem)",
-                        overflow: "hidden",
-                    }}
+                <Card
+                    variant="glass"
+                    className="animate-fade-in delay-225"
+                    style={{ overflow: "hidden" }}
                 >
                     <SectionHeader
                         title="Gastos por categoria (período)"
@@ -301,7 +232,7 @@ export default function ReportsPage() {
                     >
                         <CategoryPieSection data={categoryData} />
                     </div>
-                </div>
+                </Card>
             )}
         </div>
     );
