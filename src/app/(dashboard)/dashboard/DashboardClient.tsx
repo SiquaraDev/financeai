@@ -12,6 +12,21 @@ import {
 } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
+import StatCard from "@/components/dashboard/StatCard";
+import PeriodFilter, {
+    type FilterKey,
+} from "@/components/dashboard/PeriodFilter";
+import CategoryExpenseList from "@/components/dashboard/CategoryExpenseList";
+import RecentTransactionsList from "@/components/dashboard/RecentTransactionsList";
+import SectionHeader from "@/components/ui/SectionHeader";
+import {
+    IconArrowUp,
+    IconArrowDown,
+    IconDollarSign,
+    IconPieChart,
+    IconActivity,
+} from "@/components/icons";
+
 /* ── Tipos ── */
 interface Transaction {
     id: string;
@@ -34,33 +49,7 @@ interface Session {
     user?: { id?: string; name?: string; email?: string };
 }
 
-/* ── Opções de filtro ── */
-type FilterKey =
-    | "all"
-    | "this_month"
-    | "last_month"
-    | "3_months"
-    | "6_months"
-    | "this_year"
-    | "last_year"
-    | "custom";
-
-interface FilterOption {
-    key: FilterKey;
-    label: string;
-}
-
-const FILTER_OPTIONS: FilterOption[] = [
-    { key: "all", label: "Sem filtro" },
-    { key: "this_month", label: "Este mês" },
-    { key: "last_month", label: "Mês anterior" },
-    { key: "3_months", label: "3 meses" },
-    { key: "6_months", label: "6 meses" },
-    { key: "this_year", label: "Este ano" },
-    { key: "last_year", label: "Ano anterior" },
-    { key: "custom", label: "Personalizado" },
-];
-
+/* ── Lógica de período ── */
 function getDateRange(
     filter: FilterKey,
     customStart?: string,
@@ -73,7 +62,6 @@ function getDateRange(
         s.setHours(0, 0, 0, 0);
         return s;
     };
-
     const endOf = (d: Date) => {
         const e = endOfMonth(d);
         e.setHours(23, 59, 59, 999);
@@ -83,21 +71,16 @@ function getDateRange(
     switch (filter) {
         case "all":
             return { start: null, end: null };
-
         case "this_month":
             return { start: startOf(now), end: endOf(now) };
-
         case "last_month": {
-            const last = subMonths(now, 1);
-            return { start: startOf(last), end: endOf(last) };
+            const l = subMonths(now, 1);
+            return { start: startOf(l), end: endOf(l) };
         }
-
         case "3_months":
             return { start: startOf(subMonths(now, 2)), end: endOf(now) };
-
         case "6_months":
             return { start: startOf(subMonths(now, 5)), end: endOf(now) };
-
         case "this_year": {
             const s = startOfYear(now);
             s.setHours(0, 0, 0, 0);
@@ -105,44 +88,38 @@ function getDateRange(
             e.setHours(23, 59, 59, 999);
             return { start: s, end: e };
         }
-
         case "last_year": {
-            const lastY = subYears(now, 1);
-            const s = startOfYear(lastY);
+            const ly = subYears(now, 1);
+            const s = startOfYear(ly);
             s.setHours(0, 0, 0, 0);
-            const e = endOfYear(lastY);
+            const e = endOfYear(ly);
             e.setHours(23, 59, 59, 999);
             return { start: s, end: e };
         }
-
         case "custom": {
-            const parseLocalDate = (str: string, endOfDay = false) => {
-                const [year, month, day] = str.split("-").map(Number);
-                const d = new Date(year, month - 1, day);
-                if (endOfDay) d.setHours(23, 59, 59, 999);
-                else d.setHours(0, 0, 0, 0);
-                return d;
+            const parse = (str: string, end = false) => {
+                const [y, m, d] = str.split("-").map(Number);
+                const dt = new Date(y, m - 1, d);
+                end ? dt.setHours(23, 59, 59, 999) : dt.setHours(0, 0, 0, 0);
+                return dt;
             };
-
-            const s = customStart
-                ? parseLocalDate(customStart, false)
-                : startOf(now);
-            const e = customEnd ? parseLocalDate(customEnd, true) : endOf(now);
-            return { start: s, end: e };
+            return {
+                start: customStart ? parse(customStart) : startOf(now),
+                end: customEnd ? parse(customEnd, true) : endOf(now),
+            };
         }
-
         default:
             return { start: null, end: null };
     }
 }
 
-/* ── Helpers ── */
 const formatCurrency = (v: number) =>
     new Intl.NumberFormat("pt-BR", {
         style: "currency",
         currency: "BRL",
     }).format(v);
 
+/* ── Componente ── */
 export default function DashboardClient({ session }: { session: Session }) {
     const [activeFilter, setActiveFilter] = useState<FilterKey>("this_month");
     const [customStart, setCustomStart] = useState(
@@ -151,7 +128,6 @@ export default function DashboardClient({ session }: { session: Session }) {
     const [customEnd, setCustomEnd] = useState(
         format(endOfMonth(new Date()), "yyyy-MM-dd"),
     );
-    const [showCustom, setShowCustom] = useState(false);
     const [stats, setStats] = useState<DashboardStats | null>(null);
     const [loading, setLoading] = useState(true);
 
@@ -167,12 +143,12 @@ export default function DashboardClient({ session }: { session: Session }) {
 
         try {
             const toLocalISO = (d: Date) => {
-                const pad = (n: number) => String(n).padStart(2, "0");
-                return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+                const p = (n: number) => String(n).padStart(2, "0");
+                return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
             };
-
             const startParam = start ? `&start=${toLocalISO(start)}` : "";
             const endParam = end ? `&end=${toLocalISO(end)}` : "";
+
             const res = await fetch(
                 `/api/transactions?limit=200${startParam}${endParam}`,
             );
@@ -182,11 +158,9 @@ export default function DashboardClient({ session }: { session: Session }) {
             const totalIncome = txs
                 .filter((t) => t.type === "INCOME")
                 .reduce((s, t) => s + Number(t.amount), 0);
-
             const totalExpense = txs
                 .filter((t) => t.type === "EXPENSE")
                 .reduce((s, t) => s + Number(t.amount), 0);
-
             const byCategory = txs
                 .filter((t) => t.type === "EXPENSE")
                 .reduce(
@@ -197,7 +171,6 @@ export default function DashboardClient({ session }: { session: Session }) {
                     },
                     {} as Record<string, number>,
                 );
-
             const recent = [...txs]
                 .sort(
                     (a, b) =>
@@ -223,7 +196,6 @@ export default function DashboardClient({ session }: { session: Session }) {
         fetchStats();
     }, [fetchStats]);
 
-    /* Label do período ativo */
     const { start, end } = getDateRange(activeFilter, customStart, customEnd);
     const periodLabel =
         activeFilter === "all"
@@ -291,63 +263,17 @@ export default function DashboardClient({ session }: { session: Session }) {
           min-width: 0;
         }
         .category-row:hover { background: var(--bg-elevated); }
-
-        /* Filter bar */
-        .filter-bar {
-          display: flex;
-          align-items: center;
-          gap: var(--space-2);
-          flex-wrap: wrap;
-        }
-        .filter-btn {
-          padding: 5px 12px;
-          border-radius: var(--radius-full);
-          font-size: var(--text-xs);
-          font-family: var(--font-body);
-          cursor: pointer;
-          transition: all var(--transition-base);
-          white-space: nowrap;
-          font-weight: 500;
-        }
-        .filter-btn.active {
-          background: var(--gradient-brand);
-          border: none;
-          color: var(--text-on-brand);
-          box-shadow: var(--shadow-brand);
-          font-weight: 600;
-        }
-        .filter-btn.inactive {
-          background: transparent;
-          border: 1px solid var(--border);
-          color: var(--text-muted);
-        }
-        .filter-btn.inactive:hover {
-          border-color: var(--border-strong);
-          color: var(--text-secondary);
-          background: var(--bg-elevated);
-        }
-        .custom-dates {
-          display: flex;
-          gap: var(--space-2);
-          align-items: center;
-          flex-wrap: wrap;
-          margin-top: var(--space-2);
-        }
-        .custom-date-field {
-          display: flex;
-          align-items: center;
-          gap: var(--space-1);
-        }
-        @media (max-width: 480px) {
-          .filter-bar { gap: var(--space-1); }
-          .filter-btn { padding: 4px 9px; }
-        }
-        @media (max-width: 360px) {
-          .stat-value { font-size: clamp(13px, 5vw, 22px) !important; }
-        }
+        .filter-bar { display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; }
+        .filter-btn { padding: 5px 12px; border-radius: var(--radius-full); font-size: var(--text-xs); font-family: var(--font-body); cursor: pointer; transition: all var(--transition-base); white-space: nowrap; font-weight: 500; }
+        .filter-btn.active   { background: var(--gradient-brand); border: none; color: var(--text-on-brand); box-shadow: var(--shadow-brand); font-weight: 600; }
+        .filter-btn.inactive { background: transparent; border: 1px solid var(--border); color: var(--text-muted); }
+        .filter-btn.inactive:hover { border-color: var(--border-strong); color: var(--text-secondary); background: var(--bg-elevated); }
+        .custom-dates { display: flex; gap: var(--space-2); align-items: center; flex-wrap: wrap; margin-top: var(--space-2); }
+        .custom-date-field { display: flex; align-items: center; gap: var(--space-1); }
+        @media (max-width: 360px) { .stat-value { font-size: clamp(13px, 5vw, 22px) !important; } }
       `}</style>
 
-            {/* ── Header ── */}
+            {/* Header */}
             <div
                 className="animate-fade-in"
                 style={{ marginBottom: "clamp(1rem, 3vw, 1.5rem)" }}
@@ -370,7 +296,6 @@ export default function DashboardClient({ session }: { session: Session }) {
                         color: "var(--text-primary)",
                         letterSpacing: "-0.03em",
                         lineHeight: 1.2,
-                        wordBreak: "break-word",
                         marginBottom: ".25rem",
                     }}
                 >
@@ -395,154 +320,18 @@ export default function DashboardClient({ session }: { session: Session }) {
                 </p>
             </div>
 
-            {/* ── Filtro de período ── */}
-            <div
-                className="card-glass animate-fade-in delay-75"
-                style={{
-                    padding:
-                        "clamp(.75rem, 2vw, 1rem) clamp(.875rem, 3vw, 1.25rem)",
-                    marginBottom: "clamp(.75rem, 2vw, 1.5rem)",
-                    overflow: "hidden",
-                }}
-            >
-                <div
-                    style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "var(--space-2)",
-                        marginBottom: "var(--space-3)",
-                    }}
-                >
-                    <span
-                        style={{
-                            width: "22px",
-                            height: "22px",
-                            borderRadius: "var(--radius-sm)",
-                            background: "var(--accent-brand-glow)",
-                            border: "1px solid var(--border-glow)",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            flexShrink: 0,
-                        }}
-                    >
-                        <svg
-                            width="11"
-                            height="11"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="var(--accent-brand-light)"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                        >
-                            <rect
-                                x="3"
-                                y="4"
-                                width="18"
-                                height="18"
-                                rx="2"
-                                ry="2"
-                            />
-                            <line x1="16" y1="2" x2="16" y2="6" />
-                            <line x1="8" y1="2" x2="8" y2="6" />
-                            <line x1="3" y1="10" x2="21" y2="10" />
-                        </svg>
-                    </span>
-                    <p
-                        style={{
-                            fontSize: "var(--text-xs)",
-                            fontWeight: 600,
-                            color: "var(--text-muted)",
-                            textTransform: "uppercase",
-                            letterSpacing: "0.06em",
-                        }}
-                    >
-                        Período
-                    </p>
+            {/* Filtro de período */}
+            <PeriodFilter
+                activeFilter={activeFilter}
+                customStart={customStart}
+                customEnd={customEnd}
+                periodLabel={periodLabel}
+                onFilterChange={setActiveFilter}
+                onCustomStartChange={setCustomStart}
+                onCustomEndChange={setCustomEnd}
+            />
 
-                    <span
-                        style={{
-                            marginLeft: "auto",
-                            fontSize: "var(--text-xs)",
-                            color: "var(--accent-brand-light)",
-                            fontWeight: 500,
-                            background: "var(--accent-brand-glow)",
-                            border: "1px solid var(--border-glow)",
-                            borderRadius: "var(--radius-full)",
-                            padding: "2px 10px",
-                            whiteSpace: "nowrap",
-                        }}
-                    >
-                        {periodLabel.charAt(0).toUpperCase() +
-                            periodLabel.slice(1).toLowerCase()}
-                    </span>
-                </div>
-
-                {/* Botões de filtro */}
-                <div className="filter-bar">
-                    {FILTER_OPTIONS.map(({ key, label }) => (
-                        <button
-                            key={key}
-                            onClick={() => {
-                                setActiveFilter(key);
-                                setShowCustom(key === "custom");
-                            }}
-                            className={`filter-btn ${activeFilter === key ? "active" : "inactive"}`}
-                        >
-                            {label}
-                        </button>
-                    ))}
-                </div>
-
-                {/* Datas customizadas */}
-                {showCustom && (
-                    <div className="custom-dates animate-fade-in">
-                        <div className="custom-date-field">
-                            <label
-                                style={{
-                                    fontSize: "var(--text-xs)",
-                                    color: "var(--text-muted)",
-                                    whiteSpace: "nowrap",
-                                }}
-                            >
-                                De
-                            </label>
-                            <input
-                                type="date"
-                                value={customStart}
-                                onChange={(e) => setCustomStart(e.target.value)}
-                                style={{
-                                    padding: "6px 10px",
-                                    fontSize: "var(--text-xs)",
-                                }}
-                            />
-                        </div>
-                        <div className="custom-date-field">
-                            <label
-                                style={{
-                                    fontSize: "var(--text-xs)",
-                                    color: "var(--text-muted)",
-                                    whiteSpace: "nowrap",
-                                }}
-                            >
-                                Até
-                            </label>
-                            <input
-                                type="date"
-                                value={customEnd}
-                                onChange={(e) => setCustomEnd(e.target.value)}
-                                style={{
-                                    padding: "6px 10px",
-                                    fontSize: "var(--text-xs)",
-                                }}
-                            />
-                        </div>
-                    </div>
-                )}
-            </div>
-
-            {/* ── Stats ── */}
+            {/* Stats */}
             {loading ? (
                 <div
                     className="stats-grid"
@@ -558,251 +347,70 @@ export default function DashboardClient({ session }: { session: Session }) {
                 </div>
             ) : stats ? (
                 <div className="stats-grid">
-                    {/* Receitas */}
-                    <div
-                        className="stat-card delay-75"
-                        style={{ borderColor: "var(--color-success-border)" }}
-                    >
-                        <div
-                            style={{
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "space-between",
-                                gap: ".5rem",
-                            }}
-                        >
-                            <p
-                                style={{
-                                    fontSize: "var(--text-xs)",
-                                    color: "var(--text-muted)",
-                                    textTransform: "uppercase",
-                                    letterSpacing: ".06em",
-                                    fontWeight: 600,
-                                }}
-                            >
-                                Receitas
-                            </p>
-                            <span
-                                style={{
-                                    width: "26px",
-                                    height: "26px",
-                                    flexShrink: 0,
-                                    borderRadius: "var(--radius-full)",
-                                    background: "var(--color-success-bg)",
-                                    border: "1px solid var(--color-success-border)",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                }}
-                            >
-                                <svg
-                                    width="12"
-                                    height="12"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="var(--color-success-light)"
-                                    strokeWidth="2.5"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                >
-                                    <line x1="12" y1="19" x2="12" y2="5" />
-                                    <polyline points="5 12 12 5 19 12" />
-                                </svg>
-                            </span>
-                        </div>
-                        <p
-                            className="font-display stat-value"
-                            style={{
-                                fontSize: "clamp(14px, 3.5vw, 24px)",
-                                fontWeight: 700,
-                                color: "var(--color-success-light)",
-                                letterSpacing: "-0.03em",
-                                marginTop: ".25rem",
-                                wordBreak: "break-all",
-                            }}
-                        >
-                            {formatCurrency(stats.totalIncome)}
-                        </p>
-                        <p
-                            style={{
-                                fontSize: "var(--text-xs)",
-                                color: "var(--text-muted)",
-                            }}
-                        >
-                            Total recebido no período
-                        </p>
-                    </div>
-
-                    {/* Gastos */}
-                    <div
-                        className="stat-card delay-150"
-                        style={{ borderColor: "var(--color-danger-border)" }}
-                    >
-                        <div
-                            style={{
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "space-between",
-                                gap: ".5rem",
-                            }}
-                        >
-                            <p
-                                style={{
-                                    fontSize: "var(--text-xs)",
-                                    color: "var(--text-muted)",
-                                    textTransform: "uppercase",
-                                    letterSpacing: ".06em",
-                                    fontWeight: 600,
-                                }}
-                            >
-                                Gastos
-                            </p>
-                            <span
-                                style={{
-                                    width: "26px",
-                                    height: "26px",
-                                    flexShrink: 0,
-                                    borderRadius: "var(--radius-full)",
-                                    background: "var(--color-danger-bg)",
-                                    border: "1px solid var(--color-danger-border)",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                }}
-                            >
-                                <svg
-                                    width="12"
-                                    height="12"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="var(--color-danger-light)"
-                                    strokeWidth="2.5"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                >
-                                    <line x1="12" y1="5" x2="12" y2="19" />
-                                    <polyline points="19 12 12 19 5 12" />
-                                </svg>
-                            </span>
-                        </div>
-                        <p
-                            className="font-display stat-value"
-                            style={{
-                                fontSize: "clamp(14px, 3.5vw, 24px)",
-                                fontWeight: 700,
-                                color: "var(--color-danger-light)",
-                                letterSpacing: "-0.03em",
-                                marginTop: ".25rem",
-                                wordBreak: "break-all",
-                            }}
-                        >
-                            {formatCurrency(stats.totalExpense)}
-                        </p>
-                        <p
-                            style={{
-                                fontSize: "var(--text-xs)",
-                                color: "var(--text-muted)",
-                            }}
-                        >
-                            Total gasto no período
-                        </p>
-                    </div>
-
-                    {/* Saldo */}
-                    <div
-                        className="stat-card delay-225"
-                        style={{
-                            borderColor:
-                                stats.balance >= 0
-                                    ? "var(--border-glow)"
-                                    : "var(--color-danger-border)",
-                        }}
-                    >
-                        <div
-                            style={{
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "space-between",
-                                gap: ".5rem",
-                            }}
-                        >
-                            <p
-                                style={{
-                                    fontSize: "var(--text-xs)",
-                                    color: "var(--text-muted)",
-                                    textTransform: "uppercase",
-                                    letterSpacing: ".06em",
-                                    fontWeight: 600,
-                                }}
-                            >
-                                Saldo
-                            </p>
-                            <span
-                                style={{
-                                    width: "26px",
-                                    height: "26px",
-                                    flexShrink: 0,
-                                    borderRadius: "var(--radius-full)",
-                                    background:
-                                        stats.balance >= 0
-                                            ? "var(--accent-brand-glow)"
-                                            : "var(--color-danger-bg)",
-                                    border: `1px solid ${stats.balance >= 0 ? "var(--border-glow)" : "var(--color-danger-border)"}`,
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                }}
-                            >
-                                <svg
-                                    width="12"
-                                    height="12"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke={
-                                        stats.balance >= 0
-                                            ? "var(--accent-brand-light)"
-                                            : "var(--color-danger-light)"
-                                    }
-                                    strokeWidth="2.5"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                >
-                                    <line x1="12" y1="1" x2="12" y2="23" />
-                                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-                                </svg>
-                            </span>
-                        </div>
-                        <p
-                            className="font-display stat-value"
-                            style={{
-                                fontSize: "clamp(14px, 3.5vw, 24px)",
-                                fontWeight: 700,
-                                color:
-                                    stats.balance >= 0
-                                        ? "var(--accent-brand-light)"
-                                        : "var(--color-danger-light)",
-                                letterSpacing: "-0.03em",
-                                marginTop: ".25rem",
-                                wordBreak: "break-all",
-                            }}
-                        >
-                            {formatCurrency(stats.balance)}
-                        </p>
-                        <p
-                            style={{
-                                fontSize: "var(--text-xs)",
-                                color: "var(--text-muted)",
-                            }}
-                        >
-                            {stats.balance >= 0
+                    <StatCard
+                        label="Receitas"
+                        value={formatCurrency(stats.totalIncome)}
+                        description="Total recebido no período"
+                        icon={<IconArrowUp />}
+                        iconBg="var(--color-success-bg)"
+                        iconBorder="var(--color-success-border)"
+                        iconColor="var(--color-success-light)"
+                        valueColor="var(--color-success-light)"
+                        borderColor="var(--color-success-border)"
+                        delay="delay-75"
+                    />
+                    <StatCard
+                        label="Gastos"
+                        value={formatCurrency(stats.totalExpense)}
+                        description="Total gasto no período"
+                        icon={<IconArrowDown />}
+                        iconBg="var(--color-danger-bg)"
+                        iconBorder="var(--color-danger-border)"
+                        iconColor="var(--color-danger-light)"
+                        valueColor="var(--color-danger-light)"
+                        borderColor="var(--color-danger-border)"
+                        delay="delay-150"
+                    />
+                    <StatCard
+                        label="Saldo"
+                        value={formatCurrency(stats.balance)}
+                        description={
+                            stats.balance >= 0
                                 ? "Você está no positivo 🎉"
-                                : "Atenção: saldo negativo"}
-                        </p>
-                    </div>
+                                : "Atenção: saldo negativo"
+                        }
+                        icon={<IconDollarSign />}
+                        iconBg={
+                            stats.balance >= 0
+                                ? "var(--accent-brand-glow)"
+                                : "var(--color-danger-bg)"
+                        }
+                        iconBorder={
+                            stats.balance >= 0
+                                ? "var(--border-glow)"
+                                : "var(--color-danger-border)"
+                        }
+                        iconColor={
+                            stats.balance >= 0
+                                ? "var(--accent-brand-light)"
+                                : "var(--color-danger-light)"
+                        }
+                        valueColor={
+                            stats.balance >= 0
+                                ? "var(--accent-brand-light)"
+                                : "var(--color-danger-light)"
+                        }
+                        borderColor={
+                            stats.balance >= 0
+                                ? "var(--border-glow)"
+                                : "var(--color-danger-border)"
+                        }
+                        delay="delay-225"
+                    />
                 </div>
             ) : null}
 
-            {/* ── Bottom grid ── */}
+            {/* Bottom grid */}
             {stats && (
                 <div className="bottom-grid">
                     {/* Gastos por categoria */}
@@ -813,202 +421,17 @@ export default function DashboardClient({ session }: { session: Session }) {
                             minWidth: 0,
                         }}
                     >
-                        <div
-                            style={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: ".625rem",
-                                marginBottom: "1.125rem",
-                            }}
-                        >
-                            <span
-                                style={{
-                                    width: "26px",
-                                    height: "26px",
-                                    flexShrink: 0,
-                                    borderRadius: "var(--radius-md)",
-                                    background: "var(--accent-brand-glow)",
-                                    border: "1px solid var(--border-glow)",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                }}
-                            >
-                                <svg
-                                    width="12"
-                                    height="12"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="var(--accent-brand-light)"
-                                    strokeWidth="2"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                >
-                                    <path d="M21.21 15.89A10 10 0 1 1 8 2.83" />
-                                    <path d="M22 12A10 10 0 0 0 12 2v10z" />
-                                </svg>
-                            </span>
-                            <h2
-                                className="font-display"
-                                style={{
-                                    fontSize: "var(--text-sm)",
-                                    fontWeight: 700,
-                                    color: "var(--text-primary)",
-                                    letterSpacing: "-0.02em",
-                                }}
-                            >
-                                Gastos por categoria
-                            </h2>
-                        </div>
-
-                        {Object.keys(stats.byCategory).length === 0 ? (
-                            <div
-                                style={{
-                                    display: "flex",
-                                    flexDirection: "column",
-                                    alignItems: "center",
-                                    padding: "1.5rem 0",
-                                    gap: ".5rem",
-                                }}
-                            >
-                                <svg
-                                    width="28"
-                                    height="28"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="var(--text-dim)"
-                                    strokeWidth="1.5"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                >
-                                    <circle cx="12" cy="12" r="10" />
-                                    <line x1="12" y1="8" x2="12" y2="12" />
-                                    <line x1="12" y1="16" x2="12.01" y2="16" />
-                                </svg>
-                                <p
-                                    style={{
-                                        fontSize: "var(--text-sm)",
-                                        color: "var(--text-muted)",
-                                    }}
-                                >
-                                    Nenhum gasto no período
-                                </p>
-                            </div>
-                        ) : (
-                            <div
-                                style={{
-                                    display: "flex",
-                                    flexDirection: "column",
-                                    gap: ".75rem",
-                                }}
-                            >
-                                {Object.entries(stats.byCategory)
-                                    .sort((a, b) => b[1] - a[1])
-                                    .slice(0, 5)
-                                    .map(([cat, value], i) => {
-                                        const pct = Math.round(
-                                            (value / stats.totalExpense) * 100,
-                                        );
-                                        const colors = [
-                                            "var(--accent-brand-light)",
-                                            "var(--accent-teal-light)",
-                                            "var(--color-warning-light)",
-                                            "var(--color-success-light)",
-                                            "var(--color-info-light)",
-                                        ];
-                                        const color = colors[i % colors.length];
-                                        return (
-                                            <div
-                                                key={cat}
-                                                className="category-row"
-                                            >
-                                                <div
-                                                    style={{
-                                                        display: "flex",
-                                                        justifyContent:
-                                                            "space-between",
-                                                        alignItems: "center",
-                                                        marginBottom: ".3rem",
-                                                        gap: ".375rem",
-                                                    }}
-                                                >
-                                                    <span
-                                                        style={{
-                                                            fontSize:
-                                                                "var(--text-xs)",
-                                                            color: "var(--text-secondary)",
-                                                            fontWeight: 500,
-                                                            minWidth: 0,
-                                                            overflow: "hidden",
-                                                            textOverflow:
-                                                                "ellipsis",
-                                                            whiteSpace:
-                                                                "nowrap",
-                                                            flex: 1,
-                                                        }}
-                                                    >
-                                                        {cat}
-                                                    </span>
-                                                    <div
-                                                        style={{
-                                                            display: "flex",
-                                                            alignItems:
-                                                                "center",
-                                                            gap: ".375rem",
-                                                            flexShrink: 0,
-                                                        }}
-                                                    >
-                                                        <span
-                                                            style={{
-                                                                fontSize:
-                                                                    "var(--text-xs)",
-                                                                color: "var(--text-muted)",
-                                                            }}
-                                                        >
-                                                            {pct}%
-                                                        </span>
-                                                        <span
-                                                            className="font-mono"
-                                                            style={{
-                                                                fontSize:
-                                                                    "var(--text-xs)",
-                                                                color,
-                                                                fontWeight: 600,
-                                                            }}
-                                                        >
-                                                            {formatCurrency(
-                                                                value,
-                                                            )}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                                <div
-                                                    style={{
-                                                        height: "3px",
-                                                        background:
-                                                            "var(--bg-elevated)",
-                                                        borderRadius:
-                                                            "var(--radius-full)",
-                                                        overflow: "hidden",
-                                                    }}
-                                                >
-                                                    <div
-                                                        style={{
-                                                            height: "100%",
-                                                            width: `${pct}%`,
-                                                            background: color,
-                                                            borderRadius:
-                                                                "var(--radius-full)",
-                                                            transition:
-                                                                "width .6s cubic-bezier(0.16,1,0.3,1)",
-                                                        }}
-                                                    />
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
-                            </div>
-                        )}
+                        <SectionHeader
+                            title="Gastos por categoria"
+                            icon={<IconPieChart />}
+                            iconBg="var(--accent-brand-glow)"
+                            iconBorder="var(--border-glow)"
+                            iconColor="var(--accent-brand-light)"
+                        />
+                        <CategoryExpenseList
+                            byCategory={stats.byCategory}
+                            totalExpense={stats.totalExpense}
+                        />
                     </div>
 
                     {/* Últimas transações */}
@@ -1019,213 +442,14 @@ export default function DashboardClient({ session }: { session: Session }) {
                             minWidth: 0,
                         }}
                     >
-                        <div
-                            style={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: ".625rem",
-                                marginBottom: "1.125rem",
-                            }}
-                        >
-                            <span
-                                style={{
-                                    width: "26px",
-                                    height: "26px",
-                                    flexShrink: 0,
-                                    borderRadius: "var(--radius-md)",
-                                    background: "var(--accent-teal-glow)",
-                                    border: "1px solid rgba(20,184,166,.25)",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                }}
-                            >
-                                <svg
-                                    width="12"
-                                    height="12"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="var(--accent-teal-light)"
-                                    strokeWidth="2"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                >
-                                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
-                                </svg>
-                            </span>
-                            <h2
-                                className="font-display"
-                                style={{
-                                    fontSize: "var(--text-sm)",
-                                    fontWeight: 700,
-                                    color: "var(--text-primary)",
-                                    letterSpacing: "-0.02em",
-                                }}
-                            >
-                                Últimas transações
-                            </h2>
-                        </div>
-
-                        {stats.recent.length === 0 ? (
-                            <div
-                                style={{
-                                    display: "flex",
-                                    flexDirection: "column",
-                                    alignItems: "center",
-                                    padding: "1.5rem 0",
-                                    gap: ".5rem",
-                                }}
-                            >
-                                <svg
-                                    width="28"
-                                    height="28"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="var(--text-dim)"
-                                    strokeWidth="1.5"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                >
-                                    <rect
-                                        x="2"
-                                        y="3"
-                                        width="20"
-                                        height="14"
-                                        rx="2"
-                                    />
-                                    <line x1="8" y1="21" x2="16" y2="21" />
-                                    <line x1="12" y1="17" x2="12" y2="21" />
-                                </svg>
-                                <p
-                                    style={{
-                                        fontSize: "var(--text-sm)",
-                                        color: "var(--text-muted)",
-                                    }}
-                                >
-                                    Nenhuma transação no período
-                                </p>
-                            </div>
-                        ) : (
-                            <div>
-                                {stats.recent.map((t) => (
-                                    <div key={t.id} className="tx-row">
-                                        <div
-                                            style={{
-                                                display: "flex",
-                                                alignItems: "center",
-                                                gap: ".625rem",
-                                                minWidth: 0,
-                                                flex: 1,
-                                            }}
-                                        >
-                                            <div
-                                                style={{
-                                                    width: "30px",
-                                                    height: "30px",
-                                                    flexShrink: 0,
-                                                    borderRadius:
-                                                        "var(--radius-md)",
-                                                    background:
-                                                        t.type === "INCOME"
-                                                            ? "var(--color-success-bg)"
-                                                            : "var(--color-danger-bg)",
-                                                    border: `1px solid ${t.type === "INCOME" ? "var(--color-success-border)" : "var(--color-danger-border)"}`,
-                                                    display: "flex",
-                                                    alignItems: "center",
-                                                    justifyContent: "center",
-                                                }}
-                                            >
-                                                <svg
-                                                    width="12"
-                                                    height="12"
-                                                    viewBox="0 0 24 24"
-                                                    fill="none"
-                                                    stroke={
-                                                        t.type === "INCOME"
-                                                            ? "var(--color-success-light)"
-                                                            : "var(--color-danger-light)"
-                                                    }
-                                                    strokeWidth="2.5"
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                >
-                                                    {t.type === "INCOME" ? (
-                                                        <>
-                                                            <line
-                                                                x1="12"
-                                                                y1="19"
-                                                                x2="12"
-                                                                y2="5"
-                                                            />
-                                                            <polyline points="5 12 12 5 19 12" />
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <line
-                                                                x1="12"
-                                                                y1="5"
-                                                                x2="12"
-                                                                y2="19"
-                                                            />
-                                                            <polyline points="19 12 12 19 5 12" />
-                                                        </>
-                                                    )}
-                                                </svg>
-                                            </div>
-                                            <div style={{ minWidth: 0 }}>
-                                                <p
-                                                    style={{
-                                                        fontSize:
-                                                            "var(--text-xs)",
-                                                        fontWeight: 500,
-                                                        color: "var(--text-primary)",
-                                                        lineHeight: 1.3,
-                                                        overflow: "hidden",
-                                                        textOverflow:
-                                                            "ellipsis",
-                                                        whiteSpace: "nowrap",
-                                                    }}
-                                                >
-                                                    {t.title}
-                                                </p>
-                                                <p
-                                                    style={{
-                                                        fontSize: "10px",
-                                                        color: "var(--text-muted)",
-                                                    }}
-                                                >
-                                                    {t.category} ·{" "}
-                                                    {format(
-                                                        new Date(
-                                                            t.date.split(
-                                                                "T",
-                                                            )[0] + "T12:00:00",
-                                                        ),
-                                                        "dd/MM",
-                                                    )}
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <span
-                                            className="font-mono"
-                                            style={{
-                                                fontSize: "var(--text-xs)",
-                                                fontWeight: 600,
-                                                flexShrink: 0,
-                                                marginLeft: ".5rem",
-                                                color:
-                                                    t.type === "INCOME"
-                                                        ? "var(--color-success-light)"
-                                                        : "var(--color-danger-light)",
-                                            }}
-                                        >
-                                            {t.type === "INCOME" ? "+" : "-"}
-                                            {formatCurrency(Number(t.amount))}
-                                        </span>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
+                        <SectionHeader
+                            title="Últimas transações"
+                            icon={<IconActivity />}
+                            iconBg="var(--accent-teal-glow)"
+                            iconBorder="rgba(20,184,166,.25)"
+                            iconColor="var(--accent-teal-light)"
+                        />
+                        <RecentTransactionsList transactions={stats.recent} />
                     </div>
                 </div>
             )}
