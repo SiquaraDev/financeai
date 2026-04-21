@@ -86,7 +86,6 @@ export default function AiPage() {
             />
 
             <div className="ai-layout">
-                {/* ── Left column: analysis controls ── */}
                 <div className="ai-left">
                     <NewAnalysisCard
                         startDate={startDate}
@@ -101,7 +100,6 @@ export default function AiPage() {
                     {analysis && <AnalysisResultCard analysis={analysis} />}
                 </div>
 
-                {/* ── Right column: chat ── */}
                 <ChatArea
                     messages={messages}
                     input={input}

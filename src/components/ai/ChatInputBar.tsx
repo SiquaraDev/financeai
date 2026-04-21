@@ -1,19 +1,3 @@
-/**
- * ChatInputBar
- *
- * Auto-expanding textarea + send button for the AI chat panel.
- * The textarea grows up to `maxHeight` px as the user types and shrinks on clear.
- * Submits on Enter (Shift+Enter inserts newline).
- *
- * Layout:
- *   outer div (padding / border-top)
- *     flex row
- *       wrapper div  ← border + border-radius + overflow:hidden  ← clips scrollbar
- *         textarea   ← no border, no radius, transparent bg
- *       Button
- *     hint text
- */
-
 "use client";
 
 import React, { useRef } from "react";
@@ -27,7 +11,6 @@ interface ChatInputBarProps {
     disabled?: boolean;
     loading?: boolean;
     placeholder?: string;
-    /** Max textarea height in px before scroll activates (default 120). */
     maxHeight?: number;
 }
 
@@ -87,11 +70,6 @@ export default function ChatInputBar({
                     alignItems: "flex-end",
                 }}
             >
-                {/*
-          overflow:hidden on the wrapper clips the native scrollbar so it
-          never bleeds outside the rounded corners. Border and radius live
-          here; the textarea itself is border-less and fills the space.
-        */}
                 <div
                     ref={wrapperRef}
                     style={{

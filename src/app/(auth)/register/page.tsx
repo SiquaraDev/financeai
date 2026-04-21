@@ -78,13 +78,11 @@ export default function RegisterPage() {
                 margin: "0 auto",
             }}
         >
-            {/* Responsive rules */}
             <style>{`
         @media (max-width: 1023px) { .register-aside        { display: none !important; } }
         @media (min-width: 1024px) { .register-mobile-logo  { display: none !important; } }
       `}</style>
 
-            {/* ── Marketing aside ── */}
             <AuthAside
                 className="register-aside"
                 headline={
@@ -142,7 +140,6 @@ export default function RegisterPage() {
                 <FeatureCheckList items={FEATURES} />
             </AuthAside>
 
-            {/* ── Form card ── */}
             <AuthCard
                 accentGradient="var(--gradient-success)"
                 title="Criar conta grátis"

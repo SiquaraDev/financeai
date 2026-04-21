@@ -95,13 +95,11 @@ export default function LoginPage() {
                 margin: "0 auto",
             }}
         >
-            {/* Responsive rules injected once at page level */}
             <style>{`
         @media (max-width: 1023px) { .login-aside       { display: none !important; } }
         @media (min-width: 1024px) { .login-mobile-logo { display: none !important; } }
       `}</style>
 
-            {/* ── Marketing aside ── */}
             <AuthAside
                 className="login-aside"
                 headline={
@@ -149,7 +147,6 @@ export default function LoginPage() {
                 </div>
             </AuthAside>
 
-            {/* ── Form card ── */}
             <AuthCard
                 accentGradient="var(--gradient-brand-h)"
                 title="Bem-vindo de volta"

@@ -1,17 +1,3 @@
-/**
- * ChatArea
- *
- * Composed chat panel used on the AI page.
- * Contains:
- *   - Header with status badge
- *   - Scrollable message list (EmptyState when idle)
- *   - Typing indicator while loading
- *   - ChatInputBar at the bottom
- *
- * All state is lifted to the parent — this component is purely presentational
- * except for the internal auto-scroll effect.
- */
-
 "use client";
 
 import React, { useEffect, useRef } from "react";
@@ -55,7 +41,6 @@ export default function ChatArea({
             className="card-glass ai-chat animate-fade-in delay-150"
             style={{ overflow: "hidden" }}
         >
-            {/* ── Header ── */}
             <div
                 style={{
                     padding: "clamp(.75rem,2vw,1rem) clamp(.75rem,2vw,1.25rem)",
@@ -114,7 +99,6 @@ export default function ChatArea({
                 </div>
             </div>
 
-            {/* ── Messages ── */}
             <div
                 className="ai-messages"
                 style={{
@@ -202,7 +186,6 @@ export default function ChatArea({
                 <div ref={messagesEndRef} />
             </div>
 
-            {/* ── Input ── */}
             <ChatInputBar
                 value={input}
                 onChange={onInputChange}
