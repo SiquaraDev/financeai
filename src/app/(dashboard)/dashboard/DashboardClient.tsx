@@ -6,11 +6,7 @@ import { capitalize } from "@/lib/formatters";
 import PageHeader from "@/components/ui/PageHeader";
 import StatsGrid from "@/components/dashboard/StatsGrid";
 import PeriodFilter from "@/components/dashboard/PeriodFilter";
-import CategoryExpenseList from "@/components/dashboard/CategoryExpenseList";
-import RecentTransactionsList from "@/components/dashboard/RecentTransactionsList";
-import SectionHeader from "@/components/ui/SectionHeader";
-import Card from "@/components/ui/Card";
-import { IconPieChart, IconActivity } from "@/components/icons";
+import DashboardBottomGrid from "@/components/dashboard/DashboardBottomGrid";
 
 interface Session {
     user?: { id?: string; name?: string; email?: string };
@@ -76,34 +72,7 @@ export default function DashboardClient({ session }: { session: Session }) {
 
             <StatsGrid stats={stats} loading={loading} />
 
-            {stats && (
-                <div className="bottom-grid">
-                    <Card variant="glass" className="animate-fade-in delay-225">
-                        <SectionHeader
-                            title="Gastos por categoria"
-                            icon={<IconPieChart />}
-                            iconBg="var(--accent-brand-glow)"
-                            iconBorder="var(--border-glow)"
-                            iconColor="var(--accent-brand-light)"
-                        />
-                        <CategoryExpenseList
-                            byCategory={stats.byCategory}
-                            totalExpense={stats.totalExpense}
-                        />
-                    </Card>
-
-                    <Card variant="glass" className="animate-fade-in delay-300">
-                        <SectionHeader
-                            title="Últimas transações"
-                            icon={<IconActivity />}
-                            iconBg="var(--accent-teal-glow)"
-                            iconBorder="rgba(20,184,166,.25)"
-                            iconColor="var(--accent-teal-light)"
-                        />
-                        <RecentTransactionsList transactions={stats.recent} />
-                    </Card>
-                </div>
-            )}
+            {stats && <DashboardBottomGrid stats={stats} />}
         </div>
     );
 }
