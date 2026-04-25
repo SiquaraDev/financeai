@@ -51,7 +51,13 @@ export default function RecentTransactionsList({
     }
 
     return (
-        <div>
+        <div
+            style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.5rem",
+            }}
+        >
             {transactions.map((t) => {
                 const isIncome = t.type === "INCOME";
                 const color = isIncome
@@ -65,7 +71,15 @@ export default function RecentTransactionsList({
                     : "var(--color-danger-border)";
 
                 return (
-                    <div key={t.id} className="tx-row">
+                    <div
+                        key={t.id}
+                        className="tx-row"
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                        }}
+                    >
                         <div
                             style={{
                                 display: "flex",
@@ -87,6 +101,7 @@ export default function RecentTransactionsList({
                                     alignItems: "center",
                                     justifyContent: "center",
                                     color,
+                                    marginBottom: ".1rem",
                                 }}
                             >
                                 <TxIcon isIncome={isIncome} />

@@ -40,7 +40,7 @@ export default function ImportModal({
         <Modal
             onClose={onClose}
             maxWidth={360}
-            accentBar="none"
+            accentBar="teal"
             ariaLabel="Importar transações"
         >
             <h2

@@ -39,18 +39,11 @@ export default function NewAnalysisCard({
         >
             <div
                 style={{
-                    padding:
-                        "clamp(.4375rem,1.5vw,.625rem) clamp(.875rem,3vw,1.25rem) 0",
+                    height: "3px",
+                    background: "var(--gradient-brand-h)",
+                    marginBottom: "clamp(.4375rem,1.5vw,.625rem)",
                 }}
-            >
-                <div
-                    style={{
-                        height: "3px",
-                        background: "var(--gradient-brand-h)",
-                        marginBottom: "clamp(.4375rem,1.5vw,.625rem)",
-                    }}
-                />
-            </div>
+            />
 
             <div
                 style={{
@@ -196,6 +189,9 @@ export default function NewAnalysisCard({
                                     color: active
                                         ? "var(--accent-teal-light)"
                                         : "var(--text-muted)",
+                                    boxShadow: active
+                                        ? "var(--shadow-teal)"
+                                        : "none",
                                     whiteSpace: "nowrap",
                                 }}
                             >

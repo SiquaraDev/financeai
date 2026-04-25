@@ -43,19 +43,19 @@ export default function AnalysisResultCard({
         >
             <div
                 style={{
+                    height: "3px",
+                    background: "var(--gradient-success)",
+                }}
+            />
+            <div
+                style={{
                     overflowY: "auto",
                     overflowX: "hidden",
                     maxHeight: "clamp(300px, 45vh, 520px)",
-                    padding: "clamp(.875rem, 3vw, 1.25rem)",
+                    paddingInline: "clamp(.875rem, 3vw, 1.25rem)",
+                    paddingBottom: "clamp(.875rem, 3vw, 1.25rem)",
                 }}
             >
-                <div
-                    style={{
-                        height: "3px",
-                        background: "var(--gradient-success)",
-                    }}
-                />
-
                 <div
                     style={{
                         display: "flex",

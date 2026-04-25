@@ -1,5 +1,7 @@
 "use client";
 
+import FilterBar from "@/components/ui/FilterBar";
+
 export type FilterKey =
     | "all"
     | "this_month"
@@ -10,15 +12,15 @@ export type FilterKey =
     | "last_year"
     | "custom";
 
-const FILTER_OPTIONS: { key: FilterKey; label: string }[] = [
-    { key: "all", label: "Sem filtro" },
-    { key: "this_month", label: "Este mês" },
-    { key: "last_month", label: "Mês anterior" },
-    { key: "3_months", label: "3 meses" },
-    { key: "6_months", label: "6 meses" },
-    { key: "this_year", label: "Este ano" },
-    { key: "last_year", label: "Ano anterior" },
-    { key: "custom", label: "Personalizado" },
+const FILTER_OPTIONS: { value: FilterKey; label: string }[] = [
+    { value: "all", label: "Sem filtro" },
+    { value: "this_month", label: "Este mês" },
+    { value: "last_month", label: "Mês anterior" },
+    { value: "3_months", label: "3 meses" },
+    { value: "6_months", label: "6 meses" },
+    { value: "this_year", label: "Este ano" },
+    { value: "last_year", label: "Ano anterior" },
+    { value: "custom", label: "Personalizado" },
 ];
 
 interface PeriodFilterProps {
@@ -124,20 +126,17 @@ export default function PeriodFilter({
                 </span>
             </div>
 
-            <div className="filter-bar">
-                {FILTER_OPTIONS.map(({ key, label }) => (
-                    <button
-                        key={key}
-                        onClick={() => onFilterChange(key)}
-                        className={`filter-btn ${activeFilter === key ? "active" : "inactive"}`}
-                    >
-                        {label}
-                    </button>
-                ))}
-            </div>
+            <FilterBar
+                options={FILTER_OPTIONS}
+                active={activeFilter}
+                onChange={onFilterChange}
+            />
 
             {activeFilter === "custom" && (
-                <div className="custom-dates animate-fade-in">
+                <div
+                    className="custom-dates animate-fade-in"
+                    style={{ display: "flex", gap: "1rem" }}
+                >
                     {[
                         {
                             label: "De",
@@ -150,7 +149,11 @@ export default function PeriodFilter({
                             onChange: onCustomEndChange,
                         },
                     ].map(({ label, value, onChange }) => (
-                        <div key={label} className="custom-date-field">
+                        <div
+                            key={label}
+                            className="custom-date-field"
+                            style={{ display: "flex", flexDirection: "column" }}
+                        >
                             <label
                                 style={{
                                     fontSize: "var(--text-xs)",
