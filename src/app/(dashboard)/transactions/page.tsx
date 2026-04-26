@@ -17,8 +17,7 @@ import {
     ImportModal,
 } from "@/components/transactions";
 import { IconUpload, IconPlus } from "@/components/icons";
-import type { SortColumn } from "@/components/transactions";
-import type { SelectOption, FilterType } from "@/types";
+import type { TransactionSortColumn, SelectOption, FilterType } from "@/types";
 
 const FILTER_OPTIONS: SelectOption<FilterType>[] = [
     { value: "ALL", label: "Todas" },
@@ -28,7 +27,8 @@ const FILTER_OPTIONS: SelectOption<FilterType>[] = [
 
 export default function TransactionsPage() {
     const tx = useTransactions();
-    const { sortColumn, sortDirection, handleSort } = useSort<SortColumn>();
+    const { sortColumn, sortDirection, handleSort } =
+        useSort<TransactionSortColumn>();
 
     return (
         <div
