@@ -2,46 +2,42 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
-export function getGeminiModel() {
+function getModel() {
     return genAI.getGenerativeModel({
         model: "gemini-3-flash-preview",
-        generationConfig: {
-            temperature: 0.7,
-            maxOutputTokens: 2048,
-        },
+        generationConfig: { temperature: 0.7, maxOutputTokens: 2048 },
     });
 }
 
+interface TransactionInput {
+    title: string;
+    amount: number;
+    type: string;
+    category: string;
+    date: string;
+}
+
 export async function analyzeFinances(
-    transactions: {
-        title: string;
-        amount: number;
-        type: string;
-        category: string;
-        date: string;
-    }[],
+    transactions: TransactionInput[],
     startDate: string,
     endDate: string,
 ): Promise<{ summary: string; tips: string[] }> {
-    const model = getGeminiModel();
+    const model = getModel();
 
     const totalIncome = transactions
         .filter((t) => t.type === "INCOME")
-        .reduce((sum, t) => sum + t.amount, 0);
+        .reduce((s, t) => s + t.amount, 0);
 
     const totalExpense = transactions
         .filter((t) => t.type === "EXPENSE")
-        .reduce((sum, t) => sum + t.amount, 0);
+        .reduce((s, t) => s + t.amount, 0);
 
     const byCategory = transactions
         .filter((t) => t.type === "EXPENSE")
-        .reduce(
-            (acc, t) => {
-                acc[t.category] = (acc[t.category] || 0) + t.amount;
-                return acc;
-            },
-            {} as Record<string, number>,
-        );
+        .reduce<Record<string, number>>((acc, t) => {
+            acc[t.category] = (acc[t.category] || 0) + t.amount;
+            return acc;
+        }, {});
 
     const prompt = `
 Você é um consultor financeiro pessoal. Analise os dados financeiros abaixo e responda APENAS em JSON válido, sem markdown.
@@ -83,22 +79,19 @@ export async function chatWithGemini(
     analysisContext: string,
     history: { role: "user" | "model"; parts: string }[],
 ): Promise<string> {
-    const model = getGeminiModel();
+    const model = getModel();
 
     const validHistory = history
-        .filter((h) => h.parts && h.parts.trim() !== "")
+        .filter((h) => h.parts?.trim() !== "")
         .reduce(
             (acc, h) => {
                 const last = acc[acc.length - 1];
-                if (last && last.role === h.role) return acc;
+                if (last?.role === h.role) return acc;
                 return [...acc, h];
             },
             [] as { role: "user" | "model"; parts: string }[],
         )
-        .filter((_, i, arr) => {
-            if (i === 0 && arr[0].role !== "user") return false;
-            return true;
-        });
+        .filter((_, i, arr) => !(i === 0 && arr[0].role !== "user"));
 
     const chat = model.startChat({
         history: validHistory.map((h) => ({

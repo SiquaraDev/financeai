@@ -1,11 +1,9 @@
 "use client";
 
 import PageHeader from "@/components/ui/PageHeader";
-import NewAnalysisCard from "@/components/ai/NewAnalysisCard";
-import AnalysisResultCard from "@/components/ai/AnalysisResultCard";
-import ChatArea from "@/components/ai/ChatArea";
+import { NewAnalysisCard, AnalysisResultCard, ChatArea } from "@/components/ai";
 import { GeminiIcon } from "@/components/icons";
-import { useAiPage } from "@/hooks/useAiPage";
+import { useAiPage } from "@/hooks";
 
 export default function AiPage() {
     const {
@@ -37,19 +35,10 @@ export default function AiPage() {
             }}
         >
             <style>{`
-        .ai-layout {
-          display: grid;
-          grid-template-columns: 340px 1fr;
-          gap: clamp(.5rem, 2vw, 1rem);
-          height: calc(100dvh - 120px);
-          min-height: 500px;
-        }
-        .ai-left  { display: flex; flex-direction: column; gap: clamp(.5rem, 2vw, 1rem); overflow-y: auto; min-width: 0; }
-        .ai-chat  { display: flex; flex-direction: column; min-height: 0; }
-        @media (max-width: 900px) {
-          .ai-layout { grid-template-columns: 1fr; height: auto; min-height: unset; }
-          .ai-chat   { height: 520px; }
-        }
+        .ai-layout { display: grid; grid-template-columns: 340px 1fr; gap: clamp(.5rem, 2vw, 1rem); height: calc(100dvh - 120px); min-height: 500px; }
+        .ai-left   { display: flex; flex-direction: column; gap: clamp(.5rem, 2vw, 1rem); overflow-y: auto; min-width: 0; }
+        .ai-chat   { display: flex; flex-direction: column; min-height: 0; }
+        @media (max-width: 900px) { .ai-layout { grid-template-columns: 1fr; height: auto; } .ai-chat { height: 520px; } }
         @media (max-width: 480px) { .ai-chat { height: 460px; } }
       `}</style>
 
@@ -99,7 +88,6 @@ export default function AiPage() {
                     />
                     {analysis && <AnalysisResultCard analysis={analysis} />}
                 </div>
-
                 <ChatArea
                     messages={messages}
                     input={input}

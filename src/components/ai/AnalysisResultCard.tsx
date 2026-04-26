@@ -1,7 +1,4 @@
-interface AnalysisResult {
-    summary: string;
-    tips: string[];
-}
+import type { AnalysisResult } from "@/types";
 
 const TIP_STYLES = [
     {
@@ -42,18 +39,14 @@ export default function AnalysisResultCard({
             }}
         >
             <div
-                style={{
-                    height: "3px",
-                    background: "var(--gradient-success)",
-                }}
+                style={{ height: "3px", background: "var(--gradient-success)" }}
             />
             <div
                 style={{
                     overflowY: "auto",
-                    overflowX: "hidden",
                     maxHeight: "clamp(300px, 45vh, 520px)",
-                    paddingInline: "clamp(.875rem, 3vw, 1.25rem)",
-                    paddingBottom: "clamp(.875rem, 3vw, 1.25rem)",
+                    paddingInline: "clamp(.875rem,3vw,1.25rem)",
+                    paddingBottom: "clamp(.875rem,3vw,1.25rem)",
                 }}
             >
                 <div
@@ -108,7 +101,7 @@ export default function AnalysisResultCard({
                         background: "var(--accent-brand-glow)",
                         border: "1px solid var(--border-glow)",
                         borderRadius: "var(--radius-lg)",
-                        padding: "clamp(.625rem, 2vw, .875rem)",
+                        padding: "clamp(.625rem,2vw,.875rem)",
                         marginBottom: ".875rem",
                     }}
                 >

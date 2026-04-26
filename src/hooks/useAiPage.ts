@@ -1,43 +1,31 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { format, subMonths, startOfMonth, endOfMonth } from "date-fns";
-import type { Shortcut } from "@/components/ai/NewAnalysisCard";
-import type { ChatMessageData } from "@/components/ai/ChatArea";
+import { analysisService } from "@/services";
+import { applyAiShortcut } from "@/utils/dateRange";
+import type { AnalysisResult, ChatMessage, AiShortcut } from "@/types";
 
-export interface AnalysisResult {
-    summary: string;
-    tips: string[];
+export type { AiShortcut };
+
+interface UseAiPageReturn {
+    startDate: string;
+    endDate: string;
+    activeShortcut: AiShortcut;
+    analysis: AnalysisResult | null;
+    analyzing: boolean;
+    messages: ChatMessage[];
+    input: string;
+    chatLoading: boolean;
+    setStartDate: (v: string) => void;
+    setEndDate: (v: string) => void;
+    handleShortcut: (s: AiShortcut) => void;
+    handleAnalyze: () => Promise<void>;
+    setInput: (v: string) => void;
+    handleChat: () => Promise<void>;
 }
 
-function applyShortcut(shortcut: Shortcut): { start: string; end: string } {
-    const now = new Date();
-    const fmt = (d: Date) => format(d, "yyyy-MM-dd");
-    switch (shortcut) {
-        case "last_month":
-            return {
-                start: fmt(startOfMonth(subMonths(now, 1))),
-                end: fmt(endOfMonth(subMonths(now, 1))),
-            };
-        case "3_months":
-            return {
-                start: fmt(startOfMonth(subMonths(now, 2))),
-                end: fmt(endOfMonth(now)),
-            };
-        case "6_months":
-            return {
-                start: fmt(startOfMonth(subMonths(now, 5))),
-                end: fmt(endOfMonth(now)),
-            };
-        case "year":
-            return {
-                start: fmt(startOfMonth(subMonths(now, 11))),
-                end: fmt(endOfMonth(now)),
-            };
-    }
-}
-
-export function useAiPage() {
+export function useAiPage(): UseAiPageReturn {
     const [startDate, setStartDate] = useState(
         format(startOfMonth(subMonths(new Date(), 1)), "yyyy-MM-dd"),
     );
@@ -45,102 +33,78 @@ export function useAiPage() {
         format(endOfMonth(subMonths(new Date(), 1)), "yyyy-MM-dd"),
     );
     const [activeShortcut, setActiveShortcut] =
-        useState<Shortcut>("last_month");
+        useState<AiShortcut>("last_month");
     const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
     const [analyzing, setAnalyzing] = useState(false);
-    const [messages, setMessages] = useState<ChatMessageData[]>([]);
+    const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [input, setInput] = useState("");
     const [chatLoading, setChatLoading] = useState(false);
 
-    const handleShortcut = (shortcut: Shortcut) => {
-        const { start, end } = applyShortcut(shortcut);
+    const handleShortcut = useCallback((shortcut: AiShortcut) => {
+        const { start, end } = applyAiShortcut(shortcut);
         setStartDate(start);
         setEndDate(end);
         setActiveShortcut(shortcut);
-    };
+    }, []);
 
-    const handleAnalyze = async () => {
+    const handleAnalyze = useCallback(async () => {
         setAnalyzing(true);
         setMessages([]);
-        try {
-            const res = await fetch("/api/ai", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ action: "analyze", startDate, endDate }),
-            });
-            const data: AnalysisResult = await res.json();
-            setAnalysis(data);
+        const result = await analysisService.analyze({ startDate, endDate });
+        if (result.success && result.data) {
+            setAnalysis(result.data);
             setMessages([
                 {
                     role: "assistant",
-                    content: `Análise concluída! ${data.summary.split(".")[0]}. Pode me fazer perguntas sobre seus dados financeiros.`,
+                    content: `Análise concluída! ${result.data.summary.split(".")[0]}. Pode me fazer perguntas sobre seus dados financeiros.`,
                 },
             ]);
-        } catch {
+        } else {
             setAnalysis(null);
-        } finally {
-            setAnalyzing(false);
         }
-    };
+        setAnalyzing(false);
+    }, [startDate, endDate]);
 
-    const handleChat = async () => {
+    const handleChat = useCallback(async () => {
         if (!input.trim() || !analysis) return;
         const userMsg = input.trim();
         setInput("");
         setMessages((prev) => [...prev, { role: "user", content: userMsg }]);
         setChatLoading(true);
 
-        const historyToSend = messages.slice(1).map((m) => ({
-            role: m.role === "assistant" ? "model" : "user",
-            parts: m.content,
-        }));
+        const result = await analysisService.chat(
+            userMsg,
+            analysis.summary,
+            messages,
+        );
 
-        try {
-            const res = await fetch("/api/ai", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    action: "chat",
-                    message: userMsg,
-                    analysisContext: analysis.summary,
-                    history: historyToSend,
-                }),
-            });
-            const data = await res.json();
-            setMessages((prev) => [
-                ...prev,
-                { role: "assistant", content: data.response },
-            ]);
-        } catch {
-            setMessages((prev) => [
-                ...prev,
-                {
-                    role: "assistant",
-                    content: "Erro ao conectar com o Gemini. Tente novamente.",
-                },
-            ]);
-        } finally {
-            setChatLoading(false);
-        }
-    };
+        setMessages((prev) => [
+            ...prev,
+            {
+                role: "assistant",
+                content:
+                    result.success && result.data
+                        ? result.data
+                        : "Erro ao conectar com o Gemini. Tente novamente.",
+            },
+        ]);
+        setChatLoading(false);
+    }, [input, analysis, messages]);
 
     return {
-        // Date range
         startDate,
-        setStartDate,
         endDate,
-        setEndDate,
         activeShortcut,
-        handleShortcut,
-        // Analysis
         analysis,
         analyzing,
-        handleAnalyze,
-        // Chat
         messages,
         input,
-        setInput,
         chatLoading,
+        setStartDate,
+        setEndDate,
+        handleShortcut,
+        handleAnalyze,
+        setInput,
         handleChat,
     };
 }

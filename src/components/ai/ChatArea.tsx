@@ -1,17 +1,13 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import Badge from "@/components/ui/Badge";
 import EmptyState from "@/components/ui/EmptyState";
 import ChatMessage from "./ChatMessage";
 import ChatInputBar from "./ChatInputBar";
 import TypingDots from "./TypingDots";
 import { GeminiIcon } from "@/components/icons";
-
-export interface ChatMessageData {
-    role: "user" | "assistant";
-    content: string;
-}
+import type { ChatMessage as ChatMessageData } from "@/types";
 
 interface ChatAreaProps {
     messages: ChatMessageData[];
@@ -100,7 +96,6 @@ export default function ChatArea({
             </div>
 
             <div
-                className="ai-messages"
                 style={{
                     flex: 1,
                     overflowY: "auto",

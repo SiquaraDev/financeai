@@ -1,9 +1,7 @@
 import { GeminiIcon } from "@/components/icons";
+import type { ChatMessage as ChatMessageData } from "@/types";
 
-interface ChatMessageProps {
-    role: "user" | "assistant";
-    content: string;
-}
+type ChatMessageProps = ChatMessageData;
 
 export default function ChatMessage({ role, content }: ChatMessageProps) {
     const isUser = role === "user";

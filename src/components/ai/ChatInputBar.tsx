@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef } from "react";
+import { useRef } from "react";
 import Button from "@/components/ui/Button";
 import { IconSend } from "@/components/icons";
 
@@ -39,7 +39,6 @@ export default function ChatInputBar({
         }
     };
 
-    // Focus ring lives on the wrapper, not the textarea
     const handleFocus = () => {
         if (!wrapperRef.current) return;
         wrapperRef.current.style.borderColor = "var(--brand-500)";
@@ -112,7 +111,6 @@ export default function ChatInputBar({
                         }}
                     />
                 </div>
-
                 <Button
                     variant="primary"
                     onClick={onSubmit}
@@ -127,7 +125,6 @@ export default function ChatInputBar({
                     }}
                 />
             </div>
-
             <p
                 style={{
                     fontSize: "10px",

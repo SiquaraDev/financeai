@@ -1,10 +1,9 @@
 "use client";
 
 import { GeminiIcon, IconSpinner } from "@/components/icons";
+import type { AiShortcut } from "@/types";
 
-export type Shortcut = "last_month" | "3_months" | "6_months" | "year";
-
-const SHORTCUTS: { value: Shortcut; label: string }[] = [
+const SHORTCUTS: { value: AiShortcut; label: string }[] = [
     { value: "last_month", label: "Último mês" },
     { value: "3_months", label: "3 meses" },
     { value: "6_months", label: "6 meses" },
@@ -14,11 +13,11 @@ const SHORTCUTS: { value: Shortcut; label: string }[] = [
 interface NewAnalysisCardProps {
     startDate: string;
     endDate: string;
-    activeShortcut: Shortcut;
+    activeShortcut: AiShortcut;
     analyzing: boolean;
     onStartDateChange: (v: string) => void;
     onEndDateChange: (v: string) => void;
-    onShortcut: (s: Shortcut) => void;
+    onShortcut: (s: AiShortcut) => void;
     onAnalyze: () => void;
 }
 
