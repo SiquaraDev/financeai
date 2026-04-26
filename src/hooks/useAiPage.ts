@@ -6,7 +6,7 @@ import { analysisService } from "@/services";
 import { applyAiShortcut } from "@/utils/dateRange";
 import type { AnalysisResult, ChatMessage, AiShortcut } from "@/types";
 
-export type { AiShortcut };
+// AiShortcut lives in @/types — no re-export needed here.
 
 interface UseAiPageReturn {
     startDate: string;

@@ -8,12 +8,9 @@ import {
     subYears,
 } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import type { DateFilterKey } from "@/types";
+import type { DateFilterKey, DateRange, AiShortcut } from "@/types";
 
-export interface DateRange {
-    start: Date | null;
-    end: Date | null;
-}
+// DateRange and AiShortcut live in @/types — imported, not redefined.
 
 export function getDateRange(
     filter: DateFilterKey,
@@ -73,7 +70,9 @@ export function getDateRange(
             const parse = (str: string, isEnd = false): Date => {
                 const [y, m, d] = str.split("-").map(Number);
                 const dt = new Date(y, m - 1, d);
-                isEnd ? dt.setHours(23, 59, 59, 999) : dt.setHours(0, 0, 0, 0);
+                isEnd
+                    ? dt.setHours(23, 59, 59, 999)
+                    : dt.setHours(0, 0, 0, 0);
                 return dt;
             };
             return {
@@ -113,8 +112,6 @@ export function dateRangeToParams(
         end: range.end ? toLocalISO(range.end) : undefined,
     };
 }
-
-export type AiShortcut = "last_month" | "3_months" | "6_months" | "year";
 
 export function applyAiShortcut(shortcut: AiShortcut): {
     start: string;

@@ -5,7 +5,7 @@ import { format, startOfMonth, endOfMonth } from "date-fns";
 import { getDateRange, formatPeriodLabel } from "@/utils/dateRange";
 import type { DateFilterKey, DateRange } from "@/types";
 
-export type { DateFilterKey };
+// DateFilterKey and DateRange both live in @/types.
 
 interface UseDateRangeOptions {
     initialFilter?: DateFilterKey;

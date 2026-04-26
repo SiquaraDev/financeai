@@ -11,7 +11,7 @@ import type {
 } from "@/types";
 import { EMPTY_TRANSACTION_FORM } from "@/types";
 
-export type { Transaction, FilterType, TransactionFormData };
+// No type re-exports here — consumers import directly from "@/types".
 
 interface UseTransactionsReturn {
     transactions: Transaction[];
@@ -52,9 +52,7 @@ export function useTransactions(): UseTransactionsReturn {
     const [showModal, setShowModal] = useState(false);
     const [showImport, setShowImport] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
-    const [form, setForm] = useState<TransactionFormData>(
-        EMPTY_TRANSACTION_FORM,
-    );
+    const [form, setForm] = useState<TransactionFormData>(EMPTY_TRANSACTION_FORM);
     const [saving, setSaving] = useState(false);
     const [importError, setImportError] = useState("");
 
@@ -103,10 +101,12 @@ export function useTransactions(): UseTransactionsReturn {
     }, []);
 
     const closeModal = useCallback(() => setShowModal(false), []);
+
     const openImport = useCallback(() => {
         setImportError("");
         setShowImport(true);
     }, []);
+
     const closeImport = useCallback(() => setShowImport(false), []);
 
     const updateForm = useCallback((updates: Partial<TransactionFormData>) => {
@@ -141,10 +141,7 @@ export function useTransactions(): UseTransactionsReturn {
                 const text = await file.text();
                 const items = JSON.parse(text);
                 const list = Array.isArray(items) ? items : [items];
-                const result = await transactionService.bulkCreate(
-                    list,
-                    "JSON",
-                );
+                const result = await transactionService.bulkCreate(list, "JSON");
                 if (result.success) {
                     setShowImport(false);
                     fetchTransactions();
@@ -152,9 +149,7 @@ export function useTransactions(): UseTransactionsReturn {
                     setImportError("Erro ao importar transações.");
                 }
             } catch {
-                setImportError(
-                    "JSON inválido. Verifique o formato do arquivo.",
-                );
+                setImportError("JSON inválido. Verifique o formato do arquivo.");
             }
         },
         [fetchTransactions],
@@ -171,9 +166,9 @@ export function useTransactions(): UseTransactionsReturn {
                 const items = rows.map((row) => ({
                     title: String(row["titulo"] ?? row["title"] ?? "Importado"),
                     amount: String(Number(row["valor"] ?? row["amount"] ?? 0)),
-                    type: String(row["tipo"] ?? row["type"] ?? "EXPENSE") as
-                        | "INCOME"
-                        | "EXPENSE",
+                    type: String(
+                        row["tipo"] ?? row["type"] ?? "EXPENSE",
+                    ) as "INCOME" | "EXPENSE",
                     category: String(
                         row["categoria"] ?? row["category"] ?? "Outros",
                     ),
