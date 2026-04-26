@@ -5,7 +5,7 @@ import { format } from "date-fns";
 import Badge from "@/components/ui/Badge";
 import { formatCurrency, parseSafeDate } from "@/lib/formatters";
 
-export type SortColumn = "title" | "category" | "date" | "amount" | null;
+export type SortColumn = "title" | "category" | "date" | "amount";
 export type SortDirection = "asc" | "desc";
 
 export interface Transaction {
