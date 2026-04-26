@@ -2,29 +2,16 @@
 
 import { useState, useEffect, useCallback } from "react";
 import * as XLSX from "xlsx";
-import type { Transaction } from "./useDashboardStats";
+import { transactionService } from "@/services";
+import type {
+    Transaction,
+    FilterType,
+    TransactionFormData,
+    PaginatedResponse,
+} from "@/types";
+import { EMPTY_TRANSACTION_FORM } from "@/types";
 
-export type { Transaction };
-
-export type FilterType = "ALL" | "INCOME" | "EXPENSE";
-
-export interface TransactionFormData {
-    title: string;
-    amount: string;
-    type: "INCOME" | "EXPENSE";
-    category: string;
-    date: string;
-    description: string;
-}
-
-export const EMPTY_FORM: TransactionFormData = {
-    title: "",
-    amount: "",
-    type: "EXPENSE",
-    category: "",
-    date: new Date().toISOString().split("T")[0],
-    description: "",
-};
+export type { Transaction, FilterType, TransactionFormData };
 
 interface UseTransactionsReturn {
     transactions: Transaction[];
@@ -35,14 +22,12 @@ interface UseTransactionsReturn {
     setPage: (p: number) => void;
     setFilter: (f: FilterType) => void;
     refetch: () => void;
-
     showModal: boolean;
     showImport: boolean;
     editingId: string | null;
     form: TransactionFormData;
     saving: boolean;
     importError: string;
-
     openCreate: () => void;
     openEdit: (t: Transaction) => void;
     closeModal: () => void;
@@ -67,19 +52,26 @@ export function useTransactions(): UseTransactionsReturn {
     const [showModal, setShowModal] = useState(false);
     const [showImport, setShowImport] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
-    const [form, setForm] = useState<TransactionFormData>(EMPTY_FORM);
+    const [form, setForm] = useState<TransactionFormData>(
+        EMPTY_TRANSACTION_FORM,
+    );
     const [saving, setSaving] = useState(false);
     const [importError, setImportError] = useState("");
 
     const fetchTransactions = useCallback(async () => {
         setLoading(true);
-        const params = new URLSearchParams({ page: String(page), limit: "15" });
-        if (filter !== "ALL") params.set("type", filter);
-        const res = await fetch(`/api/transactions?${params}`);
-        const data = await res.json();
-        setTransactions(data.transactions ?? []);
-        setTotal(data.total ?? 0);
-        setLoading(false);
+        try {
+            const result: PaginatedResponse<Transaction> =
+                await transactionService.fetchTransactions({
+                    page,
+                    limit: 15,
+                    filter,
+                });
+            setTransactions(result.data);
+            setTotal(result.total);
+        } finally {
+            setLoading(false);
+        }
     }, [page, filter]);
 
     useEffect(() => {
@@ -92,7 +84,7 @@ export function useTransactions(): UseTransactionsReturn {
     }, []);
 
     const openCreate = useCallback(() => {
-        setForm(EMPTY_FORM);
+        setForm(EMPTY_TRANSACTION_FORM);
         setEditingId(null);
         setShowModal(true);
     }, []);
@@ -111,12 +103,10 @@ export function useTransactions(): UseTransactionsReturn {
     }, []);
 
     const closeModal = useCallback(() => setShowModal(false), []);
-
     const openImport = useCallback(() => {
         setImportError("");
         setShowImport(true);
     }, []);
-
     const closeImport = useCallback(() => setShowImport(false), []);
 
     const updateForm = useCallback((updates: Partial<TransactionFormData>) => {
@@ -125,26 +115,22 @@ export function useTransactions(): UseTransactionsReturn {
 
     const handleSave = useCallback(async () => {
         setSaving(true);
-        const payload = { ...form, amount: parseFloat(form.amount) };
-        const url = editingId
-            ? `/api/transactions/${editingId}`
-            : "/api/transactions";
-        const method = editingId ? "PUT" : "POST";
-        await fetch(url, {
-            method,
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
-        });
-        setShowModal(false);
+        const result = editingId
+            ? await transactionService.updateTransaction(editingId, form)
+            : await transactionService.createTransaction(form);
+
+        if (result.success) {
+            setShowModal(false);
+            fetchTransactions();
+        }
         setSaving(false);
-        fetchTransactions();
     }, [form, editingId, fetchTransactions]);
 
     const handleDelete = useCallback(
         async (id: string) => {
             if (!confirm("Excluir esta transação?")) return;
-            await fetch(`/api/transactions/${id}`, { method: "DELETE" });
-            fetchTransactions();
+            const result = await transactionService.deleteTransaction(id);
+            if (result.success) fetchTransactions();
         },
         [fetchTransactions],
     );
@@ -155,15 +141,16 @@ export function useTransactions(): UseTransactionsReturn {
                 const text = await file.text();
                 const items = JSON.parse(text);
                 const list = Array.isArray(items) ? items : [items];
-                for (const item of list) {
-                    await fetch("/api/transactions", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ ...item, source: "JSON" }),
-                    });
+                const result = await transactionService.bulkCreate(
+                    list,
+                    "JSON",
+                );
+                if (result.success) {
+                    setShowImport(false);
+                    fetchTransactions();
+                } else {
+                    setImportError("Erro ao importar transações.");
                 }
-                setShowImport(false);
-                fetchTransactions();
             } catch {
                 setImportError(
                     "JSON inválido. Verifique o formato do arquivo.",
@@ -180,26 +167,32 @@ export function useTransactions(): UseTransactionsReturn {
                 const rows = XLSX.utils.sheet_to_json(
                     wb.Sheets[wb.SheetNames[0]],
                 ) as Record<string, unknown>[];
-                for (const row of rows) {
-                    await fetch("/api/transactions", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            title: row["titulo"] ?? row["title"] ?? "Importado",
-                            amount: Number(row["valor"] ?? row["amount"] ?? 0),
-                            type: row["tipo"] ?? row["type"] ?? "EXPENSE",
-                            category:
-                                row["categoria"] ?? row["category"] ?? "Outros",
-                            date:
-                                row["data"] ??
-                                row["date"] ??
-                                new Date().toISOString(),
-                            source: "EXCEL",
-                        }),
-                    });
+
+                const items = rows.map((row) => ({
+                    title: String(row["titulo"] ?? row["title"] ?? "Importado"),
+                    amount: String(Number(row["valor"] ?? row["amount"] ?? 0)),
+                    type: String(row["tipo"] ?? row["type"] ?? "EXPENSE") as
+                        | "INCOME"
+                        | "EXPENSE",
+                    category: String(
+                        row["categoria"] ?? row["category"] ?? "Outros",
+                    ),
+                    date: String(
+                        row["data"] ?? row["date"] ?? new Date().toISOString(),
+                    ),
+                    description: "",
+                }));
+
+                const result = await transactionService.bulkCreate(
+                    items,
+                    "EXCEL",
+                );
+                if (result.success) {
+                    setShowImport(false);
+                    fetchTransactions();
+                } else {
+                    setImportError("Erro ao importar arquivo Excel.");
                 }
-                setShowImport(false);
-                fetchTransactions();
             } catch {
                 setImportError("Erro ao ler o arquivo Excel.");
             }
@@ -234,14 +227,12 @@ export function useTransactions(): UseTransactionsReturn {
         setPage,
         setFilter: handleSetFilter,
         refetch: fetchTransactions,
-
         showModal,
         showImport,
         editingId,
         form,
         saving,
         importError,
-
         openCreate,
         openEdit,
         closeModal,

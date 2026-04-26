@@ -1,40 +1,15 @@
+"use client";
+
 import { format } from "date-fns";
-import Badge from "@/components/ui/Badge";
-import { formatCurrency, parseSafeDate } from "@/lib/formatters";
-import type { Transaction } from "./TransactionTable";
+import { TransactionIcon } from "@/components/ui/TransactionIcon";
+import { formatCurrency, parseSafeDate } from "@/utils";
+import { transactionColorTokens } from "@/styles/design-tokens";
+import type { Transaction } from "@/types";
 
 interface TransactionCardListProps {
     transactions: Transaction[];
     onEdit: (t: Transaction) => void;
     onDelete: (id: string) => void;
-}
-
-function TypeIcon({ isIncome }: { isIncome: boolean }) {
-    return (
-        <svg
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden
-        >
-            {isIncome ? (
-                <>
-                    <line x1="12" y1="19" x2="12" y2="5" />
-                    <polyline points="5 12 12 5 19 12" />
-                </>
-            ) : (
-                <>
-                    <line x1="12" y1="5" x2="12" y2="19" />
-                    <polyline points="19 12 12 19 5 12" />
-                </>
-            )}
-        </svg>
-    );
 }
 
 export default function TransactionCardList({
@@ -45,16 +20,8 @@ export default function TransactionCardList({
     return (
         <div>
             {transactions.map((t) => {
+                const { color } = transactionColorTokens(t.type);
                 const isIncome = t.type === "INCOME";
-                const color = isIncome
-                    ? "var(--color-success-light)"
-                    : "var(--color-danger-light)";
-                const bg = isIncome
-                    ? "var(--color-success-bg)"
-                    : "var(--color-danger-bg)";
-                const border = isIncome
-                    ? "var(--color-success-border)"
-                    : "var(--color-danger-border)";
 
                 return (
                     <div
@@ -67,22 +34,7 @@ export default function TransactionCardList({
                             gap: ".5rem",
                         }}
                     >
-                        <div
-                            style={{
-                                width: "36px",
-                                height: "36px",
-                                flexShrink: 0,
-                                borderRadius: "var(--radius-md)",
-                                background: bg,
-                                border: `1px solid ${border}`,
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                color,
-                            }}
-                        >
-                            <TypeIcon isIncome={isIncome} />
-                        </div>
+                        <TransactionIcon type={t.type} size={36} />
 
                         <div style={{ flex: 1, minWidth: 0 }}>
                             <p
@@ -130,7 +82,6 @@ export default function TransactionCardList({
                                 {isIncome ? "+" : "-"}
                                 {formatCurrency(Number(t.amount))}
                             </span>
-
                             <div style={{ display: "flex", gap: ".25rem" }}>
                                 <button
                                     onClick={() => onEdit(t)}

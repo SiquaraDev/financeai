@@ -2,16 +2,10 @@
 
 import Modal from "@/components/ui/Modal";
 import Button from "@/components/ui/Button";
-import { TRANSACTION_CATEGORIES } from "@/types";
-
-export interface TransactionFormData {
-    title: string;
-    amount: string;
-    type: "INCOME" | "EXPENSE";
-    category: string;
-    date: string;
-    description: string;
-}
+import ModalLabel from "@/components/ui/ModalLabel";
+import TypeToggle from "@/components/ui/TypeToggle";
+import { TRANSACTION_CATEGORIES } from "@/types/categories";
+import type { TransactionFormData } from "@/types";
 
 interface TransactionModalProps {
     form: TransactionFormData;
@@ -20,24 +14,6 @@ interface TransactionModalProps {
     onFormChange: (updates: Partial<TransactionFormData>) => void;
     onSave: () => void;
     onClose: () => void;
-}
-
-function ModalLabel({ children }: { children: React.ReactNode }) {
-    return (
-        <label
-            style={{
-                display: "block",
-                fontSize: "var(--text-xs)",
-                fontWeight: 500,
-                color: "var(--text-secondary)",
-                marginBottom: ".375rem",
-                textTransform: "uppercase",
-                letterSpacing: ".05em",
-            }}
-        >
-            {children}
-        </label>
-    );
 }
 
 export default function TransactionModal({
@@ -82,53 +58,10 @@ export default function TransactionModal({
                     gap: "1rem",
                 }}
             >
-                <div
-                    style={{
-                        display: "flex",
-                        background: "var(--bg-surface)",
-                        border: "1px solid var(--border-subtle)",
-                        borderRadius: "var(--radius-lg)",
-                        padding: "4px",
-                    }}
-                >
-                    {(["EXPENSE", "INCOME"] as const).map((t) => {
-                        const isActive = form.type === t;
-                        const isExpense = t === "EXPENSE";
-                        return (
-                            <button
-                                key={t}
-                                onClick={() =>
-                                    onFormChange({ type: t, category: "" })
-                                }
-                                style={{
-                                    flex: 1,
-                                    padding: ".5rem",
-                                    borderRadius: "var(--radius-md)",
-                                    fontSize: "var(--text-sm)",
-                                    fontWeight: 600,
-                                    fontFamily: "var(--font-body)",
-                                    cursor: "pointer",
-                                    transition: "all var(--transition-base)",
-                                    background: isActive
-                                        ? isExpense
-                                            ? "var(--color-danger-bg)"
-                                            : "var(--color-success-bg)"
-                                        : "transparent",
-                                    color: isActive
-                                        ? isExpense
-                                            ? "var(--color-danger-light)"
-                                            : "var(--color-success-light)"
-                                        : "var(--text-muted)",
-                                    border: isActive
-                                        ? `1px solid ${isExpense ? "var(--color-danger-border)" : "var(--color-success-border)"}`
-                                        : "1px solid transparent",
-                                }}
-                            >
-                                {t === "EXPENSE" ? "Gasto" : "Receita"}
-                            </button>
-                        );
-                    })}
-                </div>
+                <TypeToggle
+                    value={form.type}
+                    onChange={(type) => onFormChange({ type, category: "" })}
+                />
 
                 <div>
                     <ModalLabel>Descrição</ModalLabel>

@@ -3,12 +3,13 @@
 import Modal from "@/components/ui/Modal";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
+import type { BadgeVariant } from "@/components/ui/Badge";
 
 interface ImportOption {
     label: string;
     accept: string;
     type: "json" | "excel" | "pdf";
-    badgeVariant: "warning" | "success" | "danger";
+    badgeVariant: BadgeVariant;
 }
 
 const IMPORT_OPTIONS: ImportOption[] = [

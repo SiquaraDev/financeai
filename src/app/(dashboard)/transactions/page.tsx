@@ -1,6 +1,8 @@
 "use client";
 
-import { useTransactions } from "@/hooks/useTransactions";
+import { useState } from "react";
+import { useTransactions } from "@/hooks";
+import { useSort } from "@/hooks";
 import PageHeader from "@/components/ui/PageHeader";
 import FilterBar from "@/components/ui/FilterBar";
 import Pagination from "@/components/ui/Pagination";
@@ -8,37 +10,25 @@ import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import EmptyState from "@/components/ui/EmptyState";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
-import TransactionTable from "@/components/transactions/TransactionTable";
-import TransactionCardList from "@/components/transactions/TransactionCardList";
-import TransactionModal from "@/components/transactions/TransactionModal";
-import ImportModal from "@/components/transactions/ImportModal";
+import {
+    TransactionTable,
+    TransactionCardList,
+    TransactionModal,
+    ImportModal,
+} from "@/components/transactions";
 import { IconUpload, IconPlus } from "@/components/icons";
-import type {
-    SortColumn,
-    SortDirection,
-} from "@/components/transactions/TransactionTable";
-import { useState } from "react";
+import type { SortColumn } from "@/components/transactions";
+import type { SelectOption, FilterType } from "@/types";
 
-const FILTER_OPTIONS = [
-    { value: "ALL" as const, label: "Todas" },
-    { value: "INCOME" as const, label: "Receitas" },
-    { value: "EXPENSE" as const, label: "Gastos" },
+const FILTER_OPTIONS: SelectOption<FilterType>[] = [
+    { value: "ALL", label: "Todas" },
+    { value: "INCOME", label: "Receitas" },
+    { value: "EXPENSE", label: "Gastos" },
 ];
 
 export default function TransactionsPage() {
     const tx = useTransactions();
-
-    const [sortColumn, setSortColumn] = useState<SortColumn>(null);
-    const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
-
-    const handleSort = (col: SortColumn) => {
-        if (sortColumn === col)
-            setSortDirection((d) => (d === "asc" ? "desc" : "asc"));
-        else {
-            setSortColumn(col);
-            setSortDirection("asc");
-        }
-    };
+    const { sortColumn, sortDirection, handleSort } = useSort<SortColumn>();
 
     return (
         <div

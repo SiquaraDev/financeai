@@ -13,10 +13,17 @@ const transactionSchema = z.object({
     source: z.enum(["MANUAL", "JSON", "PDF", "EXCEL"]).default("MANUAL"),
 });
 
+function parseDate(dateStr: string): Date {
+    const datePart = dateStr.includes("T") ? dateStr.split("T")[0] : dateStr;
+    const [year, month, day] = datePart.split("-").map(Number);
+    return new Date(year, month - 1, day, 12, 0, 0);
+}
+
 export async function GET(req: NextRequest) {
     const session = await auth();
-    if (!session?.user?.id)
+    if (!session?.user?.id) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
     const { searchParams } = new URL(req.url);
     const type = searchParams.get("type");
@@ -53,11 +60,13 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
     const session = await auth();
-    if (!session?.user?.id)
+    if (!session?.user?.id) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
     const body = await req.json();
     const parsed = transactionSchema.safeParse(body);
+
     if (!parsed.success) {
         return NextResponse.json(
             { error: parsed.error.flatten() },
@@ -65,17 +74,10 @@ export async function POST(req: NextRequest) {
         );
     }
 
-    const dateStr = parsed.data.date.includes("T")
-        ? parsed.data.date.split("T")[0]
-        : parsed.data.date;
-
-    const [year, month, day] = dateStr.split("-").map(Number);
-    const date = new Date(year, month - 1, day, 12, 0, 0);
-
     const transaction = await prisma.transaction.create({
         data: {
             ...parsed.data,
-            date,
+            date: parseDate(parsed.data.date),
             userId: session.user.id,
         },
     });

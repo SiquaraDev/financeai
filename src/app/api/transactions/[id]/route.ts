@@ -12,20 +12,27 @@ const updateSchema = z.object({
     description: z.string().optional(),
 });
 
-export async function PUT(
-    req: NextRequest,
-    { params }: { params: Promise<{ id: string }> },
-) {
+function parseDate(dateStr: string): Date {
+    const datePart = dateStr.includes("T") ? dateStr.split("T")[0] : dateStr;
+    const [year, month, day] = datePart.split("-").map(Number);
+    return new Date(year, month - 1, day, 12, 0, 0);
+}
+
+type Params = Promise<{ id: string }>;
+
+export async function PUT(req: NextRequest, { params }: { params: Params }) {
     const session = await auth();
-    if (!session?.user?.id)
+    if (!session?.user?.id) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
     const { id } = await params;
     const existing = await prisma.transaction.findFirst({
         where: { id, userId: session.user.id },
     });
-    if (!existing)
+    if (!existing) {
         return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
 
     const body = await req.json();
     const parsed = updateSchema.safeParse(body);
@@ -36,40 +43,31 @@ export async function PUT(
         );
     }
 
-    let dateUpdate = {};
-    if (parsed.data.date) {
-        const dateStr = parsed.data.date.includes("T")
-            ? parsed.data.date.split("T")[0]
-            : parsed.data.date;
-        const [year, month, day] = dateStr.split("-").map(Number);
-        dateUpdate = { date: new Date(year, month - 1, day, 12, 0, 0) };
-    }
+    const dateUpdate = parsed.data.date
+        ? { date: parseDate(parsed.data.date) }
+        : {};
 
     const updated = await prisma.transaction.update({
         where: { id },
-        data: {
-            ...parsed.data,
-            ...dateUpdate,
-        },
+        data: { ...parsed.data, ...dateUpdate },
     });
 
     return NextResponse.json(updated);
 }
 
-export async function DELETE(
-    req: NextRequest,
-    { params }: { params: Promise<{ id: string }> },
-) {
+export async function DELETE(req: NextRequest, { params }: { params: Params }) {
     const session = await auth();
-    if (!session?.user?.id)
+    if (!session?.user?.id) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
     const { id } = await params;
     const existing = await prisma.transaction.findFirst({
         where: { id, userId: session.user.id },
     });
-    if (!existing)
+    if (!existing) {
         return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
 
     await prisma.transaction.delete({ where: { id } });
     return NextResponse.json({ success: true });
