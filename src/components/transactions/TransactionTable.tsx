@@ -4,9 +4,12 @@ import { useMemo } from "react";
 import { format } from "date-fns";
 import Badge from "@/components/ui/Badge";
 import { formatCurrency, parseSafeDate } from "@/lib/formatters";
-import type { Transaction, TransactionSortColumn, SortDirection } from "@/types";
+import type {
+    Transaction,
+    TransactionSortColumn,
+    SortDirection,
+} from "@/types";
 
-// SortColumn is now TransactionSortColumn from @/types — no null, no local redefinition.
 export type { TransactionSortColumn as SortColumn };
 
 interface TransactionTableProps {
