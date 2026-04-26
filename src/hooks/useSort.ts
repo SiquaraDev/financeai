@@ -8,7 +8,10 @@ interface UseSortReturn<T extends string> {
     sortDirection: SortDirection;
     sortState: SortState<T>;
     handleSort: (col: T) => void;
-    getSortedItems: <I>(items: I[], getKey: (item: I) => unknown) => I[];
+    getSortedItems: <I>(
+        items: I[],
+        getKey: (item: I) => string | number,
+    ) => I[];
 }
 
 export function useSort<T extends string>(
@@ -36,7 +39,7 @@ export function useSort<T extends string>(
     }, []);
 
     const getSortedItems = useCallback(
-        <I>(items: I[], getKey: (item: I) => unknown): I[] => {
+        <I>(items: I[], getKey: (item: I) => string | number): I[] => {
             if (!sortColumn) return items;
             return [...items].sort((a, b) => {
                 const va = getKey(a);
