@@ -4,26 +4,16 @@ import { useMemo } from "react";
 import { format } from "date-fns";
 import Badge from "@/components/ui/Badge";
 import { formatCurrency, parseSafeDate } from "@/lib/formatters";
+import type { Transaction, TransactionSortColumn, SortDirection } from "@/types";
 
-export type SortColumn = "title" | "category" | "date" | "amount" | null;
-export type SortDirection = "asc" | "desc";
-
-export interface Transaction {
-    id: string;
-    title: string;
-    amount: number;
-    type: "INCOME" | "EXPENSE";
-    category: string;
-    date: string;
-    description?: string;
-    source?: string;
-}
+// SortColumn is now TransactionSortColumn from @/types — no null, no local redefinition.
+export type { TransactionSortColumn as SortColumn };
 
 interface TransactionTableProps {
     transactions: Transaction[];
-    sortColumn: SortColumn;
+    sortColumn: TransactionSortColumn | null;
     sortDirection: SortDirection;
-    onSort: (col: SortColumn) => void;
+    onSort: (col: TransactionSortColumn) => void;
     onEdit: (t: Transaction) => void;
     onDelete: (id: string) => void;
 }
@@ -33,8 +23,8 @@ function SortIcon({
     sortColumn,
     sortDirection,
 }: {
-    column: SortColumn;
-    sortColumn: SortColumn;
+    column: TransactionSortColumn;
+    sortColumn: TransactionSortColumn | null;
     sortDirection: SortDirection;
 }) {
     const active = sortColumn === column;
@@ -109,7 +99,7 @@ function TypeIcon({ isIncome }: { isIncome: boolean }) {
 }
 
 const TH_COLS: {
-    col: SortColumn;
+    col: TransactionSortColumn;
     label: string;
     align?: "left" | "right";
 }[] = [
@@ -121,7 +111,7 @@ const TH_COLS: {
 
 function sortTransactions(
     transactions: Transaction[],
-    col: SortColumn,
+    col: TransactionSortColumn | null,
     dir: SortDirection,
 ): Transaction[] {
     if (!col) return transactions;
