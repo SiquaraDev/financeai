@@ -8,7 +8,28 @@ import type {
     DateFilterKey,
     DateRange,
     SortDirection,
+    AiShortcut,
+    TransactionSortColumn,
+    PaginatedResponse,
+    MutationResult,
 } from "./base";
+
+// Re-export so consumers can import from "@/types" directly
+export type {
+    Transaction,
+    TransactionFormData,
+    FilterType,
+    DashboardStats,
+    AnalysisResult,
+    ChatMessage,
+    DateFilterKey,
+    DateRange,
+    SortDirection,
+    AiShortcut,
+    TransactionSortColumn,
+    PaginatedResponse,
+    MutationResult,
+};
 
 export interface UseDashboardStatsReturn {
     stats: DashboardStats | null;
@@ -59,7 +80,7 @@ export interface UseTransactionsReturn {
 export interface UseAiPageReturn {
     startDate: string;
     endDate: string;
-    activeShortcut: "last_month" | "3_months" | "6_months" | "year";
+    activeShortcut: AiShortcut;
     analysis: AnalysisResult | null;
     analyzing: boolean;
     messages: ChatMessage[];
@@ -67,9 +88,7 @@ export interface UseAiPageReturn {
     chatLoading: boolean;
     setStartDate: (v: string) => void;
     setEndDate: (v: string) => void;
-    handleShortcut: (
-        s: "last_month" | "3_months" | "6_months" | "year",
-    ) => void;
+    handleShortcut: (s: AiShortcut) => void;
     handleAnalyze: () => Promise<void>;
     setInput: (v: string) => void;
     handleChat: () => Promise<void>;

@@ -1,10 +1,10 @@
 /**
  * Base Utility Types
+ * Single source of truth — never redefine these elsewhere.
  */
 
 // ─── API Response wrappers ────────────────────────────────────────────────────
 
-/** Resposta paginada genérica da API */
 export interface PaginatedResponse<T> {
     data: T[];
     total: number;
@@ -12,14 +12,12 @@ export interface PaginatedResponse<T> {
     limit: number;
 }
 
-/** Estado de carregamento assíncrono genérico */
 export interface AsyncState<T> {
     data: T | null;
     loading: boolean;
     error: string | null;
 }
 
-/** Resultado de uma operação de mutação (create/update/delete) */
 export interface MutationResult<T = void> {
     success: boolean;
     data?: T;
@@ -31,6 +29,7 @@ export interface MutationResult<T = void> {
 export type TransactionType = "INCOME" | "EXPENSE";
 export type ImportSource = "MANUAL" | "JSON" | "PDF" | "EXCEL";
 
+/** Canonical Transaction shape used across the entire app. */
 export interface Transaction {
     id: string;
     title: string;
@@ -42,7 +41,6 @@ export interface Transaction {
     source?: ImportSource;
 }
 
-/** Form data para criar/editar transações */
 export interface TransactionFormData {
     title: string;
     amount: string;
@@ -65,7 +63,6 @@ export const EMPTY_TRANSACTION_FORM: TransactionFormData = {
 
 export type FilterType = "ALL" | TransactionType;
 
-/** Chaves de período de datas para o dashboard e relatórios */
 export type DateFilterKey =
     | "all"
     | "this_month"
@@ -81,6 +78,16 @@ export type SortDirection = "asc" | "desc";
 export interface SortState<T extends string> {
     column: T | null;
     direction: SortDirection;
+}
+
+/** Valid columns for transaction table sorting. Never includes null — null is handled by consumers. */
+export type TransactionSortColumn = "title" | "category" | "date" | "amount";
+
+// ─── Date range ───────────────────────────────────────────────────────────────
+
+export interface DateRange {
+    start: Date | null;
+    end: Date | null;
 }
 
 // ─── Dashboard types ──────────────────────────────────────────────────────────
@@ -109,13 +116,11 @@ export type AiShortcut = "last_month" | "3_months" | "6_months" | "year";
 
 // ─── Component prop utilities ─────────────────────────────────────────────────
 
-/** Componente com suporte a className e style opcionais */
 export interface StylableProps {
     className?: string;
     style?: React.CSSProperties;
 }
 
-/** Ação com label e handler — usada em botões e menus */
 export interface ActionItem {
     label: string;
     onClick: () => void;
@@ -123,7 +128,6 @@ export interface ActionItem {
     variant?: "primary" | "ghost" | "danger";
 }
 
-/** Option genérica para selects e filter bars */
 export interface SelectOption<T extends string = string> {
     value: T;
     label: string;
@@ -131,12 +135,10 @@ export interface SelectOption<T extends string = string> {
 
 // ─── Type guards ──────────────────────────────────────────────────────────────
 
-/** Type guard para verificar se uma string é TransactionType */
 export function isTransactionType(value: unknown): value is TransactionType {
     return value === "INCOME" || value === "EXPENSE";
 }
 
-/** Type guard para verificar se um objeto tem a forma Transaction */
 export function isTransaction(value: unknown): value is Transaction {
     if (typeof value !== "object" || value === null) return false;
     const t = value as Record<string, unknown>;
@@ -148,7 +150,6 @@ export function isTransaction(value: unknown): value is Transaction {
     );
 }
 
-/** Type guard para verificar resposta paginada */
 export function isPaginatedResponse<T>(
     value: unknown,
     itemGuard: (item: unknown) => item is T,
