@@ -2,6 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import {
+    IconDashboard,
+    IconDollarSign,
+    IconBarChart,
+    GeminiIcon,
+} from "@/components/icons";
 
 interface NavItem {
     href: string;
@@ -13,87 +19,15 @@ const NAV_ITEMS: NavItem[] = [
     {
         href: "/dashboard",
         label: "Dashboard",
-        icon: (
-            <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden
-            >
-                <rect x="3" y="3" width="7" height="7" />
-                <rect x="14" y="3" width="7" height="7" />
-                <rect x="14" y="14" width="7" height="7" />
-                <rect x="3" y="14" width="7" height="7" />
-            </svg>
-        ),
+        icon: <IconDashboard size={16} />,
     },
     {
         href: "/transactions",
         label: "Transações",
-        icon: (
-            <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden
-            >
-                <line x1="12" y1="1" x2="12" y2="23" />
-                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-            </svg>
-        ),
+        icon: <IconDollarSign size={16} />,
     },
-    {
-        href: "/reports",
-        label: "Relatórios",
-        icon: (
-            <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden
-            >
-                <line x1="18" y1="20" x2="18" y2="10" />
-                <line x1="12" y1="20" x2="12" y2="4" />
-                <line x1="6" y1="20" x2="6" y2="14" />
-            </svg>
-        ),
-    },
-    {
-        href: "/ai",
-        label: "IA Gemini",
-        icon: (
-            <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden
-            >
-                <path d="M12 2a10 10 0 1 0 10 10" />
-                <path d="M12 8v4l3 3" />
-                <circle cx="19" cy="5" r="3" />
-            </svg>
-        ),
-    },
+    { href: "/reports", label: "Relatórios", icon: <IconBarChart size={16} /> },
+    { href: "/ai", label: "IA Gemini", icon: <GeminiIcon size={16} /> },
 ];
 
 export default function NavLinks() {

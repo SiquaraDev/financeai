@@ -1,7 +1,7 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import Sidebar from "@/components/layout/Sidebar";
-import TopBar from "@/components/layout/TopBar";
+import { Sidebar } from "@/components/layout";
+import { TopBar } from "@/components/layout";
 
 export default async function DashboardLayout({
     children,
@@ -15,7 +15,6 @@ export default async function DashboardLayout({
         <div style={{ minHeight: "100dvh", background: "var(--bg-base)" }}>
             <Sidebar />
             <TopBar />
-
             <main className="main-content">
                 <div
                     aria-hidden

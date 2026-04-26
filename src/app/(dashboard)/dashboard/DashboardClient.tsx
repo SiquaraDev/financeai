@@ -1,8 +1,7 @@
 "use client";
 
-import { useDateRange } from "@/hooks/useDateRange";
-import { useDashboardStats } from "@/hooks/useDashboardStats";
-import { capitalize } from "@/lib/formatters";
+import { useDateRange, useDashboardStats } from "@/hooks";
+import { getFirstName } from "@/utils";
 import PageHeader from "@/components/ui/PageHeader";
 import StatsGrid from "@/components/dashboard/StatsGrid";
 import PeriodFilter from "@/components/dashboard/PeriodFilter";
@@ -13,7 +12,7 @@ interface Session {
 }
 
 export default function DashboardClient({ session }: { session: Session }) {
-    const firstName = session?.user?.name?.split(" ")[0] ?? "você";
+    const firstName = getFirstName(session?.user?.name);
 
     const {
         activeFilter,
@@ -42,7 +41,7 @@ export default function DashboardClient({ session }: { session: Session }) {
             }}
         >
             <PageHeader
-                label={capitalize(periodLabel.toLowerCase())}
+                label={periodLabel}
                 title={
                     <>
                         Olá, {firstName}{" "}

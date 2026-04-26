@@ -51,7 +51,6 @@ export default function TopBar() {
                     </span>
                 </span>
             </div>
-
             <nav style={{ display: "flex", alignItems: "center", gap: "4px" }}>
                 <NavMobileLinks />
             </nav>

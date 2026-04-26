@@ -6,13 +6,15 @@ export default async function DashboardPage() {
     const session = await auth();
     if (!session) redirect("/login");
 
-    const safeSession = {
-        user: {
-            id: session.user?.id ?? undefined,
-            name: session.user?.name ?? undefined,
-            email: session.user?.email ?? undefined,
-        },
-    };
-
-    return <DashboardClient session={safeSession} />;
+    return (
+        <DashboardClient
+            session={{
+                user: {
+                    id: session.user?.id ?? undefined,
+                    name: session.user?.name ?? undefined,
+                    email: session.user?.email ?? undefined,
+                },
+            }}
+        />
+    );
 }

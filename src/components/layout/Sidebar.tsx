@@ -1,15 +1,6 @@
 import { auth, signOut } from "@/lib/auth";
+import { getInitials } from "@/utils";
 import NavLinks from "./NavLinks";
-
-function getInitials(name?: string | null): string {
-    if (!name) return "U";
-    return name
-        .split(" ")
-        .map((n) => n[0])
-        .slice(0, 2)
-        .join("")
-        .toUpperCase();
-}
 
 export default async function Sidebar() {
     const session = await auth();
