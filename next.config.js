@@ -1,6 +1,7 @@
 const path = require("path");
-module.exports = {
-    turbopack: {
-        root: path.join(__dirname, ".."),
-    },
+
+const nextConfig = {
+    outputFileTracingRoot: path.join(__dirname, "../../"),
 };
+
+module.exports = nextConfig;
