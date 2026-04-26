@@ -29,7 +29,6 @@ export default function AuthCard({
                 }}
             >
                 <div style={{ height: "3px", background: accentGradient }} />
-
                 <div style={{ padding: "2rem" }}>
                     <div
                         className={mobileLogoClass}
@@ -55,7 +54,6 @@ export default function AuthCard({
                             </span>
                         </span>
                     </div>
-
                     <div style={{ marginBottom: "1.5rem" }}>
                         <h1
                             className="font-display"
@@ -78,7 +76,6 @@ export default function AuthCard({
                             {subtitle}
                         </p>
                     </div>
-
                     {children}
                 </div>
             </div>

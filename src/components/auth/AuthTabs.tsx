@@ -6,24 +6,30 @@ interface AuthTabsProps {
     active: "login" | "register";
 }
 
-const activeStyle = (
-    gradient: string,
-    shadow: string,
-): React.CSSProperties => ({
+const ACTIVE_STYLES: Record<"login" | "register", React.CSSProperties> = {
+    login: {
+        background: "var(--gradient-brand)",
+        boxShadow: "var(--shadow-brand)",
+    },
+    register: {
+        background: "var(--gradient-success)",
+        boxShadow: "var(--shadow-teal)",
+    },
+};
+
+const BASE_ACTIVE: React.CSSProperties = {
     flex: 1,
     textAlign: "center",
     padding: "var(--space-2) 0",
     fontSize: "var(--text-sm)",
     fontWeight: 600,
     borderRadius: "var(--radius-md)",
-    background: gradient,
     color: "var(--text-on-brand)",
-    boxShadow: shadow,
     userSelect: "none",
     cursor: "default",
-});
+};
 
-const inactiveStyle: React.CSSProperties = {
+const INACTIVE: React.CSSProperties = {
     flex: 1,
     textAlign: "center",
     padding: "var(--space-2) 0",
@@ -48,18 +54,13 @@ export default function AuthTabs({ active }: AuthTabsProps) {
             }}
         >
             {active === "login" ? (
-                <span
-                    style={activeStyle(
-                        "var(--gradient-brand)",
-                        "var(--shadow-brand)",
-                    )}
-                >
+                <span style={{ ...BASE_ACTIVE, ...ACTIVE_STYLES.login }}>
                     Entrar
                 </span>
             ) : (
                 <Link
                     href="/login"
-                    style={inactiveStyle}
+                    style={INACTIVE}
                     onMouseEnter={(e) =>
                         (e.currentTarget.style.color = "var(--text-secondary)")
                     }
@@ -70,20 +71,14 @@ export default function AuthTabs({ active }: AuthTabsProps) {
                     Entrar
                 </Link>
             )}
-
             {active === "register" ? (
-                <span
-                    style={activeStyle(
-                        "var(--gradient-success)",
-                        "var(--shadow-teal)",
-                    )}
-                >
+                <span style={{ ...BASE_ACTIVE, ...ACTIVE_STYLES.register }}>
                     Criar conta
                 </span>
             ) : (
                 <Link
                     href="/register"
-                    style={inactiveStyle}
+                    style={INACTIVE}
                     onMouseEnter={(e) =>
                         (e.currentTarget.style.color = "var(--text-secondary)")
                     }

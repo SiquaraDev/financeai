@@ -4,14 +4,14 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-
-import AuthAside from "@/components/auth/AuthAside";
-import AuthCard from "@/components/auth/AuthCard";
-import StatHighlight, {
-    type StatHighlightProps,
-} from "@/components/auth/StatHighlight";
-import AuthTabs from "@/components/auth/AuthTabs";
-import GoogleSignInButton from "@/components/auth/GoogleSignInButton";
+import {
+    AuthAside,
+    AuthCard,
+    StatHighlight,
+    AuthTabs,
+    GoogleSignInButton,
+} from "@/components/auth";
+import type { StatHighlightProps } from "@/components/auth";
 import InputField from "@/components/ui/InputField";
 import AlertBanner from "@/components/ui/AlertBanner";
 import Divider from "@/components/ui/Divider";
@@ -23,8 +23,6 @@ import {
     IconSpinner,
     IconShield,
 } from "@/components/icons";
-
-// ─── Static data ────────────────────────────────────────────────────────────
 
 const STATS: StatHighlightProps[] = [
     {
@@ -55,8 +53,6 @@ const STATS: StatHighlightProps[] = [
         className: "delay-225",
     },
 ];
-
-// ─── Page ────────────────────────────────────────────────────────────────────
 
 export default function LoginPage() {
     const router = useRouter();
@@ -129,8 +125,8 @@ export default function LoginPage() {
                             gap: "6px",
                         }}
                     >
-                        <IconShield />
-                        Dados protegidos com criptografia ponta a ponta
+                        <IconShield /> Dados protegidos com criptografia ponta a
+                        ponta
                     </p>
                 }
             >
@@ -203,17 +199,7 @@ export default function LoginPage() {
                                         display: "flex",
                                         alignItems: "center",
                                         padding: 0,
-                                        transition:
-                                            "color var(--transition-base)",
                                     }}
-                                    onMouseEnter={(e) =>
-                                        (e.currentTarget.style.color =
-                                            "var(--text-secondary)")
-                                    }
-                                    onMouseLeave={(e) =>
-                                        (e.currentTarget.style.color =
-                                            "var(--text-muted)")
-                                    }
                                 >
                                     <IconEye open={showPw} />
                                 </button>
@@ -232,15 +218,7 @@ export default function LoginPage() {
                                     fontSize: "var(--text-xs)",
                                     color: "var(--accent-brand-light)",
                                     cursor: "pointer",
-                                    transition:
-                                        "opacity var(--transition-base)",
                                 }}
-                                onMouseEnter={(e) =>
-                                    (e.currentTarget.style.opacity = "0.7")
-                                }
-                                onMouseLeave={(e) =>
-                                    (e.currentTarget.style.opacity = "1")
-                                }
                             >
                                 Esqueci a senha
                             </span>
@@ -296,12 +274,6 @@ export default function LoginPage() {
                             textDecoration: "none",
                             fontWeight: 600,
                         }}
-                        onMouseEnter={(e) =>
-                            (e.currentTarget.style.opacity = "0.75")
-                        }
-                        onMouseLeave={(e) =>
-                            (e.currentTarget.style.opacity = "1")
-                        }
                     >
                         Criar conta grátis →
                     </Link>

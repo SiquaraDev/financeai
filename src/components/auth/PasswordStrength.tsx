@@ -10,13 +10,13 @@ const CHECKS = [
     { label: "Número", test: (p: string) => /\d/.test(p) },
 ];
 
-const COLORS = [
+const STRENGTH_COLORS = [
     "var(--color-danger-light)",
     "var(--color-warning-light)",
     "var(--color-success-light)",
 ];
 
-const LABELS = ["Fraca", "Média", "Forte"];
+const STRENGTH_LABELS = ["Fraca", "Média", "Forte"];
 
 export default function PasswordStrength({ password }: PasswordStrengthProps) {
     if (!password) return null;
@@ -43,7 +43,9 @@ export default function PasswordStrength({ password }: PasswordStrengthProps) {
                             height: "3px",
                             borderRadius: "var(--radius-full)",
                             background:
-                                i < score ? COLORS[score - 1] : "var(--border)",
+                                i < score
+                                    ? STRENGTH_COLORS[score - 1]
+                                    : "var(--border)",
                             transition: "background 0.3s ease",
                         }}
                     />
@@ -62,11 +64,13 @@ export default function PasswordStrength({ password }: PasswordStrengthProps) {
                     style={{
                         fontSize: "var(--text-xs)",
                         color:
-                            score > 0 ? COLORS[score - 1] : "var(--text-muted)",
+                            score > 0
+                                ? STRENGTH_COLORS[score - 1]
+                                : "var(--text-muted)",
                         fontWeight: 500,
                     }}
                 >
-                    {LABELS[score - 1] ?? "—"}
+                    {STRENGTH_LABELS[score - 1] ?? "—"}
                 </span>
                 <div style={{ display: "flex", gap: "var(--space-3)" }}>
                     {CHECKS.map((c) => {

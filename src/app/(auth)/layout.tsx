@@ -19,7 +19,6 @@ export default function AuthLayout({
             className="bg-grid"
         >
             <OrbBackground />
-
             <div
                 style={{
                     position: "relative",

@@ -4,15 +4,15 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
-
-import AuthAside from "@/components/auth/AuthAside";
-import AuthCard from "@/components/auth/AuthCard";
-import FeatureCheckList, {
-    type FeatureItem,
-} from "@/components/auth/FeatureCheckList";
-import AuthTabs from "@/components/auth/AuthTabs";
-import PasswordStrength from "@/components/auth/PasswordStrength";
-import GoogleSignInButton from "@/components/auth/GoogleSignInButton";
+import {
+    AuthAside,
+    AuthCard,
+    FeatureCheckList,
+    AuthTabs,
+    PasswordStrength,
+    GoogleSignInButton,
+} from "@/components/auth";
+import type { FeatureItem } from "@/components/auth";
 import InputField from "@/components/ui/InputField";
 import AlertBanner from "@/components/ui/AlertBanner";
 import Divider from "@/components/ui/Divider";
@@ -24,16 +24,12 @@ import {
     IconSpinner,
 } from "@/components/icons";
 
-// ─── Static data ────────────────────────────────────────────────────────────
-
 const FEATURES: FeatureItem[] = [
     { label: "Dashboard com visão mensal completa", delay: "delay-75" },
     { label: "Importação via JSON, Excel e PDF", delay: "delay-150" },
     { label: "Análise e chat financeiro com Gemini AI", delay: "delay-225" },
     { label: "Relatórios interativos e gráficos", delay: "delay-300" },
 ];
-
-// ─── Page ────────────────────────────────────────────────────────────────────
 
 export default function RegisterPage() {
     const router = useRouter();
@@ -48,20 +44,17 @@ export default function RegisterPage() {
         e.preventDefault();
         setLoading(true);
         setError("");
-
         const res = await fetch("/api/auth/register", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ name, email, password }),
         });
         const data = await res.json();
-
         if (!res.ok) {
             setError(data.error || "Erro ao criar conta.");
             setLoading(false);
             return;
         }
-
         await signIn("credentials", { email, password, redirect: false });
         router.push("/dashboard");
     }
@@ -79,8 +72,8 @@ export default function RegisterPage() {
             }}
         >
             <style>{`
-        @media (max-width: 1023px) { .register-aside        { display: none !important; } }
-        @media (min-width: 1024px) { .register-mobile-logo  { display: none !important; } }
+        @media (max-width: 1023px) { .register-aside       { display: none !important; } }
+        @media (min-width: 1024px) { .register-mobile-logo { display: none !important; } }
       `}</style>
 
             <AuthAside
@@ -167,7 +160,6 @@ export default function RegisterPage() {
                         required
                         icon={<IconUser />}
                     />
-
                     <InputField
                         label="E-mail"
                         id="email"
@@ -209,17 +201,7 @@ export default function RegisterPage() {
                                         display: "flex",
                                         alignItems: "center",
                                         padding: 0,
-                                        transition:
-                                            "color var(--transition-base)",
                                     }}
-                                    onMouseEnter={(e) =>
-                                        (e.currentTarget.style.color =
-                                            "var(--text-secondary)")
-                                    }
-                                    onMouseLeave={(e) =>
-                                        (e.currentTarget.style.color =
-                                            "var(--text-muted)")
-                                    }
                                 >
                                     <IconEye open={showPw} />
                                 </button>
@@ -307,12 +289,6 @@ export default function RegisterPage() {
                             textDecoration: "none",
                             fontWeight: 600,
                         }}
-                        onMouseEnter={(e) =>
-                            (e.currentTarget.style.opacity = "0.75")
-                        }
-                        onMouseLeave={(e) =>
-                            (e.currentTarget.style.opacity = "1")
-                        }
                     >
                         Entrar →
                     </Link>

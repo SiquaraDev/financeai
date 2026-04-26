@@ -51,7 +51,6 @@ export default function AuthAside({
                         </span>
                     </span>
                 </div>
-
                 <h2
                     className="font-display"
                     style={{
@@ -65,7 +64,6 @@ export default function AuthAside({
                 >
                     {headline}
                 </h2>
-
                 <p
                     style={{
                         fontSize: "var(--text-base)",
@@ -76,10 +74,8 @@ export default function AuthAside({
                     {description}
                 </p>
             </div>
-
             {children}
-
-            {footer && footer}
+            {footer}
         </div>
     );
 }

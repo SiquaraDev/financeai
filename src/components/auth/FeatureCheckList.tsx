@@ -5,11 +5,7 @@ export interface FeatureItem {
     delay?: string;
 }
 
-interface FeatureCheckListProps {
-    items: FeatureItem[];
-}
-
-export default function FeatureCheckList({ items }: FeatureCheckListProps) {
+export default function FeatureCheckList({ items }: { items: FeatureItem[] }) {
     return (
         <div
             style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}
