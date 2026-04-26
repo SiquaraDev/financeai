@@ -3,11 +3,22 @@
 import { useState, useEffect, useCallback } from "react";
 import { format, subMonths, startOfMonth, endOfMonth } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import type {
-    MonthData,
-    CategoryData,
-} from "@/components/reports/ChartRenderer";
-import type { PeriodType } from "@/components/reports/ChartControls";
+import { ApiService } from "@/services";
+import type { Transaction } from "@/types";
+
+export type PeriodType = "monthly" | "quarterly" | "yearly";
+
+export interface MonthData {
+    month: string;
+    receitas: number;
+    gastos: number;
+    saldo: number;
+}
+
+export interface CategoryData {
+    name: string;
+    value: number;
+}
 
 const PERIOD_MONTHS: Record<PeriodType, number> = {
     monthly: 6,
@@ -15,13 +26,34 @@ const PERIOD_MONTHS: Record<PeriodType, number> = {
     yearly: 24,
 };
 
+class ReportsApiService extends ApiService {
+    constructor() {
+        super("/api");
+    }
+
+    async fetchMonthTransactions(
+        start: string,
+        end: string,
+    ): Promise<Transaction[]> {
+        const raw = await this.get<{ transactions: Transaction[] }>(
+            "/transactions",
+            {
+                limit: 200,
+                start,
+                end,
+            },
+        );
+        return raw.transactions ?? [];
+    }
+}
+
+const reportsApi = new ReportsApiService();
+
 interface UseReportsDataReturn {
     monthlyData: MonthData[];
     categoryData: CategoryData[];
     loading: boolean;
 }
-
-type RawTransaction = { type: string; amount: number; category: string };
 
 export function useReportsData(period: PeriodType): UseReportsDataReturn {
     const [monthlyData, setMonthlyData] = useState<MonthData[]>([]);
@@ -36,14 +68,10 @@ export function useReportsData(period: PeriodType): UseReportsDataReturn {
 
         for (let i = months - 1; i >= 0; i--) {
             const date = subMonths(new Date(), i);
-            const start = startOfMonth(date).toISOString();
-            const end = endOfMonth(date).toISOString();
-
-            const res = await fetch(
-                `/api/transactions?limit=200&start=${start}&end=${end}`,
+            const txs = await reportsApi.fetchMonthTransactions(
+                startOfMonth(date).toISOString(),
+                endOfMonth(date).toISOString(),
             );
-            const data = await res.json();
-            const txs: RawTransaction[] = data.transactions ?? [];
 
             const income = txs
                 .filter((t) => t.type === "INCOME")
@@ -56,9 +84,7 @@ export function useReportsData(period: PeriodType): UseReportsDataReturn {
                 month: format(
                     date,
                     period === "monthly" ? "MMM/yy" : "MM/yyyy",
-                    {
-                        locale: ptBR,
-                    },
+                    { locale: ptBR },
                 ),
                 receitas: Math.round(income),
                 gastos: Math.round(expense),

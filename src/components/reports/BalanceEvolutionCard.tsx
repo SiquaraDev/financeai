@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import {
     AreaChart,
     Area,
@@ -14,7 +13,8 @@ import Card from "@/components/ui/Card";
 import SectionHeader from "@/components/ui/SectionHeader";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { IconActivity } from "@/components/icons";
-import { formatCurrency, formatCurrencyCompact } from "@/lib/formatters";
+import { formatCurrency, formatCurrencyCompact } from "@/utils";
+import { iconTokens } from "@/styles/design-tokens";
 import type { MonthData } from "./ChartRenderer";
 
 const TOOLTIP_STYLE: React.CSSProperties = {
@@ -33,15 +33,13 @@ const AXIS_TICK = {
     fontFamily: "var(--font-mono)",
 };
 
-interface BalanceEvolutionCardProps {
-    data: MonthData[];
-    loading: boolean;
-}
-
 export default function BalanceEvolutionCard({
     data,
     loading,
-}: BalanceEvolutionCardProps) {
+}: {
+    data: MonthData[];
+    loading: boolean;
+}) {
     return (
         <Card
             variant="glass"
@@ -51,9 +49,7 @@ export default function BalanceEvolutionCard({
             <SectionHeader
                 title="Evolução do saldo"
                 icon={<IconActivity size={12} />}
-                iconBg="var(--accent-teal-glow)"
-                iconBorder="rgba(20,184,166,.25)"
-                iconColor="var(--accent-teal-light)"
+                {...iconTokens.teal}
             />
             {loading ? (
                 <LoadingSpinner height={200} />

@@ -1,19 +1,17 @@
 "use client";
 
-import React from "react";
 import Card from "@/components/ui/Card";
 import SectionHeader from "@/components/ui/SectionHeader";
 import CategoryPieSection from "./CategoryPieSection";
 import { IconPieChart } from "@/components/icons";
+import { iconTokens } from "@/styles/design-tokens";
 import type { CategoryData } from "./ChartRenderer";
-
-interface CategoryBreakdownCardProps {
-    data: CategoryData[];
-}
 
 export default function CategoryBreakdownCard({
     data,
-}: CategoryBreakdownCardProps) {
+}: {
+    data: CategoryData[];
+}) {
     if (data.length === 0) return null;
 
     return (
@@ -25,9 +23,7 @@ export default function CategoryBreakdownCard({
             <SectionHeader
                 title="Gastos por categoria (período)"
                 icon={<IconPieChart size={12} />}
-                iconBg="var(--color-warning-bg)"
-                iconBorder="var(--color-warning-border)"
-                iconColor="var(--color-warning-light)"
+                {...iconTokens.warning}
             />
             <div
                 className="reports-cat-grid"

@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import Card from "@/components/ui/Card";
 import SectionHeader from "@/components/ui/SectionHeader";
 import ChartControls, {
@@ -12,6 +11,7 @@ import ChartRenderer, {
     type CategoryData,
 } from "./ChartRenderer";
 import { IconBarChart } from "@/components/icons";
+import { iconTokens } from "@/styles/design-tokens";
 
 interface MainChartCardProps {
     chartType: ChartType;
@@ -52,9 +52,7 @@ export default function MainChartCard({
                         : "Receitas vs Gastos"
                 }
                 icon={<IconBarChart size={12} />}
-                iconBg="var(--accent-brand-glow)"
-                iconBorder="var(--border-glow)"
-                iconColor="var(--accent-brand-light)"
+                {...iconTokens.brand}
             />
             <ChartRenderer
                 chartType={chartType}

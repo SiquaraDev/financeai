@@ -2,20 +2,18 @@
 
 import { useState } from "react";
 import PageHeader from "@/components/ui/PageHeader";
-import MainChartCard from "@/components/reports/MainChartCard";
-import BalanceEvolutionCard from "@/components/reports/BalanceEvolutionCard";
-import CategoryBreakdownCard from "@/components/reports/CategoryBreakdownCard";
-import { useReportsData } from "@/hooks/useReportsData";
-import type { ChartType } from "@/components/reports/ChartControls";
-import type { PeriodType } from "@/components/reports/ChartControls";
+import {
+    MainChartCard,
+    BalanceEvolutionCard,
+    CategoryBreakdownCard,
+} from "@/components/reports";
+import { useReportsData } from "@/hooks";
+import type { ChartType, PeriodType } from "@/components/reports";
 
 export default function ReportsPage() {
     const [chartType, setChartType] = useState<ChartType>("bar");
     const [period, setPeriod] = useState<PeriodType>("monthly");
-
     const { monthlyData, categoryData, loading } = useReportsData(period);
-
-    const isPieChart = chartType === "pie";
 
     return (
         <div
@@ -42,11 +40,12 @@ export default function ReportsPage() {
                 onPeriodChange={setPeriod}
             />
 
-            {!isPieChart && (
+            {chartType !== "pie" && (
                 <BalanceEvolutionCard data={monthlyData} loading={loading} />
             )}
-
-            {!isPieChart && <CategoryBreakdownCard data={categoryData} />}
+            {chartType !== "pie" && (
+                <CategoryBreakdownCard data={categoryData} />
+            )}
         </div>
     );
 }

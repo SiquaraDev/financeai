@@ -1,7 +1,7 @@
 "use client";
 
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
-import { formatCurrency } from "@/lib/formatters";
+import { formatCurrency } from "@/utils";
 import type { CategoryData } from "./ChartRenderer";
 
 const COLORS = [
