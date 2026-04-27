@@ -158,6 +158,8 @@ export default function ChatMessage({
                         fontWeight: 700,
                         color: "white",
                         fontFamily: "var(--font-display)",
+                        lineHeight: 1,
+                        textTransform: "uppercase",
                     }}
                 >
                     {userInitials}
