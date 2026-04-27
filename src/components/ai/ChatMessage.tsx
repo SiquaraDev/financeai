@@ -1,9 +1,14 @@
+import ReactMarkdown from "react-markdown";
 import { GeminiIcon } from "@/components/icons";
 import type { ChatMessage as ChatMessageData } from "@/types";
 
 type ChatMessageProps = ChatMessageData;
 
-export default function ChatMessage({ role, content }: ChatMessageProps) {
+export default function ChatMessage({
+    role,
+    content,
+    userInitials,
+}: ChatMessageProps) {
     const isUser = role === "user";
 
     return (
@@ -57,7 +62,82 @@ export default function ChatMessage({ role, content }: ChatMessageProps) {
                     wordBreak: "break-word",
                 }}
             >
-                {content}
+                <ReactMarkdown
+                    components={{
+                        p: ({ children }) => (
+                            <p
+                                style={{
+                                    margin: "0 0 0.5rem",
+                                    color: isUser
+                                        ? "var(--text-on-brand)"
+                                        : "var(--text-secondary)",
+                                }}
+                            >
+                                {children}
+                            </p>
+                        ),
+                        strong: ({ children }) => (
+                            <strong
+                                style={{
+                                    fontWeight: 600,
+                                    color: isUser
+                                        ? "white"
+                                        : "var(--text-primary)",
+                                }}
+                            >
+                                {children}
+                            </strong>
+                        ),
+                        ul: ({ children }) => (
+                            <ul
+                                style={{
+                                    paddingLeft: "1.25rem",
+                                    margin: "0.25rem 0",
+                                }}
+                            >
+                                {children}
+                            </ul>
+                        ),
+                        ol: ({ children }) => (
+                            <ol
+                                style={{
+                                    paddingLeft: "1.25rem",
+                                    margin: "0.25rem 0",
+                                }}
+                            >
+                                {children}
+                            </ol>
+                        ),
+                        li: ({ children }) => (
+                            <li
+                                style={{
+                                    margin: "0.2rem 0",
+                                    color: isUser
+                                        ? "var(--text-on-brand)"
+                                        : "var(--text-secondary)",
+                                }}
+                            >
+                                {children}
+                            </li>
+                        ),
+                        h3: ({ children }) => (
+                            <h3
+                                style={{
+                                    fontSize: "var(--text-sm)",
+                                    fontWeight: 700,
+                                    color: isUser
+                                        ? "white"
+                                        : "var(--text-primary)",
+                                    margin: "0.5rem 0 0.25rem",
+                                }}
+                            >
+                                {children}
+                            </h3>
+                        ),
+                    }}
+                >
+                    {content}
+                </ReactMarkdown>
             </div>
 
             {isUser && (
@@ -77,7 +157,7 @@ export default function ChatMessage({ role, content }: ChatMessageProps) {
                         fontFamily: "var(--font-display)",
                     }}
                 >
-                    U
+                    {userInitials}
                 </div>
             )}
         </div>

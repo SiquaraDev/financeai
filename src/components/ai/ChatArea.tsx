@@ -16,6 +16,7 @@ interface ChatAreaProps {
     analysisReady: boolean;
     onInputChange: (value: string) => void;
     onSubmit: () => void;
+    userInitials?: string;
 }
 
 export default function ChatArea({
@@ -25,6 +26,7 @@ export default function ChatArea({
     analysisReady,
     onInputChange,
     onSubmit,
+    userInitials = "U",
 }: ChatAreaProps) {
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -136,6 +138,7 @@ export default function ChatArea({
                         key={i}
                         role={msg.role}
                         content={msg.content}
+                        userInitials={userInitials}
                     />
                 ))}
 

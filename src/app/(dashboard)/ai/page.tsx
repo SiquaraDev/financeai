@@ -4,6 +4,8 @@ import PageHeader from "@/components/ui/PageHeader";
 import { NewAnalysisCard, AnalysisResultCard, ChatArea } from "@/components/ai";
 import { GeminiIcon } from "@/components/icons";
 import { useAiPage } from "@/hooks";
+import { useSession } from "next-auth/react";
+import { getInitials } from "@/utils";
 
 export default function AiPage() {
     const {
@@ -22,6 +24,9 @@ export default function AiPage() {
         chatLoading,
         handleChat,
     } = useAiPage();
+
+    const { data: session } = useSession();
+    const userInitials = getInitials(session?.user?.name);
 
     return (
         <div
@@ -95,6 +100,7 @@ export default function AiPage() {
                     analysisReady={!!analysis}
                     onInputChange={setInput}
                     onSubmit={handleChat}
+                    userInitials={userInitials}
                 />
             </div>
         </div>
