@@ -1,22 +1,22 @@
 import type { Metadata } from "next";
-import { Syne, DM_Sans, DM_Mono } from "next/font/google";
+import { Bricolage_Grotesque, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
-const syne = Syne({
+const bricolage = Bricolage_Grotesque({
     subsets: ["latin"],
     weight: ["400", "500", "600", "700", "800"],
     variable: "--font-display",
     display: "swap",
 });
 
-const dmSans = DM_Sans({
+const inter = Inter({
     subsets: ["latin"],
     weight: ["300", "400", "500", "600"],
     variable: "--font-body",
     display: "swap",
 });
 
-const dmMono = DM_Mono({
+const jetbrainsMono = JetBrains_Mono({
     subsets: ["latin"],
     weight: ["400", "500"],
     variable: "--font-mono",
@@ -37,7 +37,7 @@ export default function RootLayout({
     return (
         <html
             lang="pt-BR"
-            className={`${syne.variable} ${dmSans.variable} ${dmMono.variable}`}
+            className={`${bricolage.variable} ${inter.variable} ${jetbrainsMono.variable}`}
         >
             <body>{children}</body>
         </html>
