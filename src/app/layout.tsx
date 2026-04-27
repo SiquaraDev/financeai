@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Bricolage_Grotesque, Inter, JetBrains_Mono } from "next/font/google";
+import { AuthSessionProvider, UserProvider } from "@/components/providers";
 import "./globals.css";
 
 const bricolage = Bricolage_Grotesque({
@@ -25,8 +26,7 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
     title: "FinanceAI — Controle financeiro inteligente",
-    description:
-        "Gerencie suas finanças com análises inteligentes do Gemini AI",
+    description: "Gerencie suas finanças com análises inteligentes do Gemini AI",
 };
 
 export default function RootLayout({
@@ -39,7 +39,13 @@ export default function RootLayout({
             lang="pt-BR"
             className={`${bricolage.variable} ${inter.variable} ${jetbrainsMono.variable}`}
         >
-            <body>{children}</body>
+            <body>
+                <AuthSessionProvider>
+                    <UserProvider>
+                        {children}
+                    </UserProvider>
+                </AuthSessionProvider>
+            </body>
         </html>
     );
 }
