@@ -1,13 +1,16 @@
 import ReactMarkdown from "react-markdown";
 import { GeminiIcon } from "@/components/icons";
-import type { ChatMessage as ChatMessageData } from "@/types";
 
-type ChatMessageProps = ChatMessageData;
+interface ChatMessageProps {
+    role: "user" | "assistant";
+    content: string;
+    userInitials?: string;
+}
 
 export default function ChatMessage({
     role,
     content,
-    userInitials,
+    userInitials = "U",
 }: ChatMessageProps) {
     const isUser = role === "user";
 

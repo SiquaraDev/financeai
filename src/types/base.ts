@@ -110,7 +110,6 @@ export interface AnalysisResult {
 export interface ChatMessage {
     role: "user" | "assistant";
     content: string;
-    userInitials: string;
 }
 
 export type AiShortcut = "last_month" | "3_months" | "6_months" | "year";

@@ -8,7 +8,6 @@ import ChatInputBar from "./ChatInputBar";
 import TypingDots from "./TypingDots";
 import { GeminiIcon } from "@/components/icons";
 import type { ChatMessage as ChatMessageData } from "@/types";
-
 interface ChatAreaProps {
     messages: ChatMessageData[];
     input: string;
@@ -26,7 +25,7 @@ export default function ChatArea({
     analysisReady,
     onInputChange,
     onSubmit,
-    userInitials = "U",
+    userInitials,
 }: ChatAreaProps) {
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
