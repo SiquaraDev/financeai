@@ -13,6 +13,12 @@ export async function middleware(req: NextRequest) {
                 : "next-auth.session-token",
     });
 
+    console.log("[middleware]", {
+        pathname,
+        hasToken: !!token,
+        cookies: req.cookies.getAll().map((c) => c.name),
+    });
+
     const isLoggedIn = !!token;
     const isPublic = ["/login", "/register"].some((r) =>
         pathname.startsWith(r),
