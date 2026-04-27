@@ -7,16 +7,7 @@ export async function middleware(req: NextRequest) {
     const token = await getToken({
         req,
         secret: process.env.NEXTAUTH_SECRET,
-        cookieName:
-            process.env.NODE_ENV === "production"
-                ? "__Secure-next-auth.session-token"
-                : "next-auth.session-token",
-    });
-
-    console.log("[middleware]", {
-        pathname,
-        hasToken: !!token,
-        cookies: req.cookies.getAll().map((c) => c.name),
+        cookieName: "__Secure-authjs.session-token",
     });
 
     const isLoggedIn = !!token;
