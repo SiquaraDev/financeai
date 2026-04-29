@@ -162,8 +162,17 @@ export default function NewAnalysisCard({
                     style={{
                         display: "flex",
                         gap: "var(--space-1)",
-                        flexWrap: "wrap",
-                        marginBottom: "1.125rem",
+                        overflowX: "auto",
+                        paddingTop: "6px",
+                        paddingBottom: "8px",
+                        paddingLeft: "6px",
+                        paddingRight: "6px",
+                        marginTop: "-6px",
+                        marginBottom: "calc(1.125rem - 8px)",
+                        marginLeft: "-6px",
+                        marginRight: "-6px",
+                        scrollbarWidth: "thin",
+                        scrollbarColor: "var(--border) transparent",
                     }}
                 >
                     {SHORTCUTS.map(({ value, label }) => {
@@ -192,6 +201,7 @@ export default function NewAnalysisCard({
                                     boxShadow: active
                                         ? "var(--shadow-teal)"
                                         : "none",
+                                    flexShrink: 0,
                                     whiteSpace: "nowrap",
                                 }}
                             >

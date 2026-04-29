@@ -20,7 +20,10 @@ export default function FilterBar<T extends string>({
                 display: "flex",
                 gap: ".5rem",
                 marginBottom: "1.25rem",
-                flexWrap: "wrap",
+                overflowX: "scroll",
+                paddingBottom: "8px",
+                scrollbarWidth: "thin",
+                scrollbarColor: "var(--border) transparent",
             }}
         >
             {options.map(({ value, label }) => {
@@ -49,6 +52,8 @@ export default function FilterBar<T extends string>({
                             boxShadow: isActive
                                 ? "var(--shadow-brand)"
                                 : "none",
+                            flexShrink: 0,
+                            whiteSpace: "nowrap",
                         }}
                     >
                         {label}
