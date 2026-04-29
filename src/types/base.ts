@@ -73,6 +73,8 @@ export type DateFilterKey =
     | "last_year"
     | "custom";
 
+export type ReportPeriodType = "3_months" | "monthly" | "quarterly" | "yearly";
+
 export type SortDirection = "asc" | "desc";
 
 export interface SortState<T extends string> {
@@ -80,7 +82,6 @@ export interface SortState<T extends string> {
     direction: SortDirection;
 }
 
-/** Valid columns for transaction table sorting. Never includes null — null is handled by consumers. */
 export type TransactionSortColumn = "title" | "category" | "date" | "amount";
 
 // ─── Date range ───────────────────────────────────────────────────────────────

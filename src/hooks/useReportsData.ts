@@ -5,8 +5,7 @@ import { format, subMonths, startOfMonth, endOfMonth } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { ApiService } from "@/services";
 import type { Transaction } from "@/types";
-
-export type PeriodType = "monthly" | "quarterly" | "yearly";
+import type { ReportPeriodType as PeriodType } from "@/types";
 
 export interface MonthData {
     month: string;
@@ -21,6 +20,7 @@ export interface CategoryData {
 }
 
 const PERIOD_MONTHS: Record<PeriodType, number> = {
+    "3_months": 3,
     monthly: 6,
     quarterly: 12,
     yearly: 24,

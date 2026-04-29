@@ -1,7 +1,8 @@
 "use client";
 
+import type { ReportPeriodType as PeriodType } from "@/types";
+
 export type ChartType = "bar" | "line" | "pie" | "area" | "scatter";
-export type PeriodType = "monthly" | "quarterly" | "yearly";
 
 const CHART_TYPES: { type: ChartType; label: string }[] = [
     { type: "bar", label: "Barras" },
@@ -12,6 +13,7 @@ const CHART_TYPES: { type: ChartType; label: string }[] = [
 ];
 
 const PERIODS: { v: PeriodType; l: string }[] = [
+    { v: "3_months", l: "3 meses" },
     { v: "monthly", l: "6 meses" },
     { v: "quarterly", l: "12 meses" },
     { v: "yearly", l: "2 anos" },
@@ -52,10 +54,14 @@ function ControlGroup({
                 {label}
             </p>
             <div
+                className="scroll-x"
                 style={{
                     display: "flex",
                     gap: "var(--space-2)",
-                    flexWrap: "wrap",
+                    overflowX: "scroll",
+                    paddingBottom: "8px",
+                    scrollbarWidth: "thin",
+                    scrollbarColor: "var(--border) transparent",
                 }}
             >
                 {children}
@@ -89,6 +95,7 @@ function PillButton({
                 border: active ? "none" : "1px solid var(--border)",
                 color: active ? undefined : "var(--text-muted)",
                 boxShadow: active ? undefined : "none",
+                flexShrink: 0,
                 whiteSpace: "nowrap",
                 ...(active ? activeStyle : { background: "transparent" }),
             }}
