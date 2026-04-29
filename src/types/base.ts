@@ -112,7 +112,12 @@ export interface ChatMessage {
     content: string;
 }
 
-export type AiShortcut = "last_month" | "3_months" | "6_months" | "year";
+export type AiShortcut =
+    | "last_month"
+    | "this_month"
+    | "3_months"
+    | "6_months"
+    | "year";
 
 // ─── Component prop utilities ─────────────────────────────────────────────────
 

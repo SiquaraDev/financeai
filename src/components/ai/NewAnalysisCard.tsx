@@ -4,6 +4,7 @@ import { GeminiIcon, IconSpinner } from "@/components/icons";
 import type { AiShortcut } from "@/types";
 
 const SHORTCUTS: { value: AiShortcut; label: string }[] = [
+    { value: "this_month", label: "Este mês" },
     { value: "last_month", label: "Último mês" },
     { value: "3_months", label: "3 meses" },
     { value: "6_months", label: "6 meses" },

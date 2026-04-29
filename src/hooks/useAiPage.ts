@@ -5,9 +5,6 @@ import { format, subMonths, startOfMonth, endOfMonth } from "date-fns";
 import { analysisService } from "@/services";
 import { applyAiShortcut } from "@/utils/dateRange";
 import type { AnalysisResult, ChatMessage, AiShortcut } from "@/types";
-
-// AiShortcut lives in @/types — no re-export needed here.
-
 interface UseAiPageReturn {
     startDate: string;
     endDate: string;
@@ -27,13 +24,13 @@ interface UseAiPageReturn {
 
 export function useAiPage(): UseAiPageReturn {
     const [startDate, setStartDate] = useState(
-        format(startOfMonth(subMonths(new Date(), 1)), "yyyy-MM-dd"),
+        format(startOfMonth(new Date()), "yyyy-MM-dd"),
     );
     const [endDate, setEndDate] = useState(
-        format(endOfMonth(subMonths(new Date(), 1)), "yyyy-MM-dd"),
+        format(endOfMonth(new Date()), "yyyy-MM-dd"),
     );
     const [activeShortcut, setActiveShortcut] =
-        useState<AiShortcut>("last_month");
+        useState<AiShortcut>("this_month");
     const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
     const [analyzing, setAnalyzing] = useState(false);
     const [messages, setMessages] = useState<ChatMessage[]>([]);

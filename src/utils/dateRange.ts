@@ -10,8 +10,6 @@ import {
 import { ptBR } from "date-fns/locale";
 import type { DateFilterKey, DateRange, AiShortcut } from "@/types";
 
-// DateRange and AiShortcut live in @/types — imported, not redefined.
-
 export function getDateRange(
     filter: DateFilterKey,
     customStart?: string,
@@ -70,9 +68,7 @@ export function getDateRange(
             const parse = (str: string, isEnd = false): Date => {
                 const [y, m, d] = str.split("-").map(Number);
                 const dt = new Date(y, m - 1, d);
-                isEnd
-                    ? dt.setHours(23, 59, 59, 999)
-                    : dt.setHours(0, 0, 0, 0);
+                isEnd ? dt.setHours(23, 59, 59, 999) : dt.setHours(0, 0, 0, 0);
                 return dt;
             };
             return {
@@ -121,6 +117,11 @@ export function applyAiShortcut(shortcut: AiShortcut): {
     const fmt = (d: Date) => format(d, "yyyy-MM-dd");
 
     switch (shortcut) {
+        case "this_month":
+            return {
+                start: fmt(startOfMonth(now)),
+                end: fmt(endOfMonth(now)),
+            };
         case "last_month":
             return {
                 start: fmt(startOfMonth(subMonths(now, 1))),
