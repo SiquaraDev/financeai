@@ -6,12 +6,31 @@ import CategoryPieSection from "./CategoryPieSection";
 import { IconPieChart } from "@/components/icons";
 import { iconTokens } from "@/styles/design-tokens";
 import type { CategoryData } from "./ChartRenderer";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 export default function CategoryBreakdownCard({
     data,
+    loading,
 }: {
     data: CategoryData[];
+    loading: boolean;
 }) {
+    if (loading)
+        return (
+            <Card
+                variant="glass"
+                className="animate-fade-in delay-225"
+                style={{ overflow: "hidden" }}
+            >
+                <SectionHeader
+                    title="Gastos por categoria (período)"
+                    icon={<IconPieChart size={12} />}
+                    {...iconTokens.warning}
+                />
+                <LoadingSpinner height={200} />
+            </Card>
+        );
+
     if (data.length === 0) return null;
 
     return (

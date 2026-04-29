@@ -29,7 +29,6 @@ export default function ReportsPage() {
                 title="Relatórios"
                 subtitle="Visualize seus dados financeiros"
             />
-
             <MainChartCard
                 chartType={chartType}
                 period={period}
@@ -39,13 +38,8 @@ export default function ReportsPage() {
                 onChartTypeChange={setChartType}
                 onPeriodChange={setPeriod}
             />
-
-            {chartType !== "pie" && (
-                <BalanceEvolutionCard data={monthlyData} loading={loading} />
-            )}
-            {chartType !== "pie" && (
-                <CategoryBreakdownCard data={categoryData} />
-            )}
+            <BalanceEvolutionCard data={monthlyData} loading={loading} />
+            <CategoryBreakdownCard data={categoryData} loading={loading} />{" "}
         </div>
     );
 }

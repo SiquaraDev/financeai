@@ -28,7 +28,7 @@ export default function CategoryPieSection({ data }: { data: CategoryData[] }) {
         <div
             style={{
                 display: "grid",
-                gridTemplateColumns: "1fr 1fr",
+                gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
                 gap: "var(--space-4)",
                 alignItems: "center",
             }}
@@ -41,7 +41,7 @@ export default function CategoryPieSection({ data }: { data: CategoryData[] }) {
                         nameKey="name"
                         cx="50%"
                         cy="50%"
-                        outerRadius={80}
+                        outerRadius={70}
                     >
                         {data.map((_, i) => (
                             <Cell key={i} fill={COLORS[i % COLORS.length]} />

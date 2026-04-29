@@ -2,10 +2,8 @@
 
 import Card from "@/components/ui/Card";
 import SectionHeader from "@/components/ui/SectionHeader";
-import ChartControls, {
-    type ChartType,
-    type PeriodType,
-} from "./ChartControls";
+import ChartControls, { type ChartType } from "./ChartControls";
+import type { ReportPeriodType as PeriodType } from "@/types";
 import ChartRenderer, {
     type MonthData,
     type CategoryData,
@@ -46,11 +44,7 @@ export default function MainChartCard({
                 onPeriodChange={onPeriodChange}
             />
             <SectionHeader
-                title={
-                    chartType === "pie"
-                        ? "Gastos por categoria"
-                        : "Receitas vs Gastos"
-                }
+                title="Receitas vs Gastos"
                 icon={<IconBarChart size={12} />}
                 {...iconTokens.brand}
             />

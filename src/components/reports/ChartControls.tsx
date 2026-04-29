@@ -7,7 +7,6 @@ export type ChartType = "bar" | "line" | "pie" | "area" | "scatter";
 const CHART_TYPES: { type: ChartType; label: string }[] = [
     { type: "bar", label: "Barras" },
     { type: "line", label: "Linhas" },
-    { type: "pie", label: "Pizza" },
     { type: "area", label: "Área" },
     { type: "scatter", label: "Dispersão" },
 ];
