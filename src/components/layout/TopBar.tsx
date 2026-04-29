@@ -1,19 +1,26 @@
+"use client";
+
 import { NavMobileLinks } from "./NavLinks";
+import { useUser } from "@/context";
+import { UserAvatar } from "@/components/ui";
 
 export default function TopBar() {
+    const { initials } = useUser();
+
     return (
         <div className="topbar">
             <div
                 style={{
                     display: "flex",
                     alignItems: "center",
-                    gap: ".625rem",
+                    gap: ".5rem",
+                    flexShrink: 0,
                 }}
             >
                 <div
                     style={{
-                        width: "28px",
-                        height: "28px",
+                        width: "26px",
+                        height: "26px",
                         flexShrink: 0,
                         borderRadius: "var(--radius-md)",
                         background: "var(--gradient-brand)",
@@ -23,8 +30,8 @@ export default function TopBar() {
                     }}
                 >
                     <svg
-                        width="12"
-                        height="12"
+                        width="11"
+                        height="11"
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="white"
@@ -43,6 +50,7 @@ export default function TopBar() {
                         fontSize: "var(--text-sm)",
                         fontWeight: 700,
                         color: "var(--text-primary)",
+                        whiteSpace: "nowrap",
                     }}
                 >
                     Finance
@@ -51,8 +59,26 @@ export default function TopBar() {
                     </span>
                 </span>
             </div>
-            <nav style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+
+            <nav
+                style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "2px",
+                    flexShrink: 0,
+                }}
+            >
                 <NavMobileLinks />
+                <div
+                    style={{
+                        width: "1px",
+                        height: "20px",
+                        background: "var(--border-subtle)",
+                        margin: "0 4px",
+                        flexShrink: 0,
+                    }}
+                />
+                <UserAvatar initials={initials} />
             </nav>
         </div>
     );

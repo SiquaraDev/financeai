@@ -640,6 +640,29 @@ select option {
     display: none;
 }
 
+@media (max-width: 768px) {
+    .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 0.75rem;
+        height: 52px;
+        background: var(--bg-surface);
+        border-bottom: 1px solid var(--border-subtle);
+        position: sticky;
+        top: 0;
+        z-index: 30;
+        flex-shrink: 0;
+        gap: 0.5rem;
+    }
+}
+
+@media (max-width: 320px) {
+    .topbar {
+        padding: 0 0.5rem;
+    }
+}
+
 .nav-link {
     display: flex;
     align-items: center;
@@ -659,6 +682,17 @@ select option {
 .nav-link:hover {
     background: var(--bg-elevated);
     color: var(--text-secondary);
+}
+
+.user-avatar-btn {
+    border: none;
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    transition: outline-color var(--transition-base);
+}
+
+.user-avatar-btn[aria-expanded="true"] {
+    outline-color: var(--accent-teal-light);
 }
 
 .signout-btn {

@@ -37,3 +37,5 @@ export { TransactionIcon } from "./TransactionIcon";
 export { default as ModalLabel } from "./ModalLabel";
 
 export { default as TypeToggle } from "./TypeToggle";
+
+export { default as UserAvatar } from "./UserAvatar";
