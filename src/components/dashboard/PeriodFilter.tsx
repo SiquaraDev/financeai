@@ -134,8 +134,12 @@ export default function PeriodFilter({
 
             {activeFilter === "custom" && (
                 <div
-                    className="custom-dates animate-fade-in"
-                    style={{ display: "flex", gap: "1rem" }}
+                    className="animate-fade-in"
+                    style={{
+                        display: "flex",
+                        gap: ".5rem",
+                        marginTop: ".75rem",
+                    }}
                 >
                     {[
                         {
@@ -151,14 +155,16 @@ export default function PeriodFilter({
                     ].map(({ label, value, onChange }) => (
                         <div
                             key={label}
-                            className="custom-date-field"
-                            style={{ display: "flex", flexDirection: "column" }}
+                            style={{
+                                display: "flex",
+                                flexDirection: "column",
+                                gap: "4px",
+                            }}
                         >
                             <label
                                 style={{
                                     fontSize: "var(--text-xs)",
                                     color: "var(--text-muted)",
-                                    whiteSpace: "nowrap",
                                 }}
                             >
                                 {label}
@@ -168,8 +174,9 @@ export default function PeriodFilter({
                                 value={value}
                                 onChange={(e) => onChange(e.target.value)}
                                 style={{
-                                    padding: "6px 10px",
+                                    padding: "6px 8px",
                                     fontSize: "var(--text-xs)",
+                                    width: "auto",
                                 }}
                             />
                         </div>
