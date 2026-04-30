@@ -1,6 +1,6 @@
 "use client";
 
-import { GeminiIcon, IconSpinner } from "@/components/icons";
+import { IconAnalyze, IconSpinner } from "@/components/icons";
 import type { AiShortcut } from "@/types";
 
 const SHORTCUTS: { value: AiShortcut; label: string }[] = [
@@ -73,7 +73,7 @@ export default function NewAnalysisCard({
                             color: "var(--accent-brand-light)",
                         }}
                     >
-                        <GeminiIcon size={12} />
+                        <IconAnalyze size={12} />
                     </span>
                     <h2
                         className="font-display"
@@ -232,7 +232,7 @@ export default function NewAnalysisCard({
                         </>
                     ) : (
                         <>
-                            <GeminiIcon size={14} /> Analisar com Gemini
+                            <IconAnalyze size={14} /> Analisar com Gemini
                         </>
                     )}
                 </button>

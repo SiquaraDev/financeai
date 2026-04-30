@@ -1,5 +1,5 @@
 import ReactMarkdown from "react-markdown";
-import { GeminiIcon } from "@/components/icons";
+import { IAIcon } from "@/components/icons";
 
 interface ChatMessageProps {
     role: "user" | "assistant";
@@ -39,7 +39,7 @@ export default function ChatMessage({
                         color: "var(--accent-teal-light)",
                     }}
                 >
-                    <GeminiIcon size={12} />
+                    <IAIcon size={12} />
                 </div>
             )}
 

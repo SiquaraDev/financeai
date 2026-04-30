@@ -6,7 +6,7 @@ import EmptyState from "@/components/ui/EmptyState";
 import ChatMessage from "./ChatMessage";
 import ChatInputBar from "./ChatInputBar";
 import TypingDots from "./TypingDots";
-import { GeminiIcon } from "@/components/icons";
+import { IconChat, IAIcon } from "@/components/icons";
 import type { ChatMessage as ChatMessageData } from "@/types";
 interface ChatAreaProps {
     messages: ChatMessageData[];
@@ -62,7 +62,7 @@ export default function ChatArea({
                         flexShrink: 0,
                     }}
                 >
-                    <GeminiIcon size={15} />
+                    <IAIcon size={15} />
                 </div>
 
                 <div style={{ minWidth: 0 }}>
@@ -124,7 +124,7 @@ export default function ChatArea({
                                     color: "var(--accent-teal-light)",
                                 }}
                             >
-                                <GeminiIcon size={22} />
+                                <IconChat size={22} />
                             </div>
                         }
                         title="Execute uma análise para começar o chat"
@@ -164,7 +164,7 @@ export default function ChatArea({
                                 flexShrink: 0,
                             }}
                         >
-                            <GeminiIcon size={12} />
+                            <IAIcon size={12} />
                         </div>
                         <div
                             style={{

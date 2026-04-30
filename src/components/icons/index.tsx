@@ -457,7 +457,36 @@ export function GoogleLogo() {
     );
 }
 
-export function GeminiIcon({ size = 18 }: { size?: number }) {
+export function IAIcon({ size = 18 }: { size?: number }) {
+    return (
+        <svg
+            width={size}
+            height={size}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
+            <path d="M13 1A9 9 0 1 0 21 12" />
+
+            <path
+                d="M12 4C12.4 7 14.5 9.6 17 10C14.5 10.4 12.4 13 12 16C11.6 13 9.5 10.4 7 10C9.5 9.6 11.6 7 12 4Z"
+                fill="currentColor"
+                stroke="none"
+            />
+
+            <path
+                d="M16.5 4C16.7 5.2 17.8 6.3 19 6.5C17.8 6.7 16.7 7.8 16.5 9C16.3 7.8 15.2 6.7 14 6.5C15.2 6.3 16.3 5.2 16.5 4Z"
+                fill="currentColor"
+                stroke="none"
+            />
+        </svg>
+    );
+}
+
+export function IconAnalyze({ size = 16 }: { size?: number }) {
     return (
         <svg
             width={size}
@@ -469,9 +498,45 @@ export function GeminiIcon({ size = 18 }: { size?: number }) {
             strokeLinecap="round"
             strokeLinejoin="round"
         >
-            <path d="M12 2a10 10 0 1 0 10 10" />
-            <path d="M12 8v4l3 3" />
-            <circle cx="19" cy="5" r="3" />
+            <line x1="18" y1="20" x2="18" y2="10" />
+            <line x1="12" y1="20" x2="12" y2="4" />
+            <line x1="6" y1="20" x2="6" y2="14" />
+            <circle cx="20" cy="8" r="3" />
+            <line x1="22.5" y1="10.5" x2="24" y2="12" />
+        </svg>
+    );
+}
+
+export function IconChat({ size = 16 }: { size?: number }) {
+    return (
+        <svg
+            width={size}
+            height={size}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+        </svg>
+    );
+}
+
+export function IconSpark({ size = 16 }: { size?: number }) {
+    return (
+        <svg
+            width={size}
+            height={size}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
+            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
         </svg>
     );
 }

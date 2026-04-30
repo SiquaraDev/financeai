@@ -2,9 +2,9 @@
 
 import PageHeader from "@/components/ui/PageHeader";
 import { NewAnalysisCard, AnalysisResultCard, ChatArea } from "@/components/ai";
-import { GeminiIcon } from "@/components/icons";
 import { useAiPage } from "@/hooks";
 import { useUser } from "@/context";
+import { IconSpark } from "@/components/icons";
 
 export default function AiPage() {
     const {
@@ -69,9 +69,9 @@ export default function AiPage() {
                                 flexShrink: 0,
                             }}
                         >
-                            <GeminiIcon size={16} />
+                            <IconSpark size={16} />
                         </div>
-                        IA Gemini
+                        Análise IA
                     </div>
                 }
                 subtitle="Análise financeira inteligente com Gemini 3 Flash"

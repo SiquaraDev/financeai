@@ -6,7 +6,7 @@ import {
     IconDashboard,
     IconDollarSign,
     IconBarChart,
-    GeminiIcon,
+    IAIcon,
 } from "@/components/icons";
 
 interface NavItem {
@@ -27,7 +27,7 @@ const NAV_ITEMS: NavItem[] = [
         icon: <IconDollarSign size={16} />,
     },
     { href: "/reports", label: "Relatórios", icon: <IconBarChart size={16} /> },
-    { href: "/ai", label: "IA Gemini", icon: <GeminiIcon size={16} /> },
+    { href: "/ai", label: "Análise IA", icon: <IAIcon size={16} /> },
 ];
 
 export default function NavLinks() {
