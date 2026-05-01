@@ -1,33 +1,44 @@
 # FinanceAI
 
-Aplicativo de controle financeiro pessoal com análise inteligente via **Gemini 3 Flash**.
+Aplicativo de controle financeiro pessoal com análise inteligente via **Gemini Flash**.
 
 ## Stack
 
-- **Next.js 15** (App Router + Turbopack)
-- **TypeScript**
-- **Tailwind CSS v4**
-- **Prisma** + PostgreSQL
-- **NextAuth.js v5** (credentials + Google OAuth)
-- **Gemini 3 Flash** (`gemini-3-flash-preview`)
-- **Recharts** (gráficos interativos)
-- **xlsx** (importação de Excel)
+| Camada         | Tecnologia                                     |
+| -------------- | ---------------------------------------------- |
+| Framework      | Next.js 15 (App Router + Turbopack)            |
+| Linguagem      | TypeScript (strict mode)                       |
+| Estilização    | Tailwind CSS v4 + CSS custom properties        |
+| Banco de dados | PostgreSQL + Prisma ORM                        |
+| Autenticação   | NextAuth.js v5 (credentials + Google OAuth)    |
+| IA             | Google Gemini Flash (`gemini-3-flash-preview`) |
+| Gráficos       | Recharts                                       |
+| Importação     | xlsx (Excel), JSON nativo                      |
 
 ## Funcionalidades
 
-- Autenticação (e-mail/senha + Google OAuth)
-- Dashboard com métricas mensais e gráfico de categorias
-- CRUD de transações com paginação e filtros
-- Importação de transações via JSON, Excel, PDF ou formulário
-- Relatórios interativos com 5 tipos de gráfico (barras, linhas, pizza, área, dispersão)
-- Análise financeira com Gemini 3 Flash por período personalizado
-- Chat de dúvidas com o Gemini após a análise
+- Autenticação via e-mail/senha e Google OAuth
+- Dashboard com métricas do período e gráfico de gastos por categoria
+- CRUD completo de transações com paginação, filtros e ordenação
+- Importação em lote via JSON, Excel (.xlsx) e PDF
+- Relatórios interativos com 5 tipos de gráfico (barras, linhas, área, pizza, dispersão)
+- Filtros de período flexíveis (mês atual, mês anterior, 3/6 meses, ano, personalizado)
+- Análise financeira com Gemini por período personalizado
+- Chat de dúvidas financeiras com o Gemini após análise
+
+## Pré-requisitos
+
+- Node.js >= 18.18
+- PostgreSQL >= 14
+- Conta no [Google AI Studio](https://aistudio.google.com) para a chave Gemini
 
 ## Setup
 
-### 1. Instalar dependências
+### 1. Clonar e instalar dependências
 
 ```bash
+git clone <repo-url>
+cd financeai
 npm install
 ```
 
@@ -43,88 +54,83 @@ Preencha o `.env`:
 DATABASE_URL="postgresql://user:password@localhost:5432/financeai"
 NEXTAUTH_SECRET="gere com: openssl rand -base64 32"
 NEXTAUTH_URL="http://localhost:3000"
-GOOGLE_CLIENT_ID="seu-client-id"        # opcional
-GOOGLE_CLIENT_SECRET="seu-client-secret" # opcional
-GEMINI_API_KEY="sua-chave-gemini"
+GOOGLE_CLIENT_ID=""        # opcional — OAuth Google
+GOOGLE_CLIENT_SECRET=""    # opcional — OAuth Google
+GEMINI_API_KEY=""          # obrigatório — Google AI Studio
 ```
 
-### 3. Configurar banco de dados
+### 3. Banco de dados
 
 ```bash
-# Criar as tabelas
+# Desenvolvimento (sem histórico de migrations)
 npm run db:push
 
-# Ou usar migrations (recomendado para produção)
+# Produção (recomendado — mantém histórico)
 npm run db:migrate
 ```
 
-### 4. Rodar o projeto
+### 4. Iniciar o servidor
 
 ```bash
 npm run dev
 ```
 
-Acesse: http://localhost:3000
+Acesse: [http://localhost:3000](http://localhost:3000)
 
-## Obter a chave Gemini
+## Scripts disponíveis
 
-1. Acesse [Google AI Studio](https://aistudio.google.com)
-2. Crie uma API Key
-3. Coloque em `GEMINI_API_KEY` no `.env`
+| Script                | Descrição                                 |
+| --------------------- | ----------------------------------------- |
+| `npm run dev`         | Servidor de desenvolvimento com Turbopack |
+| `npm run build`       | Build de produção                         |
+| `npm run start`       | Servidor de produção                      |
+| `npm run lint`        | Lint com ESLint                           |
+| `npm run db:push`     | Sincroniza schema sem migrations          |
+| `npm run db:migrate`  | Cria e aplica migration                   |
+| `npm run db:studio`   | Abre Prisma Studio                        |
+| `npm run db:generate` | Gera Prisma Client                        |
 
-> O modelo `gemini-3-flash-preview` requer conta com acesso à preview. Se necessário, use `gemini-2.5-flash` como fallback.
+## Formatos de importação
 
-## Estrutura do projeto
-
-```
-src/
-├── app/
-│   ├── (auth)/           # Login e registro
-│   ├── (dashboard)/      # Área autenticada
-│   │   ├── dashboard/    # Visão geral
-│   │   ├── transactions/ # CRUD de transações
-│   │   ├── reports/      # Relatórios interativos
-│   │   └── ai/           # Análise Gemini + chat
-│   └── api/              # API Routes
-│       ├── auth/         # NextAuth + registro
-│       ├── transactions/ # CRUD API
-│       └── ai/           # Gemini API
-├── lib/
-│   ├── prisma.ts         # Cliente Prisma (singleton)
-│   ├── auth.ts           # Configuração NextAuth
-│   └── gemini.ts         # Cliente Gemini 3 Flash
-└── types/
-    └── index.ts          # Tipos TypeScript
-```
-
-## Importação de transações
-
-### Formato JSON esperado
+### JSON
 
 ```json
 [
-  {
-    "title": "Supermercado",
-    "amount": 230.50,
-    "type": "EXPENSE",
-    "category": "Alimentação",
-    "date": "2026-04-01"
-  }
+    {
+        "title": "Supermercado",
+        "amount": 230.5,
+        "type": "EXPENSE",
+        "category": "Alimentação",
+        "date": "2026-04-01"
+    }
 ]
 ```
 
-### Formato Excel esperado
+### Excel (.xlsx)
 
-| titulo | valor | tipo | categoria | data |
-|--------|-------|------|-----------|------|
-| Salário | 4200 | INCOME | Salário | 2026-04-01 |
+| titulo       | valor | tipo    | categoria   | data       |
+| ------------ | ----- | ------- | ----------- | ---------- |
+| Salário      | 4200  | INCOME  | Salário     | 2026-04-01 |
+| Supermercado | 350   | EXPENSE | Alimentação | 2026-04-03 |
 
-## Nota sobre o Gemini 3 Flash
+Colunas aceitas: `titulo`/`title`, `valor`/`amount`, `tipo`/`type`, `categoria`/`category`, `data`/`date`.
 
-O Gemini 3 introduz **thought signatures** para conversas multi-turno. O chat da página `/ai` já implementa o envio do histórico corretamente. Para chamadas com function calling, retorne as thought signatures recebidas na resposta anterior.
+## Categorias disponíveis
 
-O parâmetro `thinking_level` pode ser configurado em `src/lib/gemini.ts`:
-- `"minimal"` — mais rápido, menor custo
-- `"low"` — para chat
-- `"medium"` — para análises financeiras (recomendado)
-- `"high"` — para análises complexas
+**Gastos:** Alimentação, Transporte, Moradia, Saúde, Lazer, Educação, Vestuário, Tecnologia, Viagens, Outros
+
+**Receitas:** Salário, Freelance, Investimentos, Aluguel, Presente, Outros
+
+## Variáveis CSS
+
+O tema é controlado por custom properties definidas em `src/app/globals.css`. As principais:
+
+```css
+--bg-base, --bg-surface, --bg-card        /* Backgrounds */
+--accent-brand, --accent-teal             /* Cores de destaque */
+--color-success, --color-danger           /* Semânticas */
+--text-primary, --text-secondary          /* Tipografia */
+--radius-*, --space-*, --shadow-*         /* Utilitários */
+```
+
+Tokens com nomes são exportados em `src/styles/design-tokens.ts` para uso em componentes TypeScript.
