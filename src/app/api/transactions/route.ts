@@ -10,7 +10,7 @@ const transactionSchema = z.object({
     category: z.string().min(1),
     date: z.string(),
     description: z.string().optional(),
-    source: z.enum(["MANUAL", "JSON", "PDF", "EXCEL"]).default("MANUAL"),
+    source: z.enum(["MANUAL", "JSON", "CSV"]).default("MANUAL"),
 });
 
 function parseDate(dateStr: string): Date {
