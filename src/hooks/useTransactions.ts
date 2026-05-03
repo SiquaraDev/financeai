@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import * as XLSX from "xlsx";
 import { transactionService } from "@/services";
 import type {
     Transaction,
@@ -10,9 +9,6 @@ import type {
     PaginatedResponse,
 } from "@/types";
 import { EMPTY_TRANSACTION_FORM } from "@/types";
-
-// No type re-exports here — consumers import directly from "@/types".
-
 interface UseTransactionsReturn {
     transactions: Transaction[];
     total: number;
@@ -38,7 +34,7 @@ interface UseTransactionsReturn {
     handleDelete: (id: string) => Promise<void>;
     handleFileImport: (
         e: React.ChangeEvent<HTMLInputElement>,
-        type: "json" | "excel" | "pdf",
+        type: "json" | "csv",
     ) => void;
 }
 
@@ -52,7 +48,9 @@ export function useTransactions(): UseTransactionsReturn {
     const [showModal, setShowModal] = useState(false);
     const [showImport, setShowImport] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
-    const [form, setForm] = useState<TransactionFormData>(EMPTY_TRANSACTION_FORM);
+    const [form, setForm] = useState<TransactionFormData>(
+        EMPTY_TRANSACTION_FORM,
+    );
     const [saving, setSaving] = useState(false);
     const [importError, setImportError] = useState("");
 
@@ -141,7 +139,10 @@ export function useTransactions(): UseTransactionsReturn {
                 const text = await file.text();
                 const items = JSON.parse(text);
                 const list = Array.isArray(items) ? items : [items];
-                const result = await transactionService.bulkCreate(list, "JSON");
+                const result = await transactionService.bulkCreate(
+                    list,
+                    "JSON",
+                );
                 if (result.success) {
                     setShowImport(false);
                     fetchTransactions();
@@ -149,34 +150,45 @@ export function useTransactions(): UseTransactionsReturn {
                     setImportError("Erro ao importar transações.");
                 }
             } catch {
-                setImportError("JSON inválido. Verifique o formato do arquivo.");
+                setImportError(
+                    "JSON inválido. Verifique o formato do arquivo.",
+                );
             }
         },
         [fetchTransactions],
     );
 
-    const importExcel = useCallback(
+    const importCsv = useCallback(
         async (file: File) => {
             try {
-                const wb = XLSX.read(await file.arrayBuffer());
-                const rows = XLSX.utils.sheet_to_json(
-                    wb.Sheets[wb.SheetNames[0]],
-                ) as Record<string, unknown>[];
+                const text = await file.text();
+                const [headerLine, ...lines] = text.trim().split("\n");
+                const headers = headerLine.split(",").map((h) => h.trim());
 
-                const items = rows.map((row) => ({
-                    title: String(row["titulo"] ?? row["title"] ?? "Importado"),
-                    amount: String(Number(row["valor"] ?? row["amount"] ?? 0)),
-                    type: String(
-                        row["tipo"] ?? row["type"] ?? "EXPENSE",
-                    ) as "INCOME" | "EXPENSE",
-                    category: String(
-                        row["categoria"] ?? row["category"] ?? "Outros",
-                    ),
-                    date: String(
-                        row["data"] ?? row["date"] ?? new Date().toISOString(),
-                    ),
-                    description: "",
-                }));
+                const items = lines
+                    .filter((line) => line.trim())
+                    .map((line) => {
+                        const values = line.split(",").map((v) => v.trim());
+                        const row = Object.fromEntries(
+                            headers.map((h, i) => [h, values[i] ?? ""]),
+                        );
+                        return {
+                            title: row["titulo"] ?? row["title"] ?? "Importado",
+                            amount: String(
+                                Number(row["valor"] ?? row["amount"] ?? 0),
+                            ),
+                            type: (row["tipo"] ?? row["type"] ?? "EXPENSE") as
+                                | "INCOME"
+                                | "EXPENSE",
+                            category:
+                                row["categoria"] ?? row["category"] ?? "Outros",
+                            date:
+                                row["data"] ??
+                                row["date"] ??
+                                new Date().toISOString(),
+                            description: "",
+                        };
+                    });
 
                 const result = await transactionService.bulkCreate(
                     items,
@@ -186,31 +198,24 @@ export function useTransactions(): UseTransactionsReturn {
                     setShowImport(false);
                     fetchTransactions();
                 } else {
-                    setImportError("Erro ao importar arquivo Excel.");
+                    setImportError("Erro ao importar arquivo CSV.");
                 }
             } catch {
-                setImportError("Erro ao ler o arquivo Excel.");
+                setImportError("Erro ao ler o arquivo CSV.");
             }
         },
         [fetchTransactions],
     );
 
     const handleFileImport = useCallback(
-        (
-            e: React.ChangeEvent<HTMLInputElement>,
-            type: "json" | "excel" | "pdf",
-        ) => {
+        (e: React.ChangeEvent<HTMLInputElement>, type: "json" | "csv") => {
             const file = e.target.files?.[0];
             if (!file) return;
             setImportError("");
             if (type === "json") importJSON(file);
-            else if (type === "excel") importExcel(file);
-            else
-                setImportError(
-                    "Importação de PDF: implemente extração no backend com pdf-parse.",
-                );
+            else importCsv(file);
         },
-        [importJSON, importExcel],
+        [importJSON, importCsv],
     );
 
     return {

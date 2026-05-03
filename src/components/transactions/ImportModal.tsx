@@ -8,26 +8,25 @@ import type { BadgeVariant } from "@/components/ui/Badge";
 interface ImportOption {
     label: string;
     accept: string;
-    type: "json" | "excel" | "pdf";
+    type: "json" | "csv";
     badgeVariant: BadgeVariant;
 }
 
 const IMPORT_OPTIONS: ImportOption[] = [
     { label: "JSON", accept: ".json", type: "json", badgeVariant: "warning" },
     {
-        label: "Excel (.xlsx)",
-        accept: ".xlsx,.xls",
-        type: "excel",
+        label: "CSV",
+        accept: ".csv",
+        type: "csv",
         badgeVariant: "success",
     },
-    { label: "PDF", accept: ".pdf", type: "pdf", badgeVariant: "danger" },
 ];
 
 interface ImportModalProps {
     error: string;
     onImport: (
         e: React.ChangeEvent<HTMLInputElement>,
-        type: "json" | "excel" | "pdf",
+        type: "json" | "csv",
     ) => void;
     onClose: () => void;
 }
