@@ -1,4 +1,5 @@
 import type { AnalysisResult } from "@/types";
+import { IconLightbulb } from "@/components/icons";
 
 const TIP_STYLES = [
     {
@@ -34,7 +35,6 @@ export default function AnalysisResultCard({
             style={{
                 overflow: "hidden",
                 borderRadius: "var(--radius-xl)",
-                maxHeight: "clamp(300px, 45vh, 520px)",
                 flexShrink: 0,
             }}
         >
@@ -43,8 +43,6 @@ export default function AnalysisResultCard({
             />
             <div
                 style={{
-                    overflowY: "auto",
-                    maxHeight: "clamp(300px, 45vh, 520px)",
                     paddingInline: "clamp(.875rem,3vw,1.25rem)",
                     paddingBottom: "clamp(.875rem,3vw,1.25rem)",
                 }}
@@ -63,25 +61,15 @@ export default function AnalysisResultCard({
                             height: "26px",
                             flexShrink: 0,
                             borderRadius: "var(--radius-md)",
-                            background: "var(--color-success-bg)",
-                            border: "1px solid var(--color-success-border)",
+                            background: "var(--color-warning-bg)",
+                            border: "1px solid var(--color-warning-border)",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
+                            color: "var(--color-warning-light)",
                         }}
                     >
-                        <svg
-                            width="12"
-                            height="12"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="var(--color-success-light)"
-                            strokeWidth="2.5"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                        >
-                            <polyline points="20 6 9 17 4 12" />
-                        </svg>
+                        <IconLightbulb size={13} />
                     </span>
                     <h2
                         className="font-display"
@@ -92,42 +80,10 @@ export default function AnalysisResultCard({
                             letterSpacing: "-0.02em",
                         }}
                     >
-                        Resumo do período
+                        Dicas personalizadas
                     </h2>
                 </div>
 
-                <div
-                    style={{
-                        background: "var(--accent-brand-glow)",
-                        border: "1px solid var(--border-glow)",
-                        borderRadius: "var(--radius-lg)",
-                        padding: "clamp(.625rem,2vw,.875rem)",
-                        marginBottom: ".875rem",
-                    }}
-                >
-                    <p
-                        style={{
-                            fontSize: "var(--text-xs)",
-                            color: "var(--text-secondary)",
-                            lineHeight: 1.7,
-                        }}
-                    >
-                        {analysis.summary}
-                    </p>
-                </div>
-
-                <p
-                    style={{
-                        fontSize: "var(--text-xs)",
-                        fontWeight: 600,
-                        color: "var(--text-muted)",
-                        textTransform: "uppercase",
-                        letterSpacing: "0.06em",
-                        marginBottom: "var(--space-2)",
-                    }}
-                >
-                    Dicas personalizadas
-                </p>
                 <div
                     style={{
                         display: "flex",

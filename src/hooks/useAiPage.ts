@@ -53,7 +53,7 @@ export function useAiPage(): UseAiPageReturn {
             setMessages([
                 {
                     role: "assistant",
-                    content: `Análise concluída! ${result.data.summary.split(".")[0]}. Pode me fazer perguntas sobre seus dados financeiros.`,
+                    content: `Análise concluída!\n\n${result.data.summary}.\n\nPode me fazer perguntas sobre seus dados financeiros.`,
                 },
             ]);
         } else {
