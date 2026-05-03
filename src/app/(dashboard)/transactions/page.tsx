@@ -15,8 +15,9 @@ import {
     TransactionCardList,
     TransactionModal,
     ImportModal,
+    ExportModal,
 } from "@/components/transactions";
-import { IconUpload, IconPlus } from "@/components/icons";
+import { IconUpload, IconPlus, IconDownload } from "@/components/icons";
 import type { TransactionSortColumn, SelectOption, FilterType } from "@/types";
 
 const FILTER_OPTIONS: SelectOption<FilterType>[] = [
@@ -44,22 +45,48 @@ export default function TransactionsPage() {
                 title="Transações"
                 subtitle={`${tx.total} registro${tx.total !== 1 ? "s" : ""} no total`}
                 actions={
-                    <>
+                    <div
+                        style={{
+                            display: "flex",
+                            gap: ".375rem",
+                            flexShrink: 1,
+                            minWidth: 0,
+                        }}
+                    >
                         <Button
                             variant="ghost"
                             icon={<IconUpload />}
                             onClick={tx.openImport}
+                            style={{
+                                padding: "8px 10px",
+                                fontSize: "var(--text-xs)",
+                            }}
                         >
                             Importar
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            icon={<IconDownload />}
+                            onClick={tx.openExport}
+                            style={{
+                                padding: "8px 10px",
+                                fontSize: "var(--text-xs)",
+                            }}
+                        >
+                            Exportar
                         </Button>
                         <Button
                             variant="primary"
                             icon={<IconPlus />}
                             onClick={tx.openCreate}
+                            style={{
+                                padding: "8px 10px",
+                                fontSize: "var(--text-xs)",
+                            }}
                         >
                             Nova
                         </Button>
-                    </>
+                    </div>
                 }
             />
 
@@ -120,6 +147,13 @@ export default function TransactionsPage() {
                     error={tx.importError}
                     onImport={tx.handleFileImport}
                     onClose={tx.closeImport}
+                />
+            )}
+
+            {tx.showExport && (
+                <ExportModal
+                    onExport={tx.handleExport}
+                    onClose={tx.closeExport}
                 />
             )}
         </div>

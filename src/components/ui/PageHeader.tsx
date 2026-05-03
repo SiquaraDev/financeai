@@ -64,7 +64,7 @@ export default function PageHeader({
                 )}
             </div>
             {actions && (
-                <div style={{ display: "flex", gap: ".625rem", flexShrink: 0 }}>
+                <div style={{ display: "flex", minWidth: 0, flexShrink: 1 }}>
                     {actions}
                 </div>
             )}

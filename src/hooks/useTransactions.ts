@@ -20,6 +20,7 @@ interface UseTransactionsReturn {
     refetch: () => void;
     showModal: boolean;
     showImport: boolean;
+    showExport: boolean;
     editingId: string | null;
     form: TransactionFormData;
     saving: boolean;
@@ -29,6 +30,8 @@ interface UseTransactionsReturn {
     closeModal: () => void;
     openImport: () => void;
     closeImport: () => void;
+    openExport: () => void;
+    closeExport: () => void;
     updateForm: (updates: Partial<TransactionFormData>) => void;
     handleSave: () => Promise<void>;
     handleDelete: (id: string) => Promise<void>;
@@ -36,6 +39,16 @@ interface UseTransactionsReturn {
         e: React.ChangeEvent<HTMLInputElement>,
         type: "json" | "csv",
     ) => void;
+    handleExport: (type: "json" | "csv") => Promise<void>;
+}
+
+function triggerDownload(blob: Blob, filename: string) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
 }
 
 export function useTransactions(): UseTransactionsReturn {
@@ -47,6 +60,7 @@ export function useTransactions(): UseTransactionsReturn {
 
     const [showModal, setShowModal] = useState(false);
     const [showImport, setShowImport] = useState(false);
+    const [showExport, setShowExport] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
     const [form, setForm] = useState<TransactionFormData>(
         EMPTY_TRANSACTION_FORM,
@@ -218,6 +232,59 @@ export function useTransactions(): UseTransactionsReturn {
         [importJSON, importCsv],
     );
 
+    const openExport = useCallback(() => setShowExport(true), []);
+    const closeExport = useCallback(() => setShowExport(false), []);
+
+    const handleExport = useCallback(
+        async (type: "json" | "csv") => {
+            const result = await transactionService.fetchTransactions({
+                page: 1,
+                limit: 10000,
+                filter,
+            });
+
+            const data = result.data;
+
+            if (type === "json") {
+                const blob = new Blob([JSON.stringify(data, null, 2)], {
+                    type: "application/json",
+                });
+                triggerDownload(blob, "transacoes.json");
+            } else {
+                const headers = [
+                    "titulo",
+                    "valor",
+                    "tipo",
+                    "categoria",
+                    "data",
+                    "descricao",
+                ];
+                const rows = data.map((t) => [
+                    t.title,
+                    t.amount,
+                    t.type,
+                    t.category,
+                    t.date.split("T")[0],
+                    t.description ?? "",
+                ]);
+                const csv = [headers, ...rows]
+                    .map((row) =>
+                        row
+                            .map((v) => `"${String(v).replace(/"/g, '""')}"`)
+                            .join(","),
+                    )
+                    .join("\n");
+                const blob = new Blob(["\uFEFF" + csv], {
+                    type: "text/csv;charset=utf-8;",
+                });
+                triggerDownload(blob, "transacoes.csv");
+            }
+
+            setShowExport(false);
+        },
+        [filter],
+    );
+
     return {
         transactions,
         total,
@@ -229,6 +296,7 @@ export function useTransactions(): UseTransactionsReturn {
         refetch: fetchTransactions,
         showModal,
         showImport,
+        showExport,
         editingId,
         form,
         saving,
@@ -238,9 +306,12 @@ export function useTransactions(): UseTransactionsReturn {
         closeModal,
         openImport,
         closeImport,
+        openExport,
+        closeExport,
         updateForm,
         handleSave,
         handleDelete,
         handleFileImport,
+        handleExport,
     };
 }
