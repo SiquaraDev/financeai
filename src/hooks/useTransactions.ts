@@ -9,13 +9,19 @@ import type {
     PaginatedResponse,
 } from "@/types";
 import { EMPTY_TRANSACTION_FORM } from "@/types";
+
+const PAGE_SIZE_OPTIONS = [10, 20, 50, 100, 0] as const;
+export type PageSizeOption = (typeof PAGE_SIZE_OPTIONS)[number];
+
 interface UseTransactionsReturn {
     transactions: Transaction[];
     total: number;
     page: number;
+    pageSize: number;
     filter: FilterType;
     loading: boolean;
     setPage: (p: number) => void;
+    setPageSize: (s: number) => void;
     setFilter: (f: FilterType) => void;
     refetch: () => void;
     showModal: boolean;
@@ -55,6 +61,7 @@ export function useTransactions(): UseTransactionsReturn {
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [total, setTotal] = useState(0);
     const [page, setPage] = useState(1);
+    const [pageSize, setPageSizeState] = useState<number>(10);
     const [filter, setFilter] = useState<FilterType>("ALL");
     const [loading, setLoading] = useState(true);
 
@@ -71,10 +78,11 @@ export function useTransactions(): UseTransactionsReturn {
     const fetchTransactions = useCallback(async () => {
         setLoading(true);
         try {
+            const limit = pageSize === 0 ? 10000 : pageSize;
             const result: PaginatedResponse<Transaction> =
                 await transactionService.fetchTransactions({
                     page,
-                    limit: 15,
+                    limit,
                     filter,
                 });
             setTransactions(result.data);
@@ -82,7 +90,7 @@ export function useTransactions(): UseTransactionsReturn {
         } finally {
             setLoading(false);
         }
-    }, [page, filter]);
+    }, [page, pageSize, filter]);
 
     useEffect(() => {
         fetchTransactions();
@@ -90,6 +98,11 @@ export function useTransactions(): UseTransactionsReturn {
 
     const handleSetFilter = useCallback((f: FilterType) => {
         setFilter(f);
+        setPage(1);
+    }, []);
+
+    const handleSetPageSize = useCallback((s: number) => {
+        setPageSizeState(s);
         setPage(1);
     }, []);
 
@@ -322,9 +335,11 @@ export function useTransactions(): UseTransactionsReturn {
         transactions,
         total,
         page,
+        pageSize,
         filter,
         loading,
         setPage,
+        setPageSize: handleSetPageSize,
         setFilter: handleSetFilter,
         refetch: fetchTransactions,
         showModal,

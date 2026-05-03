@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
 import { useTransactions } from "@/hooks";
 import { useSort } from "@/hooks";
 import PageHeader from "@/components/ui/PageHeader";
 import FilterBar from "@/components/ui/FilterBar";
 import Pagination from "@/components/ui/Pagination";
+import PageSizeSelect from "@/components/ui/PageSizeSelect";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import EmptyState from "@/components/ui/EmptyState";
@@ -31,6 +31,8 @@ export default function TransactionsPage() {
     const { sortColumn, sortDirection, handleSort } =
         useSort<TransactionSortColumn>();
 
+    const effectivePageSize = tx.pageSize === 0 ? tx.total : tx.pageSize;
+
     return (
         <div
             style={{
@@ -51,6 +53,7 @@ export default function TransactionsPage() {
                             gap: ".375rem",
                             flexShrink: 1,
                             minWidth: 0,
+                            flexWrap: "wrap",
                         }}
                     >
                         <Button
@@ -95,6 +98,16 @@ export default function TransactionsPage() {
                 active={tx.filter}
                 onChange={tx.setFilter}
             />
+            <div
+                style={{
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    marginTop: "calc(-1.25rem + var(--space-2))",
+                    marginBottom: "1.25rem",
+                }}
+            >
+                <PageSizeSelect value={tx.pageSize} onChange={tx.setPageSize} />
+            </div>
 
             <Card variant="glass" padding={0}>
                 {tx.loading ? (
@@ -124,12 +137,14 @@ export default function TransactionsPage() {
                 )}
             </Card>
 
-            <Pagination
-                page={tx.page}
-                total={tx.total}
-                pageSize={15}
-                onPageChange={tx.setPage}
-            />
+            {tx.pageSize !== 0 && (
+                <Pagination
+                    page={tx.page}
+                    total={tx.total}
+                    pageSize={effectivePageSize}
+                    onPageChange={tx.setPage}
+                />
+            )}
 
             {tx.showModal && (
                 <TransactionModal
