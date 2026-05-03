@@ -28,7 +28,7 @@ export interface ITransactionService {
     deleteTransaction(id: string): Promise<MutationResult>;
     bulkCreate(
         items: Partial<TransactionFormData>[],
-        source: "JSON" | "EXCEL" | "PDF",
+        source: "JSON" | "CSV",
     ): Promise<MutationResult<{ created: number; failed: number }>>;
 }
 

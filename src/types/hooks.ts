@@ -73,7 +73,7 @@ export interface UseTransactionsReturn {
     handleDelete: (id: string) => Promise<void>;
     handleFileImport: (
         e: React.ChangeEvent<HTMLInputElement>,
-        type: "json" | "excel" | "pdf",
+        type: "json" | "csv",
     ) => void;
 }
 

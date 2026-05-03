@@ -27,7 +27,7 @@ export interface MutationResult<T = void> {
 // ─── Transaction types ────────────────────────────────────────────────────────
 
 export type TransactionType = "INCOME" | "EXPENSE";
-export type ImportSource = "MANUAL" | "JSON" | "PDF" | "EXCEL";
+export type ImportSource = "MANUAL" | "JSON" | "CSV";
 
 /** Canonical Transaction shape used across the entire app. */
 export interface Transaction {
