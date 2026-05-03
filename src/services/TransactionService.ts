@@ -106,14 +106,18 @@ export class TransactionService extends ApiService {
 
     async bulkCreate(
         items: Partial<TransactionFormData>[],
-        source: "JSON" | "EXCEL" | "PDF",
+        source: "JSON" | "CSV",
     ): Promise<MutationResult<{ created: number; failed: number }>> {
         let created = 0;
         let failed = 0;
 
         for (const item of items) {
             try {
-                await this.post("/transactions", { ...item, source });
+                await this.post("/transactions", {
+                    ...item,
+                    amount: parseFloat(String(item.amount ?? "0")),
+                    source,
+                });
                 created++;
             } catch {
                 failed++;

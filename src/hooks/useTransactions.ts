@@ -175,38 +175,71 @@ export function useTransactions(): UseTransactionsReturn {
     const importCsv = useCallback(
         async (file: File) => {
             try {
-                const text = await file.text();
+                const raw = await file.text();
+                const text = raw.replace(/^\uFEFF/, "");
+
+                const parseRow = (line: string): string[] => {
+                    const fields: string[] = [];
+                    let current = "";
+                    let insideQuotes = false;
+
+                    for (let i = 0; i < line.length; i++) {
+                        const char = line[i];
+                        if (char === '"') {
+                            if (insideQuotes && line[i + 1] === '"') {
+                                current += '"';
+                                i++;
+                            } else {
+                                insideQuotes = !insideQuotes;
+                            }
+                        } else if (char === "," && !insideQuotes) {
+                            fields.push(current.trim());
+                            current = "";
+                        } else {
+                            current += char;
+                        }
+                    }
+                    fields.push(current.trim());
+                    return fields;
+                };
+
                 const [headerLine, ...lines] = text.trim().split("\n");
-                const headers = headerLine.split(",").map((h) => h.trim());
+                const headers = parseRow(headerLine);
 
                 const items = lines
                     .filter((line) => line.trim())
                     .map((line) => {
-                        const values = line.split(",").map((v) => v.trim());
+                        const values = parseRow(line);
                         const row = Object.fromEntries(
                             headers.map((h, i) => [h, values[i] ?? ""]),
                         );
+                        const rawType = (
+                            row["tipo"] ??
+                            row["type"] ??
+                            "EXPENSE"
+                        ).toUpperCase();
                         return {
                             title: row["titulo"] ?? row["title"] ?? "Importado",
                             amount: String(
                                 Number(row["valor"] ?? row["amount"] ?? 0),
                             ),
-                            type: (row["tipo"] ?? row["type"] ?? "EXPENSE") as
-                                | "INCOME"
-                                | "EXPENSE",
+                            type: (rawType === "INCOME"
+                                ? "INCOME"
+                                : "EXPENSE") as "INCOME" | "EXPENSE",
                             category:
                                 row["categoria"] ?? row["category"] ?? "Outros",
                             date:
                                 row["data"] ??
                                 row["date"] ??
-                                new Date().toISOString(),
-                            description: "",
+                                new Date().toISOString().split("T")[0],
+                            description:
+                                row["descricao"] ?? row["description"] ?? "",
                         };
                     });
 
                 const result = await transactionService.bulkCreate(
                     items,
-                    "EXCEL",
+                    "CSV",
                 );
                 if (result.success) {
                     setShowImport(false);
