@@ -71,7 +71,7 @@ export default function DashboardClient({ session }: { session: Session }) {
 
             <StatsGrid stats={stats} loading={loading} />
 
-            {stats && <DashboardBottomGrid stats={stats} />}
+            <DashboardBottomGrid stats={stats} loading={loading} />
         </div>
     );
 }

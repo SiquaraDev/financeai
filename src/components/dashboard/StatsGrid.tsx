@@ -9,20 +9,21 @@ interface StatsGridProps {
     loading: boolean;
 }
 
+function StatCardSkeleton({ delay }: { delay: string }) {
+    return (
+        <div className={`stat-card ${delay}`} style={{ minHeight: "110px" }}>
+            <LoadingSpinner height={78} />
+        </div>
+    );
+}
+
 export default function StatsGrid({ stats, loading }: StatsGridProps) {
     if (loading) {
         return (
-            <div
-                className="stats-grid"
-                style={{ marginBottom: "clamp(.75rem, 2vw, 1.5rem)" }}
-            >
-                {[0, 1, 2].map((i) => (
-                    <div
-                        key={i}
-                        className="stat-card skeleton"
-                        style={{ height: "110px", opacity: 0.5 }}
-                    />
-                ))}
+            <div className="stats-grid">
+                <StatCardSkeleton delay="delay-75" />
+                <StatCardSkeleton delay="delay-150" />
+                <StatCardSkeleton delay="delay-225" />
             </div>
         );
     }

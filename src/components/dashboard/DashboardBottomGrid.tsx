@@ -6,11 +6,13 @@ import { IconPieChart, IconActivity } from "@/components/icons";
 import type { DashboardStats } from "@/hooks/useDashboardStats";
 
 interface DashboardBottomGridProps {
-    stats: DashboardStats;
+    stats: DashboardStats | null;
+    loading: boolean;
 }
 
 export default function DashboardBottomGrid({
     stats,
+    loading,
 }: DashboardBottomGridProps) {
     return (
         <div className="bottom-grid">
@@ -23,8 +25,9 @@ export default function DashboardBottomGrid({
                     iconColor="var(--accent-brand-light)"
                 />
                 <CategoryExpenseList
-                    byCategory={stats.byCategory}
-                    totalExpense={stats.totalExpense}
+                    byCategory={stats?.byCategory ?? {}}
+                    totalExpense={stats?.totalExpense ?? 0}
+                    loading={loading}
                 />
             </Card>
 
@@ -36,7 +39,10 @@ export default function DashboardBottomGrid({
                     iconBorder="rgba(20,184,166,.25)"
                     iconColor="var(--accent-teal-light)"
                 />
-                <RecentTransactionsList transactions={stats.recent} />
+                <RecentTransactionsList
+                    transactions={stats?.recent ?? []}
+                    loading={loading}
+                />
             </Card>
         </div>
     );

@@ -1,4 +1,5 @@
 import EmptyState from "@/components/ui/EmptyState";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { formatCurrency } from "@/lib/formatters";
 
 const COLORS = [
@@ -12,12 +13,18 @@ const COLORS = [
 interface CategoryExpenseListProps {
     byCategory: Record<string, number>;
     totalExpense: number;
+    loading: boolean;
 }
 
 export default function CategoryExpenseList({
     byCategory,
     totalExpense,
+    loading,
 }: CategoryExpenseListProps) {
+    if (loading) {
+        return <LoadingSpinner height={160} />;
+    }
+
     if (Object.keys(byCategory).length === 0) {
         return <EmptyState title="Nenhum gasto no período" />;
     }

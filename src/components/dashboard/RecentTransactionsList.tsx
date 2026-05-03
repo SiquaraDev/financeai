@@ -1,5 +1,6 @@
 import { format } from "date-fns";
 import EmptyState from "@/components/ui/EmptyState";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { formatCurrency, parseSafeDate } from "@/lib/formatters";
 
 interface Transaction {
@@ -13,6 +14,7 @@ interface Transaction {
 
 interface RecentTransactionsListProps {
     transactions: Transaction[];
+    loading: boolean;
 }
 
 function TxIcon({ isIncome }: { isIncome: boolean }) {
@@ -45,7 +47,12 @@ function TxIcon({ isIncome }: { isIncome: boolean }) {
 
 export default function RecentTransactionsList({
     transactions,
+    loading,
 }: RecentTransactionsListProps) {
+    if (loading) {
+        return <LoadingSpinner height={160} />;
+    }
+
     if (transactions.length === 0) {
         return <EmptyState title="Nenhuma transação no período" />;
     }
