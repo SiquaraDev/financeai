@@ -1,4 +1,3 @@
-import React from "react";
 import { IconSpinner } from "@/components/icons";
 
 export type ButtonVariant = "primary" | "ghost" | "danger" | "teal";

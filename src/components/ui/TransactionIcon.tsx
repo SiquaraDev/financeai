@@ -1,4 +1,3 @@
-import React from "react";
 import { transactionColorTokens } from "@/styles/design-tokens";
 
 interface TransactionIconProps {

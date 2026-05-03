@@ -1,8 +1,3 @@
-/**
- * Base Utility Types
- * Single source of truth — never redefine these elsewhere.
- */
-
 // ─── API Response wrappers ────────────────────────────────────────────────────
 
 export interface PaginatedResponse<T> {
@@ -28,8 +23,6 @@ export interface MutationResult<T = void> {
 
 export type TransactionType = "INCOME" | "EXPENSE";
 export type ImportSource = "MANUAL" | "JSON" | "CSV";
-
-/** Canonical Transaction shape used across the entire app. */
 export interface Transaction {
     id: string;
     title: string;

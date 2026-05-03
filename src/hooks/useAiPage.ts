@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { format, subMonths, startOfMonth, endOfMonth } from "date-fns";
+import { format, startOfMonth, endOfMonth } from "date-fns";
 import { analysisService } from "@/services";
 import { applyAiShortcut } from "@/utils/dateRange";
 import type { AnalysisResult, ChatMessage, AiShortcut } from "@/types";

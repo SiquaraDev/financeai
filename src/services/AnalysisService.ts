@@ -6,12 +6,6 @@ interface AnalyzeParams {
     endDate: string;
 }
 
-interface ChatParams {
-    message: string;
-    analysisContext: string;
-    history: { role: "user" | "model"; parts: string }[];
-}
-
 interface ChatResponse {
     response: string;
 }

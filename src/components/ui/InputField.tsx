@@ -1,5 +1,3 @@
-import React from "react";
-
 interface InputFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
     label: string;
     id: string;

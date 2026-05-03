@@ -1,5 +1,3 @@
-import React from "react";
-
 export type CardVariant = "glass" | "solid" | "elevated";
 
 interface CardProps {

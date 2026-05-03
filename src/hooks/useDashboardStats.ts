@@ -4,9 +4,6 @@ import { useState, useEffect, useCallback } from "react";
 import { dashboardService } from "@/services";
 import type { DashboardStats, DateFilterKey } from "@/types";
 
-// DashboardStats lives in @/types — re-exporting it here so existing
-// imports like `import type { DashboardStats } from "@/hooks/useDashboardStats"`
-// continue to work during migration, but prefer importing from "@/types".
 export type { DashboardStats };
 
 interface UseDashboardStatsParams {

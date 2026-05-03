@@ -1,5 +1,3 @@
-import React from "react";
-
 interface ModalLabelProps {
     children: React.ReactNode;
     htmlFor?: string;

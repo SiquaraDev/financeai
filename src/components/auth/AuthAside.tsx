@@ -1,4 +1,3 @@
-import React from "react";
 import LogoMark from "./LogoMark";
 
 interface AuthAsideProps {

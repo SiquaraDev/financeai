@@ -4,9 +4,6 @@ import { useState, useCallback } from "react";
 import { format, startOfMonth, endOfMonth } from "date-fns";
 import { getDateRange, formatPeriodLabel } from "@/utils/dateRange";
 import type { DateFilterKey, DateRange } from "@/types";
-
-// DateFilterKey and DateRange both live in @/types.
-
 interface UseDateRangeOptions {
     initialFilter?: DateFilterKey;
 }
