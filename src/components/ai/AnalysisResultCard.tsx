@@ -1,3 +1,4 @@
+import ReactMarkdown from "react-markdown";
 import type { AnalysisResult } from "@/types";
 import { IconLightbulb } from "@/components/icons";
 
@@ -23,6 +24,66 @@ const TIP_STYLES = [
         color: "var(--accent-teal-light)",
     },
 ];
+
+const MD_COMPONENTS: React.ComponentProps<typeof ReactMarkdown>["components"] =
+    {
+        p: ({ children }) => (
+            <p
+                style={{
+                    margin: "0 0 0.4rem",
+                    fontSize: "var(--text-xs)",
+                    color: "var(--text-secondary)",
+                    lineHeight: 1.6,
+                }}
+            >
+                {children}
+            </p>
+        ),
+        strong: ({ children }) => (
+            <strong style={{ fontWeight: 600, color: "var(--text-primary)" }}>
+                {children}
+            </strong>
+        ),
+        em: ({ children }) => (
+            <em style={{ fontStyle: "italic" }}>{children}</em>
+        ),
+        ul: ({ children }) => (
+            <ul style={{ paddingLeft: "1.1rem", margin: "0.2rem 0" }}>
+                {children}
+            </ul>
+        ),
+        ol: ({ children }) => (
+            <ol style={{ paddingLeft: "1.1rem", margin: "0.2rem 0" }}>
+                {children}
+            </ol>
+        ),
+        li: ({ children }) => (
+            <li
+                style={{
+                    margin: "0.15rem 0",
+                    fontSize: "var(--text-xs)",
+                    color: "var(--text-secondary)",
+                    lineHeight: 1.6,
+                }}
+            >
+                {children}
+            </li>
+        ),
+        code: ({ children }) => (
+            <code
+                style={{
+                    fontFamily: "var(--font-mono)",
+                    fontSize: "0.7rem",
+                    background: "var(--bg-elevated)",
+                    borderRadius: "var(--radius-sm)",
+                    padding: "1px 5px",
+                    color: "var(--accent-brand-light)",
+                }}
+            >
+                {children}
+            </code>
+        ),
+    };
 
 export default function AnalysisResultCard({
     analysis,
@@ -110,21 +171,17 @@ export default function AnalysisResultCard({
                                     style={{
                                         color: s.color,
                                         fontSize: "10px",
-                                        marginTop: "2px",
+                                        marginTop: "3px",
                                         flexShrink: 0,
                                     }}
                                 >
                                     ✦
                                 </span>
-                                <p
-                                    style={{
-                                        fontSize: "var(--text-xs)",
-                                        color: "var(--text-secondary)",
-                                        lineHeight: 1.6,
-                                    }}
-                                >
-                                    {tip}
-                                </p>
+                                <div style={{ minWidth: 0, flex: 1 }}>
+                                    <ReactMarkdown components={MD_COMPONENTS}>
+                                        {tip}
+                                    </ReactMarkdown>
+                                </div>
                             </div>
                         );
                     })}

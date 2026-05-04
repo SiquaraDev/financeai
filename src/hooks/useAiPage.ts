@@ -5,6 +5,7 @@ import { format, startOfMonth, endOfMonth } from "date-fns";
 import { analysisService } from "@/services";
 import { applyAiShortcut } from "@/utils/dateRange";
 import type { AnalysisResult, ChatMessage, AiShortcut } from "@/types";
+
 interface UseAiPageReturn {
     startDate: string;
     endDate: string;
@@ -53,7 +54,17 @@ export function useAiPage(): UseAiPageReturn {
             setMessages([
                 {
                     role: "assistant",
-                    content: `Análise concluída!\n\n${result.data.summary}.\n\nPode me fazer perguntas sobre seus dados financeiros.`,
+                    content:
+                        "Análise concluída! Aqui está o resumo do período:",
+                },
+                {
+                    role: "assistant",
+                    content: result.data.summary,
+                },
+                {
+                    role: "assistant",
+                    content:
+                        "Pode me fazer perguntas sobre seus dados financeiros.",
                 },
             ]);
         } else {

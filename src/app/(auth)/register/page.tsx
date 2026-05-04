@@ -27,7 +27,7 @@ import {
 const FEATURES: FeatureItem[] = [
     { label: "Dashboard com visão mensal completa", delay: "delay-75" },
     { label: "Importação via JSON e CSV", delay: "delay-150" },
-    { label: "Análise e chat financeiro com Gemini AI", delay: "delay-225" },
+    { label: "Análise e chat financeiro com IA", delay: "delay-225" },
     { label: "Relatórios interativos e gráficos", delay: "delay-300" },
 ];
 
