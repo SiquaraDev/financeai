@@ -1,4 +1,5 @@
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { IAIcon } from "@/components/icons";
 
 interface ChatMessageProps {
@@ -63,9 +64,11 @@ export default function ChatMessage({
                         : "var(--text-secondary)",
                     lineHeight: 1.65,
                     wordBreak: "break-word",
+                    overflowX: "auto",
                 }}
             >
                 <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
                     components={{
                         p: ({ children }) => (
                             <p
@@ -123,6 +126,20 @@ export default function ChatMessage({
                                 {children}
                             </li>
                         ),
+                        h2: ({ children }) => (
+                            <h2
+                                style={{
+                                    fontSize: "var(--text-base)",
+                                    fontWeight: 700,
+                                    color: isUser
+                                        ? "white"
+                                        : "var(--text-primary)",
+                                    margin: "0.6rem 0 0.3rem",
+                                }}
+                            >
+                                {children}
+                            </h2>
+                        ),
                         h3: ({ children }) => (
                             <h3
                                 style={{
@@ -136,6 +153,122 @@ export default function ChatMessage({
                             >
                                 {children}
                             </h3>
+                        ),
+                        table: ({ children }) => (
+                            <div
+                                style={{
+                                    overflowX: "auto",
+                                    margin: "0.5rem 0",
+                                    borderRadius: "var(--radius-md)",
+                                    border: isUser
+                                        ? "1px solid rgba(255,255,255,0.2)"
+                                        : "1px solid var(--border-subtle)",
+                                }}
+                            >
+                                <table
+                                    style={{
+                                        width: "100%",
+                                        borderCollapse: "collapse",
+                                        fontSize: "var(--text-xs)",
+                                    }}
+                                >
+                                    {children}
+                                </table>
+                            </div>
+                        ),
+                        thead: ({ children }) => (
+                            <thead
+                                style={{
+                                    background: isUser
+                                        ? "rgba(255,255,255,0.15)"
+                                        : "var(--bg-card)",
+                                }}
+                            >
+                                {children}
+                            </thead>
+                        ),
+                        tbody: ({ children }) => <tbody>{children}</tbody>,
+                        tr: ({ children }) => (
+                            <tr
+                                style={{
+                                    borderBottom: isUser
+                                        ? "1px solid rgba(255,255,255,0.1)"
+                                        : "1px solid var(--border-subtle)",
+                                }}
+                            >
+                                {children}
+                            </tr>
+                        ),
+                        th: ({ children }) => (
+                            <th
+                                style={{
+                                    padding: "6px 10px",
+                                    textAlign: "left",
+                                    fontWeight: 600,
+                                    color: isUser
+                                        ? "white"
+                                        : "var(--text-primary)",
+                                    whiteSpace: "nowrap",
+                                }}
+                            >
+                                {children}
+                            </th>
+                        ),
+                        td: ({ children }) => (
+                            <td
+                                style={{
+                                    padding: "6px 10px",
+                                    color: isUser
+                                        ? "var(--text-on-brand)"
+                                        : "var(--text-secondary)",
+                                    verticalAlign: "top",
+                                }}
+                            >
+                                {children}
+                            </td>
+                        ),
+                        code: ({ children }) => (
+                            <code
+                                style={{
+                                    fontFamily: "var(--font-mono)",
+                                    fontSize: "0.75em",
+                                    background: isUser
+                                        ? "rgba(255,255,255,0.15)"
+                                        : "var(--bg-card)",
+                                    borderRadius: "var(--radius-sm)",
+                                    padding: "1px 5px",
+                                    color: isUser
+                                        ? "white"
+                                        : "var(--accent-brand-light)",
+                                }}
+                            >
+                                {children}
+                            </code>
+                        ),
+                        blockquote: ({ children }) => (
+                            <blockquote
+                                style={{
+                                    borderLeft: isUser
+                                        ? "3px solid rgba(255,255,255,0.4)"
+                                        : "3px solid var(--accent-brand-light)",
+                                    paddingLeft: "0.75rem",
+                                    margin: "0.4rem 0",
+                                    opacity: 0.85,
+                                }}
+                            >
+                                {children}
+                            </blockquote>
+                        ),
+                        hr: () => (
+                            <hr
+                                style={{
+                                    border: "none",
+                                    borderTop: isUser
+                                        ? "1px solid rgba(255,255,255,0.2)"
+                                        : "1px solid var(--border-subtle)",
+                                    margin: "0.5rem 0",
+                                }}
+                            />
                         ),
                     }}
                 >
