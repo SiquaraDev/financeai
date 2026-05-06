@@ -58,10 +58,7 @@ export async function analyzeFinances(
             return acc;
         }, {});
 
-    const prompt = `
-Você é um consultor financeiro pessoal altamente especializado e restrito EXCLUSIVAMENTE a análises financeiras.
-
-Analise os dados financeiros abaixo e responda APENAS com um JSON válido.
+    const prompt = `Você é um consultor financeiro pessoal. Analise os dados abaixo.
 
 Período: ${startDate} a ${endDate}
 Total de receitas: R$${totalIncome.toFixed(2)}
@@ -70,33 +67,8 @@ Saldo: R$${(totalIncome - totalExpense).toFixed(2)}
 Gastos por categoria: ${JSON.stringify(byCategory, null, 2)}
 Transações: ${JSON.stringify(transactions.slice(0, 50), null, 2)}
 
-REGRAS OBRIGATÓRIAS:
-- Você DEVE responder SOMENTE com JSON válido.
-- NÃO inclua nenhum texto antes ou depois do JSON.
-- NÃO utilize crases (backticks) ou blocos de código.
-- NÃO explique o que está fazendo.
-- NÃO inclua campos extras além dos especificados.
-- O conteúdo DEVE ser 100% relacionado a finanças.
-- É PROIBIDO mencionar qualquer assunto fora do contexto financeiro.
-- Sempre utilize linguagem profissional, objetiva e analítica.
-
-FORMATAÇÃO (OBRIGATÓRIA DENTRO DOS VALORES):
-- Utilize Markdown dentro das strings JSON.
-- Destaque pontos importantes com **negrito**.
-- Use listas com "-" quando aplicável.
-- Use quebras de linha reais (barra invertida + n) para organizar o texto.
-
-Responda EXATAMENTE com este formato JSON:
-{
-  "summary": "resumo financeiro do período em 2-3 parágrafos, detalhado, analítico e personalizado utilizando markdown",
-  "tips": [
-    "dica 1 específica utilizando markdown",
-    "dica 2 específica utilizando markdown",
-    "dica 3 específica utilizando markdown",
-    "dica 4 específica utilizando markdown"
-  ]
-}
-`;
+Responda SOMENTE com o JSON abaixo, sem nenhum texto antes ou depois, sem blocos de código, sem backticks:
+{"summary":"resumo financeiro detalhado em 2-3 parágrafos usando Markdown com **negrito** nos pontos importantes","tips":["dica 1 específica","dica 2 específica","dica 3 específica","dica 4 específica"]}`;
 
     const result = await model.generateContent(prompt);
     const raw = result.response.text();
@@ -105,15 +77,17 @@ Responda EXATAMENTE com este formato JSON:
         const cleaned = extractJSON(raw);
         const parsed = JSON.parse(cleaned);
 
+        if (typeof parsed.summary !== "string" || !Array.isArray(parsed.tips)) {
+            throw new Error("Invalid structure");
+        }
+
         return {
-            summary: unescapeNewlines(parsed.summary ?? ""),
-            tips: Array.isArray(parsed.tips)
-                ? parsed.tips.map((t: string) => unescapeNewlines(t))
-                : [],
+            summary: unescapeNewlines(parsed.summary),
+            tips: parsed.tips.map((t: unknown) => unescapeNewlines(String(t))),
         };
     } catch {
         return {
-            summary: raw,
+            summary: "Não foi possível processar a análise. Tente novamente.",
             tips: [
                 "Analise seus gastos por categoria para identificar onde economizar.",
             ],

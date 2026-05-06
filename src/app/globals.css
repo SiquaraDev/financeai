@@ -703,7 +703,6 @@ select option {
     display: flex;
     flex-direction: column;
     gap: clamp(0.5rem, 2vw, 1rem);
-    overflow-y: auto;
     min-height: 0;
     min-width: 0;
 }
@@ -728,6 +727,151 @@ select option {
 
 .ai-chat-input {
     flex-shrink: 0;
+}
+
+.analysis-result-card {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+}
+
+.analysis-result-card__accent {
+    height: 3px;
+    background: var(--gradient-success);
+    flex-shrink: 0;
+}
+
+.analysis-result-card__header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: clamp(0.75rem, 2vw, 0.875rem) clamp(0.875rem, 3vw, 1.25rem);
+    flex-shrink: 0;
+}
+
+.analysis-result-card__icon {
+    width: 26px;
+    height: 26px;
+    flex-shrink: 0;
+    border-radius: var(--radius-md);
+    background: var(--color-warning-bg);
+    border: 1px solid var(--color-warning-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-warning-light);
+}
+
+.analysis-result-card__title {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+}
+
+.analysis-result-card__list {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: 0 clamp(0.875rem, 3vw, 1.25rem) clamp(0.875rem, 3vw, 1.25rem);
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+}
+
+.analysis-result-card__tip {
+    border-radius: var(--radius-md);
+    padding: 8px 12px;
+    display: flex;
+    gap: var(--space-2);
+    align-items: flex-start;
+    flex-shrink: 0;
+}
+
+.analysis-result-card__tip-icon {
+    font-size: 10px;
+    margin-top: 3px;
+    flex-shrink: 0;
+}
+
+.analysis-result-card__tip-content {
+    min-width: 0;
+    flex: 1;
+}
+
+.analysis-result-card__tip-p {
+    margin: 0 0 0.4rem;
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.analysis-result-card__tip-strong {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.analysis-result-card__tip-ul,
+.analysis-result-card__tip-ol {
+    padding-left: 1.1rem;
+    margin: 0.2rem 0;
+}
+
+.analysis-result-card__tip-li {
+    margin: 0.15rem 0;
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.analysis-result-card__tip-table-wrapper {
+    overflow-x: auto;
+    margin: 0.4rem 0;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-subtle);
+}
+
+.analysis-result-card__tip-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-xs);
+}
+
+.analysis-result-card__tip-thead {
+    background: var(--bg-elevated);
+}
+
+.analysis-result-card__tip-tr {
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.analysis-result-card__tip-th {
+    padding: 5px 8px;
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+    font-size: var(--text-xs);
+}
+
+.analysis-result-card__tip-td {
+    padding: 5px 8px;
+    color: var(--text-secondary);
+    vertical-align: top;
+    font-size: var(--text-xs);
+}
+
+.analysis-result-card__tip-code {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    background: var(--bg-elevated);
+    border-radius: var(--radius-sm);
+    padding: 1px 5px;
 }
 
 /* ─── AI Chat Header ─────────────────────────────────────────────────────── */
@@ -978,9 +1122,35 @@ select option {
 }
 
 @media (max-width: 900px) {
+    .ai-page {
+        overflow-y: hidden;
+        overflow-x: hidden;
+        height: auto;
+        min-height: 0;
+        flex: none;
+    }
+
     .ai-layout {
-        grid-template-columns: 1fr;
-        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        height: auto;
+        min-height: 0;
+    }
+
+    .ai-left {
+        display: flex;
+        flex-direction: column;
+        overflow: visible;
+        height: auto;
+        min-height: 0;
+        flex-shrink: 0;
+    }
+
+    .analysis-result-card {
+        flex: none;
+        height: auto;
+        max-height: 400px;
     }
 
     .ai-chat {
@@ -990,12 +1160,20 @@ select option {
 }
 
 @media (max-width: 480px) {
+    .analysis-result-card {
+        max-height: 360px;
+    }
+
     .ai-chat {
         height: clamp(280px, 48dvh, 460px);
     }
 }
 
 @media (max-width: 320px) {
+    .analysis-result-card {
+        max-height: 300px;
+    }
+
     .ai-chat {
         height: clamp(260px, 45dvh, 400px);
     }
