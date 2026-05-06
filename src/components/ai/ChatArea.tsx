@@ -8,6 +8,7 @@ import ChatInputBar from "./ChatInputBar";
 import TypingDots from "./TypingDots";
 import { IconChat, IAIcon } from "@/components/icons";
 import type { ChatMessage as ChatMessageData } from "@/types";
+
 interface ChatAreaProps {
     messages: ChatMessageData[];
     input: string;
@@ -34,96 +35,33 @@ export default function ChatArea({
     }, [messages, loading]);
 
     return (
-        <div
-            className="card-glass ai-chat animate-fade-in delay-150"
-            style={{ overflow: "hidden" }}
-        >
-            <div
-                style={{
-                    padding: "clamp(.75rem,2vw,1rem) clamp(.75rem,2vw,1.25rem)",
-                    borderBottom: "1px solid var(--border-subtle)",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: ".625rem",
-                    flexShrink: 0,
-                }}
-            >
-                <div
-                    style={{
-                        width: "32px",
-                        height: "32px",
-                        borderRadius: "var(--radius-full)",
-                        background: "var(--accent-teal-glow)",
-                        border: "1px solid rgba(20,184,166,.3)",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        color: "var(--accent-teal-light)",
-                        flexShrink: 0,
-                    }}
-                >
+        <div className="ai-chat card-glass animate-fade-in delay-150">
+            <div className="ai-chat__header">
+                <div className="ai-chat__avatar">
                     <IAIcon size={15} />
                 </div>
 
-                <div style={{ minWidth: 0 }}>
-                    <p
-                        className="font-display"
-                        style={{
-                            fontSize: "var(--text-sm)",
-                            fontWeight: 700,
-                            color: "var(--text-primary)",
-                            letterSpacing: "-0.02em",
-                        }}
-                    >
-                        Tirar dúvidas
-                    </p>
-                    <p
-                        style={{
-                            fontSize: "var(--text-xs)",
-                            color: "var(--text-muted)",
-                        }}
-                    >
+                <div className="ai-chat__info">
+                    <p className="ai-chat__title font-display">Tirar dúvidas</p>
+                    <p className="ai-chat__subtitle">
                         {analysisReady
                             ? "Faça perguntas sobre sua análise"
                             : "Execute uma análise primeiro"}
                     </p>
                 </div>
 
-                <div style={{ marginLeft: "auto", flexShrink: 0 }}>
+                <div className="ai-chat__badge">
                     <Badge variant={analysisReady ? "success" : "neutral"} dot>
                         {analysisReady ? "Ativo" : "Aguardando"}
                     </Badge>
                 </div>
             </div>
 
-            <div
-                style={{
-                    flex: 1,
-                    overflowY: "auto",
-                    padding: "clamp(.75rem,2vw,1.25rem)",
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: ".75rem",
-                    scrollBehavior: "smooth",
-                }}
-            >
+            <div className="ai-chat-messages">
                 {messages.length === 0 && !analysisReady && (
                     <EmptyState
                         icon={
-                            <div
-                                className="animate-pulse-teal"
-                                style={{
-                                    width: "52px",
-                                    height: "52px",
-                                    borderRadius: "var(--radius-full)",
-                                    background: "var(--accent-teal-glow)",
-                                    border: "1px solid rgba(20,184,166,.25)",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    color: "var(--accent-teal-light)",
-                                }}
-                            >
+                            <div className="ai-chat__empty-icon animate-pulse-teal">
                                 <IconChat size={22} />
                             </div>
                         }
@@ -142,39 +80,11 @@ export default function ChatArea({
                 ))}
 
                 {loading && (
-                    <div
-                        className="animate-fade-in"
-                        style={{
-                            display: "flex",
-                            alignItems: "flex-end",
-                            gap: "var(--space-2)",
-                        }}
-                    >
-                        <div
-                            style={{
-                                width: "26px",
-                                height: "26px",
-                                borderRadius: "var(--radius-full)",
-                                background: "var(--accent-teal-glow)",
-                                border: "1px solid rgba(20,184,166,.25)",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                color: "var(--accent-teal-light)",
-                                flexShrink: 0,
-                            }}
-                        >
+                    <div className="ai-chat__typing animate-fade-in">
+                        <div className="ai-chat__typing-avatar">
                             <IAIcon size={12} />
                         </div>
-                        <div
-                            style={{
-                                padding: "10px 14px",
-                                borderRadius:
-                                    "var(--radius-xl) var(--radius-xl) var(--radius-xl) var(--radius-sm)",
-                                background: "var(--bg-elevated)",
-                                border: "1px solid var(--border-subtle)",
-                            }}
-                        >
+                        <div className="ai-chat__typing-bubble">
                             <TypingDots />
                         </div>
                     </div>
